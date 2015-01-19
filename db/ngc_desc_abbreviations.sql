@@ -1,0 +1,63 @@
+DROP TABLE IF EXISTS ngc_desc_abbreviation;
+
+CREATE TABLE ngc_desc_abbreviation (
+	code varchar(10),
+	meaning varchar(100)
+) Engine=InnoDB;
+
+INSERT INTO ngc_desc_abbreviation (code, meaning) values ('!', 'remarkable object');
+INSERT INTO ngc_desc_abbreviation (code, meaning) values ('!!', 'very remarkable object');
+INSERT INTO ngc_desc_abbreviation (code, meaning) values ('am', 'among');
+INSERT INTO ngc_desc_abbreviation (code, meaning) values ('n', 'north');
+INSERT INTO ngc_desc_abbreviation (code, meaning) values ('att', 'attached');
+INSERT INTO ngc_desc_abbreviation (code, meaning) values ('N', 'nucleus');
+INSERT INTO ngc_desc_abbreviation (code, meaning) values ('bet', 'between');
+INSERT INTO ngc_desc_abbreviation (code, meaning) values ('neb', 'nebula, nebulosity');
+INSERT INTO ngc_desc_abbreviation (code, meaning) values ('B', 'bright');
+INSERT INTO ngc_desc_abbreviation (code, meaning) values ('P w', 'paired with');
+INSERT INTO ngc_desc_abbreviation (code, meaning) values ('b', 'brighter');
+INSERT INTO ngc_desc_abbreviation (code, meaning) values ('p', 'pretty (before F,B,L,S)');
+INSERT INTO ngc_desc_abbreviation (code, meaning) values ('C', 'compressed');
+INSERT INTO ngc_desc_abbreviation (code, meaning) values ('p', 'preceding');
+INSERT INTO ngc_desc_abbreviation (code, meaning) values ('c', 'considerably');
+INSERT INTO ngc_desc_abbreviation (code, meaning) values ('P', 'poor');
+INSERT INTO ngc_desc_abbreviation (code, meaning) values ('Cl', 'cluster');
+INSERT INTO ngc_desc_abbreviation (code, meaning) values ('R', 'round');
+INSERT INTO ngc_desc_abbreviation (code, meaning) values ('D', 'double');
+INSERT INTO ngc_desc_abbreviation (code, meaning) values ('Ri', 'rich');
+INSERT INTO ngc_desc_abbreviation (code, meaning) values ('def', 'defined');
+INSERT INTO ngc_desc_abbreviation (code, meaning) values ('r', 'not well resolved');
+INSERT INTO ngc_desc_abbreviation (code, meaning) values ('deg', 'degrees');
+INSERT INTO ngc_desc_abbreviation (code, meaning) values ('rr', 'partially resolved');
+INSERT INTO ngc_desc_abbreviation (code, meaning) values ('diam', 'diameter');
+INSERT INTO ngc_desc_abbreviation (code, meaning) values ('rrr', 'well resolved');
+INSERT INTO ngc_desc_abbreviation (code, meaning) values ('dif', 'diffuse');
+INSERT INTO ngc_desc_abbreviation (code, meaning) values ('S', 'small');
+INSERT INTO ngc_desc_abbreviation (code, meaning) values ('E', 'elongated');
+INSERT INTO ngc_desc_abbreviation (code, meaning) values ('s', 'suddenly');
+INSERT INTO ngc_desc_abbreviation (code, meaning) values ('e', 'extremely');
+INSERT INTO ngc_desc_abbreviation (code, meaning) values ('s', 'south');
+INSERT INTO ngc_desc_abbreviation (code, meaning) values ('er', 'easily resolved');
+INSERT INTO ngc_desc_abbreviation (code, meaning) values ('sc', 'scattered');
+INSERT INTO ngc_desc_abbreviation (code, meaning) values ('F', 'faint');
+INSERT INTO ngc_desc_abbreviation (code, meaning) values ('susp', 'suspected');
+INSERT INTO ngc_desc_abbreviation (code, meaning) values ('f', 'following');
+INSERT INTO ngc_desc_abbreviation (code, meaning) values ('st', 'star or stellar');
+INSERT INTO ngc_desc_abbreviation (code, meaning) values ('g', 'gradually');
+INSERT INTO ngc_desc_abbreviation (code, meaning) values ('v', 'very');
+INSERT INTO ngc_desc_abbreviation (code, meaning) values ('iF', 'irregular figure');
+INSERT INTO ngc_desc_abbreviation (code, meaning) values ('var', 'variable');
+INSERT INTO ngc_desc_abbreviation (code, meaning) values ('inv', 'involved');
+INSERT INTO ngc_desc_abbreviation (code, meaning) values ('nf', 'north following');
+INSERT INTO ngc_desc_abbreviation (code, meaning) values ('irr', 'irregular');
+INSERT INTO ngc_desc_abbreviation (code, meaning) values ('np', 'north preceding');
+INSERT INTO ngc_desc_abbreviation (code, meaning) values ('L', 'large');
+INSERT INTO ngc_desc_abbreviation (code, meaning) values ('sf', 'south following');
+INSERT INTO ngc_desc_abbreviation (code, meaning) values ('l', 'little');
+INSERT INTO ngc_desc_abbreviation (code, meaning) values ('sp', 'south preceding');
+INSERT INTO ngc_desc_abbreviation (code, meaning) values ('mag', 'magnitude');
+INSERT INTO ngc_desc_abbreviation (code, meaning) values ('11m', '11th magnitude');
+INSERT INTO ngc_desc_abbreviation (code, meaning) values ('M', 'middle');
+INSERT INTO ngc_desc_abbreviation (code, meaning) values ('8...', '8th mag and fainter');
+INSERT INTO ngc_desc_abbreviation (code, meaning) values ('m', 'much');
+INSERT INTO ngc_desc_abbreviation (code, meaning) values ('9...13', '9th to 13th magnitude');

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE module PUBLIC "-//Google Inc.//DTD Google Web Toolkit 1.6.2//EN"
+        "http://google-web-toolkit.googlecode.com/svn/tags/1.6.2/distro-source/core/src/gwt-module.dtd">
+<module rename-to='dso'>
+    <inherits name='com.google.gwt.user.User'/>
+    <inherits name='com.google.gwt.user.theme.dark.Dark'/>
+    <inherits name='com.google.gwt.visualization.Visualization'/>
+    <entry-point class='com.nzv.gwt.dsocatalog.client.DsoCatalogGWT'/>
+    
+    <!-- Specify the paths for translatable code                    -->
+    <source path='client' />
+    <source path='model'  />
+    <source path='date'  />
+    <source path='visualization'  />
+    
+    <!-- External resources -->
+    <inherits name='com.nzv.astro.meusEngine' />
+    
+</module>
