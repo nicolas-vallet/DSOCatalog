@@ -156,6 +156,21 @@
 	                <configuration />
 	            </plugin>
 	            <plugin>
+			        <groupId>com.ejwa</groupId>
+			        <artifactId>maven-gitdep-plugin</artifactId>
+			        <version>0.1</version>
+			        <configuration>
+			            <gitDependencies>
+			                <gitDependency>
+			                    <groupId>com.nzv.astro</groupId>
+			                    <artifactId>meeus-engine</artifactId>
+			                    <location>https://github.com/nicolas-vallet/EphemerisEngine</location>
+			                    <branch>master</branch>
+			                </gitDependency>
+			            </gitDependencies>
+			        </configuration>
+			    </plugin>
+	            <plugin>
 				    <groupId>org.apache.maven.plugins</groupId>
 				    <artifactId>maven-install-plugin</artifactId>
 				    <version>2.4</version>
