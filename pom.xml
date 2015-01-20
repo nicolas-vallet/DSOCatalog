@@ -126,8 +126,8 @@
 	<repositories>
 		<!-- Useful repository on github -->
 		<repository>
-			<id>my-extra-maven-repository</id>
-			<url>https://github.com/nicolas-vallet/maven-repo/</url>
+			<id>my-github-maven-repository</id>
+			<url>https://github.com/nicolas-vallet/maven-repo/raw/master/</url>
 		</repository>
     </repositories>
 
