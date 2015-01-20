@@ -1,4 +1,4 @@
-package com.nzv.gwt.dsocatalog;
+package com.nzv.gwt.dsocatalog.importer;
 
 import java.io.File;
 import java.io.FileNotFoundException;
