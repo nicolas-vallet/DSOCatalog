@@ -33,9 +33,9 @@
 		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
 		<property name="driverClassName" value="com.mysql.jdbc.Driver" />
 		<property name="url"
-			value="jdbc:mysql://localhost:3306/dso?tinyInt1isBit=false" />
-		<property name="username" value="root" />
-		<property name="password" value="password" />
+			value="jdbc:mysql://localhost:3306/dsocatalog?tinyInt1isBit=false" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
 	</bean>
 
 	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
