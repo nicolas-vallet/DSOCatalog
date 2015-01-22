@@ -1058,14 +1058,14 @@ public class DsoCatalogGWT implements EntryPoint {
 		
 		if (ao instanceof Star) {
 			Star o = (Star) ao;
+			objectDetailsTable.setText(row, 0, "NAME");
+			objectDetailsTable.setText(row++, 1, o.getName());
+			
 			objectDetailsTable.setText(row, 0, "HR NUMBER");
 			objectDetailsTable.setText(row++, 1, ""+o.getHrNumber());
 			
 			objectDetailsTable.setText(row, 0, "HD NUMBER");
 			objectDetailsTable.setText(row++, 1, ""+o.getHdNumber());
-			
-			objectDetailsTable.setText(row, 0, "NAME");
-			objectDetailsTable.setText(row++, 1, o.getName());
 			
 			objectDetailsTable.setText(row, 0, "SAO NUMBER");
 			objectDetailsTable.setText(row++, 1, ""+o.getSaoNumber());
