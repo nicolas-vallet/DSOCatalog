@@ -33,5 +33,7 @@ public interface PublicCatalogServiceAsync {
 	public void findStarByFk5Number(Integer fk5Number, AsyncCallback<Star> callback);
 	
 	public void findObjectByName(String name, AsyncCallback<DeepSkyObject> callback);
+	
+	public void findObjectById(Integer id, AsyncCallback<DeepSkyObject> callback);
 
 }

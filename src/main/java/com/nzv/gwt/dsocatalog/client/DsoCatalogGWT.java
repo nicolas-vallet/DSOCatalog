@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.google.gwt.core.client.EntryPoint;
+import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -19,8 +21,10 @@ import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.i18n.shared.DateTimeFormat;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.CheckBox;
+import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
@@ -36,12 +40,16 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.google.gwt.visualization.client.AbstractDataTable;
 import com.google.gwt.visualization.client.AbstractDataTable.ColumnType;
+import com.google.gwt.visualization.client.Selection;
 import com.google.gwt.visualization.client.VisualizationUtils;
+import com.google.gwt.visualization.client.events.SelectHandler;
+import com.google.gwt.visualization.client.events.SelectHandler.SelectEvent;
 import com.google.gwt.visualization.client.visualizations.corechart.AxisOptions;
 import com.google.gwt.visualization.client.visualizations.corechart.LineChart;
 import com.google.gwt.visualization.client.visualizations.corechart.Options;
 import com.google.gwt.visualization.client.visualizations.corechart.TextStyle;
 import com.nzv.astro.ephemeris.Sexagesimal;
+import com.nzv.astro.ephemeris.Sexagesimal.SexagesimalType;
 import com.nzv.astro.ephemeris.coordinate.GeographicCoordinates;
 import com.nzv.astro.ephemeris.coordinate.adapter.EquatorialCoordinatesAdapter;
 import com.nzv.astro.ephemeris.coordinate.impl.EquatorialCoordinates;
@@ -130,6 +138,7 @@ public class DsoCatalogGWT implements EntryPoint {
 	private static VerticalPanel observerPanel = new VerticalPanel();
 
 	private static Panel visualizationPanel = new SimplePanel();
+	private static FlexTable objectDetailsTable = new FlexTable();
 
 	private static PushButton btUpdateMap = new PushButton("Update map");
 	private static Label systemMessage = new Label("");
@@ -286,6 +295,9 @@ public class DsoCatalogGWT implements EntryPoint {
 		// We add the panel that will be used to display the chart.
 		rightPanel.add(visualizationPanel);
 		
+		// We add the table that will be used to display object details
+		rightPanel.add(objectDetailsTable);
+		
 		// We place the left and the right panels in the main one.
 		appPanel.addWest(leftPanel, 280);
 		appPanel.add(rightPanel);
@@ -314,6 +326,8 @@ public class DsoCatalogGWT implements EntryPoint {
 	}
 
 	private static void updateMap() {
+		// We remove every data in details table
+		objectDetailsTable.removeAllRows();
 		final CatalogSearchOptions searchOptions = createSearchOptions();
 		catalogService.findObjectBrighterThan(searchOptions, new AsyncCallback<Set<AstroObject>>() {
 
@@ -329,16 +343,30 @@ public class DsoCatalogGWT implements EntryPoint {
 
 							@Override
 							public void run() {
-								AbstractDataTable data = createDataTableOptimized(searchOptions);
+								final Map<ObjectReferenceAddressInTable, ObjectReference> displayedObjectReferences = 
+										new HashMap<DsoCatalogGWT.ObjectReferenceAddressInTable, DsoCatalogGWT.ObjectReference>();
+								AbstractDataTable data = createDataTableOptimized(searchOptions, displayedObjectReferences);
 								Options options = createLineChartOptions(searchOptions);
 								final LineChart chart = new LineChart(data, options);
+								chart.addSelectHandler(new SelectHandler() {
+									@Override
+									public void onSelect(SelectEvent event) {
+										JsArray<Selection> selections = chart.getSelections();
+										for (int i=0 ; i<selections.length() ; i++) {
+											Selection selection = selections.get(i);
+											fetchObjectDetails(displayedObjectReferences.get(
+															new ObjectReferenceAddressInTable(selection.getRow(), selection.getColumn())));
+										}
+									}
+								});
 								visualizationPanel.add(chart);
 							}
 
-							private MyDataTable createDataTableOptimized(CatalogSearchOptions searchOptions) {
+							private MyDataTable createDataTableOptimized(CatalogSearchOptions searchOptions,
+									Map<ObjectReferenceAddressInTable, ObjectReference> displayedObjectReferences) {
 								MyDataTable optimizedData = MyDataTable.create();
 								optimizedData = initializeDataTable(searchOptions, optimizedData, objects);
-								optimizedData = fillDataTableWithValues(searchOptions, optimizedData, objects);
+								optimizedData = fillDataTableWithValues(searchOptions, optimizedData, displayedObjectReferences, objects);
 								return optimizedData;
 							}
 						};
@@ -598,7 +626,8 @@ public class DsoCatalogGWT implements EntryPoint {
 		return optimizedData;
 	}
 	
-	private static MyDataTable fillDataTableWithValues(CatalogSearchOptions searchOptions, MyDataTable optimizedData, Set<AstroObject> objects) {
+	private static MyDataTable fillDataTableWithValues(CatalogSearchOptions searchOptions, MyDataTable optimizedData, 
+			Map<ObjectReferenceAddressInTable, ObjectReference> displayedObjectReferences, Set<AstroObject> objects) {
 		boolean showOneConstellation = searchOptions.getRestrictedToConstellationCode() != null && 
 				!searchOptions.getRestrictedToConstellationCode().isEmpty();
 		CoordinatesSystem cs = CoordinatesSystem.valueOf(liCoordinatesMode.getValue(liCoordinatesMode.getSelectedIndex()));
@@ -615,55 +644,46 @@ public class DsoCatalogGWT implements EntryPoint {
 			
 			optimizedData = fillRowWithNullValues(optimizedData, i);
 			optimizedData.setValue(i, 0, o.getXCoordinateForReferential(cs, observer));
+			int serieIndexToUse = 0;
+			String styleToUse = new String();
+			ObjectReference objectReference = null;
 			if (o instanceof Star) {
-				optimizedData.setValue(i, serieIndexes.getStarSerieIndex(), 
-						o.getYCoordinateForReferential(cs, observer));
-				optimizedData.setValue(i, serieIndexes.getStarSerieIndex()+1, STYLE_STARS);
-				optimizedData.setValue(i, serieIndexes.getStarSerieIndex()+2, generateTooltip(o, observer));
+				serieIndexToUse = serieIndexes.getStarSerieIndex();
+				styleToUse = STYLE_STARS;
+				objectReference = new ObjectReference(true, false, ((Star) o).getHrNumber());
 			} else if (o instanceof DeepSkyObject) {
 				DeepSkyObject dso = (DeepSkyObject) o;
 				if (dso.isAsterism()) {
-					optimizedData.setValue(i, serieIndexes.getAsterismSerieIndex(), 
-							dso.getYCoordinateForReferential(cs, observer));
-					optimizedData.setValue(i, serieIndexes.getAsterismSerieIndex()+1, STYLE_ASTERISMS);
-					optimizedData.setValue(i, serieIndexes.getAsterismSerieIndex()+2, generateTooltip(o, observer));
+					serieIndexToUse = serieIndexes.getAsterismSerieIndex();
+					styleToUse = STYLE_ASTERISMS;
 				} else if (dso.isGalaxy()) {
-					optimizedData.setValue(i, serieIndexes.getGalaxySerieIndex(), 
-							dso.getYCoordinateForReferential(cs, observer));
-					optimizedData.setValue(i, serieIndexes.getGalaxySerieIndex()+1, STYLE_GALAXIES);
-					optimizedData.setValue(i, serieIndexes.getGalaxySerieIndex()+2, generateTooltip(o, observer));
+					serieIndexToUse = serieIndexes.getGalaxySerieIndex();
+					styleToUse = STYLE_GALAXIES;
 				} else if (dso.isGlobularCluster()) {
-					optimizedData.setValue(i, serieIndexes.getGlobularClusterSerieIndex(), 
-							dso.getYCoordinateForReferential(cs, observer));
-					optimizedData.setValue(i, serieIndexes.getGlobularClusterSerieIndex()+1, STYLE_GLOBULAR_CLUSTERS);
-					optimizedData.setValue(i, serieIndexes.getGlobularClusterSerieIndex()+2, generateTooltip(o, observer));
+					serieIndexToUse = serieIndexes.getGlobularClusterSerieIndex();
+					styleToUse = STYLE_GLOBULAR_CLUSTERS;
 				} else if (dso.isOpenCluster()) {
-					optimizedData.setValue(i, serieIndexes.getOpenClusterSerieIndex(), 
-							dso.getYCoordinateForReferential(cs, observer));
-					optimizedData.setValue(i, serieIndexes.getOpenClusterSerieIndex()+1, STYLE_OPEN_CLUSTERS);
-					optimizedData.setValue(i, serieIndexes.getOpenClusterSerieIndex()+2, generateTooltip(o, observer));
+					serieIndexToUse = serieIndexes.getOpenClusterSerieIndex();
+					styleToUse = STYLE_OPEN_CLUSTERS;
 				} else if (dso.isPlanetaryNebula()) {
-					optimizedData.setValue(i, serieIndexes.getPlanetaryNebulaSerieIndex(), 
-							dso.getYCoordinateForReferential(cs, observer));
-					optimizedData.setValue(i, serieIndexes.getPlanetaryNebulaSerieIndex()+1, STYLE_PLANETARY_NEBULAS);
-					optimizedData.setValue(i, serieIndexes.getPlanetaryNebulaSerieIndex()+2, generateTooltip(o, observer));
+					serieIndexToUse = serieIndexes.getPlanetaryNebulaSerieIndex();
+					styleToUse = STYLE_PLANETARY_NEBULAS;
 				} else if (dso.isNebula()) {
-					optimizedData.setValue(i, serieIndexes.getNebulaSerieIndex(), 
-							dso.getYCoordinateForReferential(cs, observer));
-					optimizedData.setValue(i, serieIndexes.getNebulaSerieIndex()+1, STYLE_NEBULAS);
-					optimizedData.setValue(i, serieIndexes.getNebulaSerieIndex()+2, generateTooltip(o, observer));
+					serieIndexToUse = serieIndexes.getNebulaSerieIndex();
+					styleToUse = STYLE_NEBULAS;
 				} else if (dso.isSupernovaRemnant()) {
-					optimizedData.setValue(i, serieIndexes.getSnRemnantSerieIndex(), 
-							dso.getYCoordinateForReferential(cs, observer));
-					optimizedData.setValue(i, serieIndexes.getSnRemnantSerieIndex()+1, STYLE_SN_REMNANTS);
-					optimizedData.setValue(i, serieIndexes.getSnRemnantSerieIndex()+2, generateTooltip(o, observer));
+					serieIndexToUse = serieIndexes.getSnRemnantSerieIndex();
+					styleToUse = STYLE_SN_REMNANTS;
 				} else if (dso.isQuasar()) {
-					optimizedData.setValue(i, serieIndexes.getQuasarSerieIndex(), 
-							dso.getYCoordinateForReferential(cs, observer));
-					optimizedData.setValue(i, serieIndexes.getQuasarSerieIndex()+1, STYLE_QUASARS);
-					optimizedData.setValue(i, serieIndexes.getQuasarSerieIndex()+2, generateTooltip(o, observer));
+					serieIndexToUse = serieIndexes.getQuasarSerieIndex();
+					styleToUse = STYLE_QUASARS;
 				}
+				objectReference = new ObjectReference(false, true, dso.getId());
 			}
+			optimizedData.setValue(i, serieIndexToUse, o.getYCoordinateForReferential(cs, observer));
+			optimizedData.setValue(i, serieIndexToUse+1, styleToUse);
+			optimizedData.setValue(i, serieIndexToUse+2, generateTooltip(o, observer));
+			displayedObjectReferences.put(new ObjectReferenceAddressInTable(i, serieIndexToUse), objectReference);
 			i++;
 		}
 		
@@ -993,5 +1013,180 @@ public class DsoCatalogGWT implements EntryPoint {
 		txtObserverDate.setText(dtfDate.format(now));
 		txtObserverLocalTime.setText(dtfTime.format(now));
 		updateMap();
+	}
+	
+	private static void fetchObjectDetails(final ObjectReference objectReference) {
+		// TODO
+		if (objectReference.isStar) {
+			catalogService.findStarByHrNumber(objectReference.getId(), new AsyncCallback<Star>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					systemMessage.setText("Unable to fetch details about star ["+objectReference.getId()+"]");
+				}
+
+				@Override
+				public void onSuccess(Star result) {
+					displayObjectDetails(result);
+				}
+			});
+		} else if (objectReference.isDeepSkyObject) {
+			catalogService.findObjectById(objectReference.getId(), new AsyncCallback<DeepSkyObject>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					systemMessage.setText("Unable to fetch details about object ["+objectReference.getId()+"]");
+				}
+				
+				@Override
+				public void onSuccess(DeepSkyObject result) {
+					displayObjectDetails(result);
+				}
+			});
+		}
+		// Display object's details in the flextable objectDetailsTable
+	}
+	
+	private static void displayObjectDetails(AstroObject ao) {
+		objectDetailsTable.removeAllRows();
+		int row = 0;
+		Sexagesimal ra = new Sexagesimal(ao.getRightAscension() / 15);
+		objectDetailsTable.setText(row, 0, "RIGHT ASCENSION (J2000)");
+		objectDetailsTable.setText(row++, 1, ra.toString(SexagesimalType.HOURS));
+		
+		Sexagesimal dec = new Sexagesimal(ao.getDeclinaison());
+		objectDetailsTable.setText(row, 0, "DECLINAISON (J2000)");
+		objectDetailsTable.setText(row++, 1, dec.toString(SexagesimalType.DEGREES));
+		
+		if (ao instanceof Star) {
+			Star o = (Star) ao;
+			objectDetailsTable.setText(row, 0, "HR NUMBER");
+			objectDetailsTable.setText(row++, 1, ""+o.getHrNumber());
+			
+			objectDetailsTable.setText(row, 0, "HD NUMBER");
+			objectDetailsTable.setText(row++, 1, ""+o.getHdNumber());
+			
+			objectDetailsTable.setText(row, 0, "NAME");
+			objectDetailsTable.setText(row++, 1, o.getName());
+			
+			objectDetailsTable.setText(row, 0, "SAO NUMBER");
+			objectDetailsTable.setText(row++, 1, ""+o.getSaoNumber());
+			
+			objectDetailsTable.setText(row, 0, "MAGNITUDE");
+			objectDetailsTable.setText(row++, 1, ""+o.getVisualMagnitude());
+			
+			objectDetailsTable.setText(row, 0, "MAGNITUDE B-V");
+			objectDetailsTable.setText(row++, 1, ""+o.getBvMag()+(o.isUncertainBvMag() ? " (uncertain) " : ""));
+			
+			objectDetailsTable.setText(row, 0, "MAGNITUDE U-B");
+			objectDetailsTable.setText(row++, 1, ""+o.getUbMag()+(o.isUncertainUbMag() ? " (uncertain) " : ""));
+			
+			objectDetailsTable.setText(row, 0, "MAGNITUDE R-I");
+			objectDetailsTable.setText(row++, 1, ""+o.getRiMag());
+			
+			objectDetailsTable.setText(row, 0,  "SPECTRAL TYPE");
+			objectDetailsTable.setText(row++, 1, o.getSpectralType());
+			
+			objectDetailsTable.setText(row, 0, "IR SOURCE ?");
+			objectDetailsTable.setText(row++, 1, ""+o.isIrSource());
+			
+		} else if (ao instanceof DeepSkyObject) {
+			DeepSkyObject o = (DeepSkyObject) ao;
+			objectDetailsTable.setText(row, 0, "NAME");
+			objectDetailsTable.setText(row++, 1, o.getName());
+			
+			objectDetailsTable.setText(row, 0, "OTHER NAME");
+			objectDetailsTable.setText(row++, 1, o.getOtherName());
+			
+			objectDetailsTable.setText(row, 0, "OBJECT TYPE");
+			objectDetailsTable.setText(row++, 1, o.getObjectType());
+			
+			objectDetailsTable.setText(row, 0, "CONSTELLATION");
+			objectDetailsTable.setText(row++, 1, o.getConstellation().getName());
+			
+			objectDetailsTable.setText(row, 0, "MAGNITUDE");
+			objectDetailsTable.setText(row++, 1, ""+o.getMagnitude());
+			
+			objectDetailsTable.setText(row, 0, "SURFACE BRIGHTNESS");
+			objectDetailsTable.setText(row++, 1, ""+o.getSurfaceBrightness());
+			
+			objectDetailsTable.setText(row, 0, "SIZE");
+			objectDetailsTable.setText(row++, 1, ""+o.getSizeHumanReadable());
+			
+			objectDetailsTable.setText(row, 0, "IN BEST NGC CATALOG");
+			objectDetailsTable.setText(row++, 1, ""+o.isInBestNgcCatalog());
+			
+			objectDetailsTable.setText(row, 0, "IN CALDWELL CATALOG");
+			objectDetailsTable.setText(row++, 1, ""+o.isInCaldwellCalatalog());
+			
+			objectDetailsTable.setText(row, 0, "IN HERSCHEL CATALOG");
+			objectDetailsTable.setText(row++, 1, ""+o.isInHerschelCatalog());
+			
+			objectDetailsTable.setText(row, 0, "IN MESSIER CATALOG");
+			objectDetailsTable.setText(row++, 1, ""+o.isInMessierCatalog());
+		}
+	}
+	
+	private static class ObjectReference {
+		private boolean isStar = false;
+		private boolean isDeepSkyObject = false;
+		private Integer id = null;
+		
+		public ObjectReference(boolean isStar, boolean isDeepSkyObject, Integer id) {
+			super();
+			this.isStar = isStar;
+			this.isDeepSkyObject = isDeepSkyObject;
+			this.id = id;
+		}
+		
+		public boolean isStar() {
+			return isStar;
+		}
+		public boolean isDeepSkyObject() {
+			return isDeepSkyObject;
+		}
+		public Integer getId() {
+			return id;
+		}
+
+		@Override
+		public String toString() {
+			return "DisplayedObjectReference [isStar=" + isStar + ", isDeepSkyObject="
+					+ isDeepSkyObject + ", id=" + id + "]";
+		}
+	}
+	
+	private static class ObjectReferenceAddressInTable {
+		private int row;
+		private int column;
+		
+		public ObjectReferenceAddressInTable(int row, int column) {
+			super();
+			this.row = row;
+			this.column = column;
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + column;
+			result = prime * result + row;
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			ObjectReferenceAddressInTable other = (ObjectReferenceAddressInTable) obj;
+			if (column != other.column)
+				return false;
+			if (row != other.row)
+				return false;
+			return true;
+		}
 	}
 }

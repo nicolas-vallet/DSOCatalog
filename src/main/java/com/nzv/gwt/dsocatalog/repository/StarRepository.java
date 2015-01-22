@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import com.nzv.gwt.dsocatalog.model.Star;
 
 @Repository
-public interface StarRepository extends JpaRepository<Star, Long> {
+public interface StarRepository extends JpaRepository<Star, Integer> {
 
 	public Star findByName(String name);
 

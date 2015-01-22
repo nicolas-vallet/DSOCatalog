@@ -191,4 +191,9 @@ public class PublicCatalogServiceImpl implements PublicCatalogService {
 		return dsoRepository.findByName(name);
 	}
 
+	@Override
+	@Transactional(readOnly = true)
+	public DeepSkyObject findObjectById(Integer id) {
+		return dsoRepository.findOne(id);
+	}
 }

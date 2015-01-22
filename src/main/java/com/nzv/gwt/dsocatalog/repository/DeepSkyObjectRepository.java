@@ -11,7 +11,7 @@ import com.nzv.gwt.dsocatalog.model.DeepSkyObject;
 import com.nzv.gwt.dsocatalog.model.DsoType;
 
 @Repository
-public interface DeepSkyObjectRepository extends JpaRepository<DeepSkyObject, Long> {
+public interface DeepSkyObjectRepository extends JpaRepository<DeepSkyObject, Integer> {
 
 	List<DeepSkyObject> findDistinctByConstellationAndMagnitudeLessThanEqualAndTypeInOrderByMagnitudeAsc(
 			Constellation constellation, Double limitMagnitude, Collection<DsoType> types);

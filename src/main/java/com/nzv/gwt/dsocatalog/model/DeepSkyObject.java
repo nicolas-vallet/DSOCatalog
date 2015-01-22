@@ -255,6 +255,23 @@ public class DeepSkyObject extends AstroObject implements Serializable {
 	public void setMinSizeUnit(SizeUnit minSizeUnit) {
 		this.minSizeUnit = minSizeUnit;
 	}
+	
+	public String getSizeHumanReadable() {
+		StringBuffer sb = new StringBuffer();
+		if (minSize != null && maxSize != null) {
+			sb.append(""+maxSize+maxSizeUnit);
+			sb.append(" x ");
+			sb.append(""+minSize+minSizeUnit);
+		} else {
+			if (maxSize != null) {
+				sb.append(""+maxSize+maxSizeUnit);
+			}
+			if (minSize != null) {
+				sb.append(""+minSize+minSizeUnit);
+			}
+		}
+		return sb.toString();
+	}
 
 	public Double getPositionAngle() {
 		return positionAngle;

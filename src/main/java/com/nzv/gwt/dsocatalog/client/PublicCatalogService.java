@@ -32,5 +32,7 @@ public interface PublicCatalogService extends RemoteService {
 	public Star findStarByFk5Number(Integer fk5Number);
 
 	public DeepSkyObject findObjectByName(String name);
+	
+	public DeepSkyObject findObjectById(Integer id);
 
 }
