@@ -1,5 +1,9 @@
 package com.nzv.gwt.dsocatalog.model;
 
+import static java.lang.Math.cos;
+import static java.lang.Math.sin;
+import static java.lang.Math.toRadians;
+
 import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
@@ -12,24 +16,16 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
 import com.nzv.astro.ephemeris.coordinate.impl.EquatorialCoordinates;
 
-import static java.lang.Math.cos;
-import static java.lang.Math.sin;
-import static java.lang.Math.toRadians;
-
 @SuppressWarnings("serial")
 @Entity
 @Table(name = "constellation")
 public class Constellation implements Serializable {
-
-	@Transient
-	public static final int NB_CONSTELLATION = 88;
 
 	@Id
 	private String code;

@@ -337,8 +337,8 @@ public class DsoCatalogGWT implements EntryPoint {
 
 					@Override
 					public void onSuccess(final Set<AstroObject> objects) {
-						systemMessage.setText("Displaying " + objects.size()
-								+ " object(s)...");
+//						systemMessage.setText("Displaying " + objects.size() + " object(s)...");
+						systemMessage.setText("Rendering map...");
 						visualizationPanel.clear();
 
 						// Initialize the visualization...
@@ -369,6 +369,7 @@ public class DsoCatalogGWT implements EntryPoint {
 										}
 									}
 								});
+								systemMessage.setText(displayedObjectReferences.keySet().size() + " object(s) displayed.");
 								visualizationPanel.add(chart);
 							}
 
@@ -602,9 +603,7 @@ public class DsoCatalogGWT implements EntryPoint {
 			codeOfConstellationsToDisplay.addAll(constellationsList.keySet());
 		}
 		if (searchOptions.isDisplayConstellationBoundaries()) {
-			for (String constellationCode : codeOfConstellationsToDisplay) {
-				optimizedData.addColumn(ColumnType.NUMBER, "Limites constellation "+constellationCode);
-			}
+			optimizedData.addColumn(ColumnType.NUMBER, "Limites constellation");
 		}
 		if (searchOptions.isDisplayConstellationShape()) {
 			optimizedData.addColumn(ColumnType.NUMBER, "Forme constellation");
@@ -613,10 +612,10 @@ public class DsoCatalogGWT implements EntryPoint {
 		optimizedData.addRows(objects.size());
 		if (searchOptions.isDisplayConstellationBoundaries()) {
 			if (showOneConstellation) {
-				optimizedData.addRows(constellationsList.get(searchOptions.getRestrictedToConstellationCode()).getBoundaryPoints().size()+1);
+				optimizedData.addRows(constellationsList.get(searchOptions.getRestrictedToConstellationCode()).getBoundaryPoints().size()+2);
 			} else {
 				for (Constellation constellation : constellationsList.values()) {
-					optimizedData.addRows(constellation.getBoundaryPoints().size()+1);
+					optimizedData.addRows(constellation.getBoundaryPoints().size()+2);
 				}
 			}
 		}
@@ -701,68 +700,75 @@ public class DsoCatalogGWT implements EntryPoint {
 				constellationsToDisplay.addAll(constellationsList.values());
 			}
 		}
+		// Constellation(s) boundaries...
 		if (searchOptions.isDisplayConstellationBoundaries()) {
-			int constellationIndex = 0;
 			for (Constellation constellation : constellationsToDisplay) {
-				// Constellation(s) boundaries...
+				double X;
+				double Y;
 				for (ConstellationBoundaryPoint p : constellation.getBoundaryPoints()) {
 					EquatorialCoordinatesAdapter eca = new EquatorialCoordinatesAdapter(
 							new EquatorialCoordinates(p.getRightAscensionAsDecimalDegrees(), p.getDeclinaisonAsDecimalDegrees()));
 					switch(cs) {
 					case ALTAZ:
-						optimizedData.setValue(i, 0, eca.getAzimuth(
-								new GeographicCoordinates(observer.getLatitude(), observer.getLongitude()), observer.getGreenwichSiderealTime()));
-						optimizedData.setValue(i, serieIndexes.getFirstConstellationBoundarySerieIndex()+constellationIndex, eca.getElevation(
-								new GeographicCoordinates(observer.getLatitude(), observer.getLongitude()), observer.getGreenwichSiderealTime()));
+						GeographicCoordinates observatory = new GeographicCoordinates(observer.getLatitude(), observer.getLongitude());
+						X = eca.getAzimuth(observatory, observer.getGreenwichSiderealTime());
+						Y = eca.getElevation(observatory, observer.getGreenwichSiderealTime());
 						break;
 					case ECL:
-						optimizedData.setValue(i, 0, eca.getEcliptiqueLongitude());
-						optimizedData.setValue(i, serieIndexes.getFirstConstellationBoundarySerieIndex()+constellationIndex, eca.getEcliptiqueLatitude());
+						X = eca.getEcliptiqueLongitude();
+						Y = eca.getEcliptiqueLatitude();
 						break;
 					case GAL:
-						optimizedData.setValue(i, 0, eca.getGalacticLongitude());
-						optimizedData.setValue(i, serieIndexes.getFirstConstellationBoundarySerieIndex()+constellationIndex, eca.getGalacticLatitude());
+						X = eca.getGalacticLongitude();
+						Y = eca.getGalacticLatitude();
 						break;
 					case EQ:
 					default:
-						optimizedData.setValue(i, 0, p.getRightAscensionAsDecimalDegrees());
-						optimizedData.setValue(i, serieIndexes.getFirstConstellationBoundarySerieIndex()+constellationIndex, p.getDeclinaisonAsDecimalDegrees());
+						X = p.getRightAscensionAsDecimalDegrees();
+						Y = p.getDeclinaisonAsDecimalDegrees();
 						break;
 					}
+					optimizedData.setValue(i, 0, X);
+					optimizedData.setValue(i, serieIndexes.getConstellationBoundarySerieIndex(), Y);
 					i++;
 				}
-				// We add a last point to close the boundary of the constellation...
+				// We put the first point again to close the boundary of the constellation...
 				ConstellationBoundaryPoint lastPoint = constellation.getBoundaryPoints().get(0);
 				EquatorialCoordinatesAdapter eca = new EquatorialCoordinatesAdapter(
 						new EquatorialCoordinates(lastPoint.getRightAscensionAsDecimalDegrees(), lastPoint.getDeclinaisonAsDecimalDegrees()));
 				switch(cs) {
 				case ALTAZ:
-					optimizedData.setValue(i, 0, eca.getAzimuth(
-							new GeographicCoordinates(observer.getLatitude(), observer.getLongitude()), observer.getGreenwichSiderealTime()));
-					optimizedData.setValue(i, serieIndexes.getFirstConstellationBoundarySerieIndex()+constellationIndex, eca.getElevation(
-							new GeographicCoordinates(observer.getLatitude(), observer.getLongitude()), observer.getGreenwichSiderealTime()));
+					GeographicCoordinates observatory = new GeographicCoordinates(observer.getLatitude(), observer.getLongitude());
+					X = eca.getAzimuth(observatory, observer.getGreenwichSiderealTime());
+					Y = eca.getElevation(observatory, observer.getGreenwichSiderealTime());
 					break;
 				case ECL:
-					optimizedData.setValue(i, 0, eca.getEcliptiqueLongitude());
-					optimizedData.setValue(i, serieIndexes.getFirstConstellationBoundarySerieIndex()+constellationIndex, eca.getEcliptiqueLatitude());
+					X = eca.getEcliptiqueLongitude();
+					Y = eca.getEcliptiqueLatitude();
 					break;
 				case GAL:
-					optimizedData.setValue(i, 0, eca.getGalacticLongitude());
-					optimizedData.setValue(i, serieIndexes.getFirstConstellationBoundarySerieIndex()+constellationIndex, eca.getGalacticLatitude());
+					X = eca.getGalacticLongitude();
+					Y = eca.getGalacticLatitude();
 					break;
 				case EQ:
 				default:
-					optimizedData.setValue(i, 0, lastPoint.getRightAscensionAsDecimalDegrees());
-					optimizedData.setValue(i, serieIndexes.getFirstConstellationBoundarySerieIndex()+constellationIndex, lastPoint.getDeclinaisonAsDecimalDegrees());
+					X = lastPoint.getRightAscensionAsDecimalDegrees();
+					Y = lastPoint.getDeclinaisonAsDecimalDegrees();
 					break;
 				}
+				optimizedData.setValue(i, 0, X);
+				optimizedData.setValue(i, serieIndexes.getConstellationBoundarySerieIndex(), Y);
 				i++;
-				constellationIndex++;
+				
+				// We finally put a null value as separator in the serie to avoid two constellations to have their boundaries linked together
+				optimizedData.setValue(i, 0, X);
+				optimizedData.setValueNull(i, serieIndexes.getConstellationBoundarySerieIndex());
+				i++;
 			}
 		}
 			
+		// Constellation shape lines...
 		if (searchOptions.isDisplayConstellationShape()) {
-			// Constellation shape lines...
 			for (Constellation constellation : constellationsToDisplay) {
 				for (ConstellationShapeLine l : constellation.getShapeLines()) {
 					// Start
@@ -807,11 +813,11 @@ public class DsoCatalogGWT implements EntryPoint {
 					
 					
 					optimizedData.setValue(i, 0, startX);
-					optimizedData.setValue(i, serieIndexes.getFirstConstellationShapeSerieIndex(), startY);
+					optimizedData.setValue(i, serieIndexes.getConstellationShapeSerieIndex(), startY);
 					optimizedData.setValue(i+1, 0, endX);
-					optimizedData.setValue(i+1, serieIndexes.getFirstConstellationShapeSerieIndex(), endY);
+					optimizedData.setValue(i+1, serieIndexes.getConstellationShapeSerieIndex(), endY);
 					optimizedData.setValue(i+2, 0, endX);
-					optimizedData.setValueNull(i+2, serieIndexes.getFirstConstellationShapeSerieIndex());
+					optimizedData.setValueNull(i+2, serieIndexes.getConstellationShapeSerieIndex());
 					
 					i += 3;
 				}
@@ -951,7 +957,7 @@ public class DsoCatalogGWT implements EntryPoint {
 		options.setVAxisOptions(vAxisOptions);
 		options.setLegendTextStyle(textStyle);
 		
-		// Trying to fine tune the series representation options...
+		// Trying to fine-tune the series representation options...
 		options = createSeriesOptions(options, searchOptions);
 		return options;
 	}
@@ -959,35 +965,21 @@ public class DsoCatalogGWT implements EntryPoint {
 	private static MyLineChartOptions createSeriesOptions(MyLineChartOptions options, CatalogSearchOptions searchOptions) {
 		DataSerieIndexes serieIndexes = new DataSerieIndexes(searchOptions);
 		int i=0;
-		for (i=0 ; i<serieIndexes.getSeriesCount() ; i++) {
+		for (i=0 ; i<serieIndexes.getObjectSeriesCount() ; i++) {
 			MySeries s = MySeries.create();
 			s.setLineWidth(0);
 			s.setVisibleInLegend(false);
 			options.setSeries(i, s);
 		}
 		if (searchOptions.isDisplayConstellationBoundaries()) {
-			if (searchOptions.getRestrictedToConstellationCode() != null && 
-					!searchOptions.getRestrictedToConstellationCode().isEmpty()) {
-				MySeries s = MySeries.create();
-				s.setLineWidth(1);
-				s.setPointSize(0);
-				s.setLineDashStyle(new int[]{5, 1, 3});
-				s.setColor(STYLE_CONSTELLATION_BORDER_COLOR);
-				s.setVisibleInLegend(false);
-				options.setSeries(i, s);
-				i++;
-			} else {
-				for (int constellationIndex = 0 ; constellationIndex<constellationsList.size() ; constellationIndex++) {
-					MySeries s = MySeries.create();
-					s.setLineWidth(1);
-					s.setPointSize(0);
-					s.setLineDashStyle(new int[]{5, 1, 3});
-					s.setColor(STYLE_CONSTELLATION_BORDER_COLOR);
-					s.setVisibleInLegend(false);
-					options.setSeries(i, s);
-					i++;
-				}
-			}
+			MySeries s = MySeries.create();
+			s.setLineWidth(1);
+			s.setPointSize(0);
+			s.setLineDashStyle(new int[]{5, 1, 3});
+			s.setColor(STYLE_CONSTELLATION_BORDER_COLOR);
+			s.setVisibleInLegend(false);
+			options.setSeries(i, s);
+			i++;
 		}
 		if (searchOptions.isDisplayConstellationShape()) {
 			MySeries s = MySeries.create();
@@ -1034,7 +1026,6 @@ public class DsoCatalogGWT implements EntryPoint {
 				}
 			});
 		}
-		// Display object's details in the flextable objectDetailsTable
 	}
 	
 	private static void displayObjectDetails(AstroObject ao) {
