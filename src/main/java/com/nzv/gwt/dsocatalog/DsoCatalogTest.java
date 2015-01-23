@@ -1,13 +1,12 @@
 package com.nzv.gwt.dsocatalog;
 
-import java.util.List;
-
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import com.nzv.astro.ephemeris.coordinate.impl.EquatorialCoordinates;
+import com.nzv.astro.ephemeris.Sexagesimal;
+import com.nzv.astro.ephemeris.Sexagesimal.SexagesimalType;
 import com.nzv.gwt.dsocatalog.client.PublicCatalogService;
-import com.nzv.gwt.dsocatalog.model.Constellation;
+import com.nzv.gwt.dsocatalog.model.DeepSkyObject;
 
 public class DsoCatalogTest {
 
@@ -20,8 +19,13 @@ public class DsoCatalogTest {
 
 		PublicCatalogService catalogService = ctx
 				.getBean(PublicCatalogService.class);
-		for (Constellation constellation : catalogService.findAllConstellations()) {
-			System.out.println(constellation.getName()+"'s shape has "+constellation.getShapeLines().size()+" line(s)");
-		}
+		
+		DeepSkyObject dso = catalogService.findObjectById(4901);
+		System.out.println(dso);
+		
+//		double ra = dso.getRightAscension();
+		System.out.println(dso.getRightAscension());
+		Sexagesimal ra = new Sexagesimal(dso.getRightAscension() / 15);
+		System.out.println(ra.toString(SexagesimalType.HOURS));
 	}
 }
