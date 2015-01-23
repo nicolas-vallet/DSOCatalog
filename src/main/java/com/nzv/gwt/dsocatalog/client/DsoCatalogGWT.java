@@ -40,6 +40,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.google.gwt.visualization.client.AbstractDataTable;
 import com.google.gwt.visualization.client.AbstractDataTable.ColumnType;
+import com.google.gwt.visualization.client.ChartArea;
 import com.google.gwt.visualization.client.Selection;
 import com.google.gwt.visualization.client.VisualizationUtils;
 import com.google.gwt.visualization.client.events.SelectHandler;
@@ -88,6 +89,9 @@ public class DsoCatalogGWT implements EntryPoint {
 	public static String STYLE_NEBULAS = "point { shape-type: square; size: 6; fill-color: #f28787; stroke-color: #f42929; shape-rotation:45;}";
 	public static String STYLE_SN_REMNANTS = "point { shape-type: square; size: 5; fill-color: #110e3d; stroke-color: #f42929; stroke-width: 1; shape-rotation:45;}";
 	public static String STYLE_QUASARS = "point { shape-type: circle; size: 3; fill-color: #f42929;}";
+	public static int LEFT_PANEL_WIDTH = 280;
+	public static int RIGHT_PANEL_WIDTH = 280;
+	public static int PANEL_SPLITTER_WIDTH = 2; 
 	
 	private static VerticalPanel filterPanel = new VerticalPanel();
 	private static Label lbConstellation = new Label("Constellation : ");
@@ -145,8 +149,9 @@ public class DsoCatalogGWT implements EntryPoint {
 	
 	private static StackLayoutPanel configurationPanel = new StackLayoutPanel(Unit.PX);
 	private static VerticalPanel leftPanel = new VerticalPanel();
+	private static VerticalPanel centerPanel = new VerticalPanel();
 	private static VerticalPanel rightPanel = new VerticalPanel();
-	private final SplitLayoutPanel appPanel = new SplitLayoutPanel();
+	private final SplitLayoutPanel appPanel = new SplitLayoutPanel(PANEL_SPLITTER_WIDTH);
 
 	private static PublicCatalogServiceAsync catalogService = GWT
 			.create(PublicCatalogService.class);
@@ -156,68 +161,7 @@ public class DsoCatalogGWT implements EntryPoint {
 	@Override
 	public void onModuleLoad() {
 		// We set the size of the stack panel.
-		configurationPanel.setPixelSize(280, 600);
-		
-		//filterPanel.setSize("270px", "250px");
-		
-		// We put the constellation select list in the filter panel.
-		liConstellations.addChangeHandler(new UpdateMapEventHandler());
-		filterPanel.add(lbConstellation);
-		filterPanel.add(liConstellations);
-		chkDisplayConstellationShapes.addValueChangeHandler(new UpdateMapEventHandler());
-		filterPanel.add(chkDisplayConstellationShapes);
-		chkDisplayConstellationBoundaries.addValueChangeHandler(new UpdateMapEventHandler());
-		filterPanel.add(chkDisplayConstellationBoundaries);
-
-		// We put the star magnitude filter field
-		chkDisplayStars.setValue(true);
-		chkDisplayStars.addValueChangeHandler(new UpdateMapEventHandler());
-		filterPanel.add(chkDisplayStars);
-		filterPanel.add(lbStarLimitMagnitude);
-		txtBoxStarLimitMagnitude.setText("" + CatalogSearchOptions.DEFAULT_STAR_LIMIT_MAGNITUDE);
-		txtBoxStarLimitMagnitude.setWidth("100px");
-		filterPanel.add(txtBoxStarLimitMagnitude);
-		
-		// We set the DSO filter fields
-		chkDisplayAsterisms.setValue(true);
-		chkDisplayAsterisms.addValueChangeHandler(new UpdateMapEventHandler());
-		filterPanel.add(chkDisplayAsterisms);
-		
-		chkDisplayGalaxies.setValue(false);
-		chkDisplayGalaxies.addValueChangeHandler(new UpdateMapEventHandler());
-		filterPanel.add(chkDisplayGalaxies);
-		
-		chkDisplayGlobularClusters.setValue(false);
-		chkDisplayGlobularClusters.addValueChangeHandler(new UpdateMapEventHandler());
-		filterPanel.add(chkDisplayGlobularClusters);
-		
-		chkDisplayOpenClusters.setValue(false);
-		chkDisplayOpenClusters.addValueChangeHandler(new UpdateMapEventHandler());
-		filterPanel.add(chkDisplayOpenClusters);
-		
-		chkDisplayPlanetaryNebulas.setValue(false);
-		chkDisplayPlanetaryNebulas.addValueChangeHandler(new UpdateMapEventHandler());
-		filterPanel.add(chkDisplayPlanetaryNebulas);
-		
-		chkDisplayNebulas.setValue(false);
-		chkDisplayNebulas.addValueChangeHandler(new UpdateMapEventHandler());
-		filterPanel.add(chkDisplayNebulas);
-		
-		chkDisplaySupernovaRemnants.setValue(false);
-		chkDisplaySupernovaRemnants.addValueChangeHandler(new UpdateMapEventHandler());
-		filterPanel.add(chkDisplaySupernovaRemnants);
-		
-		chkDisplayQuasars.setValue(false);
-		chkDisplayQuasars.addValueChangeHandler(new UpdateMapEventHandler());
-		filterPanel.add(chkDisplayQuasars);
-		
-		filterPanel.add(lbDsoLimitMagnitude);
-		txtBoxDsoLimitMagnitude.setText("" + CatalogSearchOptions.DEFAULT_DSO_LIMIT_MAGNITUDE);
-		txtBoxDsoLimitMagnitude.setWidth("100px");
-		filterPanel.add(txtBoxDsoLimitMagnitude);
-
-		// We add the filter panel to configuration panel.
-		configurationPanel.add(filterPanel, new Label("Filtres"), 28);
+		configurationPanel.setPixelSize(LEFT_PANEL_WIDTH, 500);
 		
 		// We add the coordinates panel.
 		coordinatesPanel.setSize("270px", "30px");
@@ -283,6 +227,66 @@ public class DsoCatalogGWT implements EntryPoint {
 		// We add the observer panel to configuration panel.
 		configurationPanel.add(observerPanel, new Label("Observateur"), 28);
 		
+		// We put the constellation select list in the filter panel.
+		liConstellations.addChangeHandler(new UpdateMapEventHandler());
+		filterPanel.add(lbConstellation);
+		filterPanel.add(liConstellations);
+		chkDisplayConstellationShapes.addValueChangeHandler(new UpdateMapEventHandler());
+		filterPanel.add(chkDisplayConstellationShapes);
+		chkDisplayConstellationBoundaries.addValueChangeHandler(new UpdateMapEventHandler());
+		filterPanel.add(chkDisplayConstellationBoundaries);
+
+		// We put the star magnitude filter field
+		chkDisplayStars.setValue(true);
+		chkDisplayStars.addValueChangeHandler(new UpdateMapEventHandler());
+		filterPanel.add(chkDisplayStars);
+		filterPanel.add(lbStarLimitMagnitude);
+		txtBoxStarLimitMagnitude.setText("" + CatalogSearchOptions.DEFAULT_STAR_LIMIT_MAGNITUDE);
+		txtBoxStarLimitMagnitude.setWidth("100px");
+		filterPanel.add(txtBoxStarLimitMagnitude);
+		
+		// We set the DSO filter fields
+		chkDisplayAsterisms.setValue(true);
+		chkDisplayAsterisms.addValueChangeHandler(new UpdateMapEventHandler());
+		filterPanel.add(chkDisplayAsterisms);
+		
+		chkDisplayGalaxies.setValue(false);
+		chkDisplayGalaxies.addValueChangeHandler(new UpdateMapEventHandler());
+		filterPanel.add(chkDisplayGalaxies);
+		
+		chkDisplayGlobularClusters.setValue(false);
+		chkDisplayGlobularClusters.addValueChangeHandler(new UpdateMapEventHandler());
+		filterPanel.add(chkDisplayGlobularClusters);
+		
+		chkDisplayOpenClusters.setValue(false);
+		chkDisplayOpenClusters.addValueChangeHandler(new UpdateMapEventHandler());
+		filterPanel.add(chkDisplayOpenClusters);
+		
+		chkDisplayPlanetaryNebulas.setValue(false);
+		chkDisplayPlanetaryNebulas.addValueChangeHandler(new UpdateMapEventHandler());
+		filterPanel.add(chkDisplayPlanetaryNebulas);
+		
+		chkDisplayNebulas.setValue(false);
+		chkDisplayNebulas.addValueChangeHandler(new UpdateMapEventHandler());
+		filterPanel.add(chkDisplayNebulas);
+		
+		chkDisplaySupernovaRemnants.setValue(false);
+		chkDisplaySupernovaRemnants.addValueChangeHandler(new UpdateMapEventHandler());
+		filterPanel.add(chkDisplaySupernovaRemnants);
+		
+		chkDisplayQuasars.setValue(false);
+		chkDisplayQuasars.addValueChangeHandler(new UpdateMapEventHandler());
+		filterPanel.add(chkDisplayQuasars);
+		
+		filterPanel.add(lbDsoLimitMagnitude);
+		txtBoxDsoLimitMagnitude.setText("" + CatalogSearchOptions.DEFAULT_DSO_LIMIT_MAGNITUDE);
+		txtBoxDsoLimitMagnitude.setWidth("100px");
+		filterPanel.add(txtBoxDsoLimitMagnitude);
+
+		// We add the filter panel to configuration panel.
+		configurationPanel.add(filterPanel, new Label("Filtres"), 28);
+		configurationPanel.showWidget(filterPanel);
+		
 		leftPanel.add(configurationPanel);
 
 		// We set the button which will trigger the map's display.
@@ -290,18 +294,19 @@ public class DsoCatalogGWT implements EntryPoint {
 		leftPanel.add(btUpdateMap);
 		
 		// We put a label that will be used to give feedback to the user.
-		rightPanel.add(systemMessage);
+		centerPanel.add(systemMessage);
 		
 		// We add the panel that will be used to display the chart.
-		rightPanel.add(visualizationPanel);
+		centerPanel.add(visualizationPanel);
 		
 		// We add the table that will be used to display object details
 		rightPanel.add(objectDetailsTable);
 		
 		// We place the left and the right panels in the main one.
-		appPanel.addWest(leftPanel, 280);
-		appPanel.add(rightPanel);
-
+		appPanel.addWest(leftPanel, LEFT_PANEL_WIDTH);
+		appPanel.addEast(rightPanel, RIGHT_PANEL_WIDTH);
+		appPanel.add(centerPanel);
+		
 		// We load the list of constellation.
 		catalogService.findAllConstellations(new AsyncCallback<List<Constellation>>() {
 			@Override
@@ -882,8 +887,16 @@ public class DsoCatalogGWT implements EntryPoint {
 	private static Options createLineChartOptions(CatalogSearchOptions searchOptions) {
 		String coordinatesMode = liCoordinatesMode.getValue(liCoordinatesMode.getSelectedIndex());
 		MyLineChartOptions options = MyLineChartOptions.create();
-		options.setWidth(1000);
-		options.setHeight(600);
+		int chartWidth = Window.getClientWidth() - (2 * PANEL_SPLITTER_WIDTH) - LEFT_PANEL_WIDTH - RIGHT_PANEL_WIDTH;
+		int chartHeight = Window.getClientHeight() - 25;
+		options.setWidth(chartWidth);
+		options.setHeight(chartHeight);
+		ChartArea area = ChartArea.create();
+		area.setLeft(25);
+		area.setTop(25);
+		area.setWidth("92%");
+		area.setHeight("92%");
+		options.setChartArea(area);
 		options.setBackgroundColor(STYLE_CHART_BACKGROUND_COLOR);
 		AxisOptions hAxisOptions = AxisOptions.create();
 		AxisOptions vAxisOptions = AxisOptions.create();
@@ -1016,7 +1029,6 @@ public class DsoCatalogGWT implements EntryPoint {
 	}
 	
 	private static void fetchObjectDetails(final ObjectReference objectReference) {
-		// TODO
 		if (objectReference.isStar) {
 			catalogService.findStarByHrNumber(objectReference.getId(), new AsyncCallback<Star>() {
 				@Override
