@@ -61,6 +61,8 @@ import com.nzv.gwt.dsocatalog.model.ConstellationShapeLine;
 import com.nzv.gwt.dsocatalog.model.CoordinatesSystem;
 import com.nzv.gwt.dsocatalog.model.DeepSkyObject;
 import com.nzv.gwt.dsocatalog.model.Star;
+import com.nzv.gwt.dsocatalog.projection.MollweideProjection;
+import com.nzv.gwt.dsocatalog.projection.Point;
 import com.nzv.gwt.dsocatalog.visualization.MyDataTable;
 import com.nzv.gwt.dsocatalog.visualization.MyLineChartOptions;
 import com.nzv.gwt.dsocatalog.visualization.MySeries;
@@ -655,7 +657,7 @@ public class DsoCatalogGWT implements EntryPoint {
 			if (o instanceof Star) {
 				serieIndexToUse = serieIndexes.getStarSerieIndex();
 				
-				// We compute the size of point to use based on this star'magnitude...
+				// We compute the size of point to use given star magnitude...
 				double mag = o.getVisualMagnitude();
 				double tmp = 10 / Math.exp(0.15 * mag);
 				int sizePoint = ((int)(Math.ceil(tmp))) * STYLE_STARS_SIZE_MAX_POINT / 12;
@@ -690,8 +692,16 @@ public class DsoCatalogGWT implements EntryPoint {
 				}
 				objectReference = new ObjectReference(false, true, dso.getId());
 			}
-			optimizedData.setValue(i, 0, o.getXCoordinateForReferential(cs, observer));
-			optimizedData.setValue(i, serieIndexToUse, o.getYCoordinateForReferential(cs, observer));
+			if (cs == CoordinatesSystem.GAL) {
+				MollweideProjection projection = new MollweideProjection();
+				EquatorialCoordinatesAdapter eca = new EquatorialCoordinatesAdapter(new EquatorialCoordinates(o.getRightAscension(), o.getDeclinaison()));
+				Point p = projection.project(Math.toRadians(eca.getGalacticLongitude()-180), Math.toRadians(eca.getGalacticLatitude()));
+				optimizedData.setValue(i, 0, Math.toDegrees(p.getX()));
+				optimizedData.setValue(i, serieIndexToUse, Math.toDegrees(p.getY()));
+			} else {
+				optimizedData.setValue(i, 0, o.getXCoordinateForReferential(cs, observer));
+				optimizedData.setValue(i, serieIndexToUse, o.getYCoordinateForReferential(cs, observer));
+			}
 			optimizedData.setValue(i, serieIndexToUse+1, styleToUse);
 			optimizedData.setValue(i, serieIndexToUse+2, generateTooltip(o, observer));
 			displayedObjectReferences.put(new ObjectReferenceAddressInTable(i, serieIndexToUse), objectReference);
@@ -727,6 +737,10 @@ public class DsoCatalogGWT implements EntryPoint {
 					case GAL:
 						X = eca.getGalacticLongitude();
 						Y = eca.getGalacticLatitude();
+						MollweideProjection projection = new MollweideProjection();
+						Point mp = projection.project(Math.toRadians(X-180), Math.toRadians(Y));
+						X = Math.toDegrees(mp.getX());
+						Y = Math.toDegrees(mp.getY());
 						break;
 					case EQ:
 					default:
@@ -755,6 +769,10 @@ public class DsoCatalogGWT implements EntryPoint {
 				case GAL:
 					X = eca.getGalacticLongitude();
 					Y = eca.getGalacticLatitude();
+					MollweideProjection projection = new MollweideProjection();
+					Point mp = projection.project(Math.toRadians(X-180), Math.toRadians(Y));
+					X = Math.toDegrees(mp.getX());
+					Y = Math.toDegrees(mp.getY());
 					break;
 				case EQ:
 				default:
@@ -803,10 +821,19 @@ public class DsoCatalogGWT implements EntryPoint {
 						endY = lineEnd.getEcliptiqueLatitude();
 						break;
 					case GAL:
+						MollweideProjection projection = new MollweideProjection();
+						
 						startX = lineStart.getGalacticLongitude();
 						startY = lineStart.getGalacticLatitude();
+						Point pStart = projection.project(Math.toRadians(startX-180), Math.toRadians(startY));
+						startX = Math.toDegrees(pStart.getX());
+						startY = Math.toDegrees(pStart.getY());
+
 						endX = lineEnd.getGalacticLongitude();
 						endY = lineEnd.getGalacticLatitude();
+						Point pEnd = projection.project(Math.toRadians(endX-180), Math.toRadians(endY));
+						endX = Math.toDegrees(pEnd.getX());
+						endY = Math.toDegrees(pEnd.getY());
 						break;
 					case EQ:
 					default:
@@ -925,8 +952,8 @@ public class DsoCatalogGWT implements EntryPoint {
 			hAxisOptions.setTitle("LONGITUDE ECLIPTIQUE");
 			vAxisOptions.setTitle("LATITUDE ECLIPTIQUE");
 		} else if ((""+CoordinatesSystem.GAL).equals(coordinatesMode)) {
-			hAxisOptions.setMinValue(0);
-			hAxisOptions.setMaxValue(360);
+			hAxisOptions.setMinValue(-180);
+			hAxisOptions.setMaxValue(180);
 			hAxisOptions.setTitle("LONGITUDE GALACTIQUE");
 			vAxisOptions.setTitle("LATITUDE GALACTIQUE");
 		} else if ((""+CoordinatesSystem.ALTAZ).equals(coordinatesMode)) {

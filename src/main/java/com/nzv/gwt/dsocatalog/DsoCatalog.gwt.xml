@@ -12,6 +12,7 @@
     <source path='model'  />
     <source path='date'  />
     <source path='visualization'  />
+    <source path='projection' />
     
     <!-- External resources -->
     <inherits name='com.nzv.astro.meusEngine' />
