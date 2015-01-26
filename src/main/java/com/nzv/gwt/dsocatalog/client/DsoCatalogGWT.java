@@ -35,6 +35,7 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.SplitLayoutPanel;
 import com.google.gwt.user.client.ui.StackLayoutPanel;
 import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.ValueBoxBase;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.datepicker.client.CalendarUtil;
@@ -104,6 +105,9 @@ public class DsoCatalogGWT implements EntryPoint {
 	private static Label lbStarLimitMagnitude = new Label(
 			"Vmag. max étoiles :");
 	private static TextBox txtBoxStarLimitMagnitude = new TextBox();
+	private static HorizontalPanel starLimitMagnitudeButtonsPanel = new HorizontalPanel();
+	private static PushButton btIncreaseStarLimitMagnitude = new PushButton("+");
+	private static PushButton btDecreaseStarLimitMagnitude = new PushButton("-");
 
 	private static CheckBox chkDisplayAsterisms = new CheckBox("Astérismes");
 	private static CheckBox chkDisplayGalaxies = new CheckBox("Galaxies");
@@ -116,6 +120,9 @@ public class DsoCatalogGWT implements EntryPoint {
 	
 	private static Label lbDsoLimitMagnitude = new Label(
 			"Vmag. max ciel profond :");
+	private static HorizontalPanel dsoLimitMagnitudeButtonsPanel = new HorizontalPanel();
+	private static PushButton btIncreaseDsoLimitMagnitude = new PushButton("+");
+	private static PushButton btDecreaseDsoLimitMagnitude = new PushButton("-");
 	private static TextBox txtBoxDsoLimitMagnitude = new TextBox();
 	
 	private static Label lbCoordinatesMode = new Label("Système de coordonnées");
@@ -242,6 +249,11 @@ public class DsoCatalogGWT implements EntryPoint {
 		chkDisplayStars.setValue(true);
 		chkDisplayStars.addValueChangeHandler(new UpdateMapEventHandler());
 		filterPanel.add(chkDisplayStars);
+		btIncreaseStarLimitMagnitude.addClickHandler(new ChangeLimitMagnitudeClickEventHandler(txtBoxStarLimitMagnitude, +1));
+		starLimitMagnitudeButtonsPanel.add(btIncreaseStarLimitMagnitude);
+		btDecreaseStarLimitMagnitude.addClickHandler(new ChangeLimitMagnitudeClickEventHandler(txtBoxStarLimitMagnitude, -1));
+		starLimitMagnitudeButtonsPanel.add(btDecreaseStarLimitMagnitude);
+		filterPanel.add(starLimitMagnitudeButtonsPanel);
 		filterPanel.add(lbStarLimitMagnitude);
 		txtBoxStarLimitMagnitude.setText("" + CatalogSearchOptions.DEFAULT_STAR_LIMIT_MAGNITUDE);
 		txtBoxStarLimitMagnitude.setWidth("100px");
@@ -281,6 +293,11 @@ public class DsoCatalogGWT implements EntryPoint {
 		filterPanel.add(chkDisplayQuasars);
 		
 		filterPanel.add(lbDsoLimitMagnitude);
+		btIncreaseDsoLimitMagnitude.addClickHandler(new ChangeLimitMagnitudeClickEventHandler(txtBoxDsoLimitMagnitude, +1));
+		dsoLimitMagnitudeButtonsPanel.add(btIncreaseDsoLimitMagnitude);
+		btDecreaseDsoLimitMagnitude.addClickHandler(new ChangeLimitMagnitudeClickEventHandler(txtBoxDsoLimitMagnitude, -1));
+		dsoLimitMagnitudeButtonsPanel.add(btDecreaseDsoLimitMagnitude);
+		filterPanel.add(dsoLimitMagnitudeButtonsPanel);
 		txtBoxDsoLimitMagnitude.setText("" + CatalogSearchOptions.DEFAULT_DSO_LIMIT_MAGNITUDE);
 		txtBoxDsoLimitMagnitude.setWidth("100px");
 		filterPanel.add(txtBoxDsoLimitMagnitude);
@@ -505,6 +522,25 @@ public class DsoCatalogGWT implements EntryPoint {
 		
 	}
 	
+	private static class ChangeLimitMagnitudeClickEventHandler implements ClickHandler {
+		
+		private ValueBoxBase<String> target;
+		private double variation;
+		
+		public ChangeLimitMagnitudeClickEventHandler(ValueBoxBase<String> target, double variation) {
+			this.target = target;
+			this.variation = variation;
+		}
+
+		@Override
+		public void onClick(ClickEvent event) {
+			double currentValue = Double.parseDouble(target.getText());
+			double newValue = currentValue + variation;
+			target.setText(""+newValue);
+			updateMap();
+		}
+	}
+	
 	private static class UpdateMapEventHandler implements ClickHandler, ValueChangeHandler<Boolean>, ChangeHandler, KeyUpHandler {
 		@Override
 		public void onClick(ClickEvent event) {
@@ -695,7 +731,7 @@ public class DsoCatalogGWT implements EntryPoint {
 			if (cs == CoordinatesSystem.GAL) {
 				MollweideProjection projection = new MollweideProjection();
 				EquatorialCoordinatesAdapter eca = new EquatorialCoordinatesAdapter(new EquatorialCoordinates(o.getRightAscension(), o.getDeclinaison()));
-				Point p = projection.project(Math.toRadians(eca.getGalacticLongitude()-180), Math.toRadians(eca.getGalacticLatitude()));
+				Point p = projection.project(Math.toRadians(eca.getGalacticLongitude()>=180?eca.getGalacticLongitude()-360:eca.getGalacticLongitude()), Math.toRadians(eca.getGalacticLatitude()));
 				optimizedData.setValue(i, 0, Math.toDegrees(p.getX()));
 				optimizedData.setValue(i, serieIndexToUse, Math.toDegrees(p.getY()));
 			} else {
@@ -738,7 +774,7 @@ public class DsoCatalogGWT implements EntryPoint {
 						X = eca.getGalacticLongitude();
 						Y = eca.getGalacticLatitude();
 						MollweideProjection projection = new MollweideProjection();
-						Point mp = projection.project(Math.toRadians(X-180), Math.toRadians(Y));
+						Point mp = projection.project(Math.toRadians(X>=180?X-360:X), Math.toRadians(Y));
 						X = Math.toDegrees(mp.getX());
 						Y = Math.toDegrees(mp.getY());
 						break;
@@ -770,7 +806,7 @@ public class DsoCatalogGWT implements EntryPoint {
 					X = eca.getGalacticLongitude();
 					Y = eca.getGalacticLatitude();
 					MollweideProjection projection = new MollweideProjection();
-					Point mp = projection.project(Math.toRadians(X-180), Math.toRadians(Y));
+					Point mp = projection.project(Math.toRadians(X>=180?X-360:X), Math.toRadians(Y));
 					X = Math.toDegrees(mp.getX());
 					Y = Math.toDegrees(mp.getY());
 					break;
@@ -825,13 +861,13 @@ public class DsoCatalogGWT implements EntryPoint {
 						
 						startX = lineStart.getGalacticLongitude();
 						startY = lineStart.getGalacticLatitude();
-						Point pStart = projection.project(Math.toRadians(startX-180), Math.toRadians(startY));
+						Point pStart = projection.project(Math.toRadians(startX>=180?startX-360:startX), Math.toRadians(startY));
 						startX = Math.toDegrees(pStart.getX());
 						startY = Math.toDegrees(pStart.getY());
 
 						endX = lineEnd.getGalacticLongitude();
 						endY = lineEnd.getGalacticLatitude();
-						Point pEnd = projection.project(Math.toRadians(endX-180), Math.toRadians(endY));
+						Point pEnd = projection.project(Math.toRadians(endX>=180?endX-360:endX), Math.toRadians(endY));
 						endX = Math.toDegrees(pEnd.getX());
 						endY = Math.toDegrees(pEnd.getY());
 						break;
