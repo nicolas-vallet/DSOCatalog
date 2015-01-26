@@ -79,7 +79,8 @@ public class DsoCatalogGWT implements EntryPoint {
 	public static String AXIS_TITLE_TEXT_STYLE = "color: #ffffff;";
 	public static String STYLE_CONSTELLATION_BORDER_COLOR = "#888888";
 	public static String STYLE_CONSTELLATION_SHAPE_COLOR = "#32baf0";
-	public static String STYLE_STARS = "point {shape-type: star;shape-dent: 0.2; size: 5; fill-color: #f29500;}";
+	public static String STYLE_STARS = "point {shape-type: star;shape-dent: 0.2; size: SIZE_STAR; fill-color: #f29500;}";
+	public static int STYLE_STARS_SIZE_MAX_POINT = 7;
 	public static String STYLE_ASTERISMS = "point { shape-type: polygon; size: 4; fill-color: #110e3d; stroke-color: #f29500; stroke-width: 1;}";
 	public static String STYLE_GALAXIES = "point { shape-type: circle; size: 4; fill-color: #110e3d; stroke-color: #f42929; stroke-width: 2;}";
 	public static String STYLE_GLOBULAR_CLUSTERS = "point {shape-type: circle; size: 4; fill-color: #9bf2bd; stroke-color: #000000; stroke-width: 1;}";
@@ -653,7 +654,12 @@ public class DsoCatalogGWT implements EntryPoint {
 			ObjectReference objectReference = null;
 			if (o instanceof Star) {
 				serieIndexToUse = serieIndexes.getStarSerieIndex();
-				styleToUse = STYLE_STARS;
+				
+				// We compute the size of point to use based on this star'magnitude...
+				double mag = o.getVisualMagnitude();
+				double tmp = 10 / Math.exp(0.15 * mag);
+				int sizePoint = ((int)(Math.ceil(tmp))) * STYLE_STARS_SIZE_MAX_POINT / 12;
+				styleToUse = STYLE_STARS.replaceAll("SIZE_STAR", ""+sizePoint);
 				objectReference = new ObjectReference(true, false, ((Star) o).getHrNumber());
 			} else if (o instanceof DeepSkyObject) {
 				DeepSkyObject dso = (DeepSkyObject) o;
