@@ -1,6 +1,6 @@
 package com.nzv.gwt.dsocatalog.projection;
 
-public class MollweideProjection {
+public class MollweideProjection implements Projection {
 
 	private static final int MAX_ITER = 10;
 	private static final double TOLERANCE = 1e-7;
@@ -17,7 +17,7 @@ public class MollweideProjection {
 		cp = p2 + Math.sin(p2);
 	}
 
-	public Point project(double longitudeInRadians, double latitudeInRadian) {
+	public Point2D project(double longitudeInRadians, double latitudeInRadian) {
 		double k, v;
 		int i;
 
@@ -33,7 +33,7 @@ public class MollweideProjection {
 		} else {
 			latitudeInRadian *= 0.5;
 		}
-		Point xy = new Point();
+		Point2D xy = new Point2D();
 		xy.setX(cx * longitudeInRadians * Math.cos(latitudeInRadian));
 		xy.setY(cy * Math.sin(latitudeInRadian));
 		return xy;
