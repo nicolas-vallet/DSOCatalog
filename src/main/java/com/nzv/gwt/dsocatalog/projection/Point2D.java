@@ -1,5 +1,8 @@
 package com.nzv.gwt.dsocatalog.projection;
 
+/**
+ * A simple point representing by Cartesian coordinates of type double.
+ */
 public class Point2D {
 
 	private double x;
