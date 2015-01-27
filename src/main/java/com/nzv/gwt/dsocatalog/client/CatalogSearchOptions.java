@@ -163,6 +163,10 @@ public class CatalogSearchOptions implements Serializable {
 	public void setFindQuasars(boolean findQuasars) {
 		this.findQuasars = findQuasars;
 	}
+	
+	public boolean isDisplayConstellationNames() {
+		return displayConstellationBoundaries || displayConstellationShape;
+	}
 
 	@Override
 	public String toString() {

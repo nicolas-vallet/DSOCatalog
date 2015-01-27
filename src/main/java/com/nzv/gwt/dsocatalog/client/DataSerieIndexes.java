@@ -11,6 +11,7 @@ public class DataSerieIndexes {
 	private int nebulaSerieIndex = 0;
 	private int snRemnantSerieIndex = 0;
 	private int quasarSerieIndex = 0;
+	private int constellationNameSerieIndex = 0;
 	private int constellationBoundarySerieIndex = 0;
 	private int constellationShapeSerieIndex = 0;
 	private int objectSeriesCount = 0;
@@ -63,12 +64,17 @@ public class DataSerieIndexes {
 			serieIndex += 2;
 			objectSeriesCount++;
 		}
-		if (searchOptions.isDisplayConstellationBoundaries()) {
-			constellationBoundarySerieIndex = ++serieIndex;
-		}
-		
-		if (searchOptions.isDisplayConstellationShape()) {
-			constellationShapeSerieIndex = ++serieIndex;
+		if (searchOptions.isDisplayConstellationBoundaries() || searchOptions.isDisplayConstellationShape()) {
+			// Constellation name display requires columns for RA center, DEC center, Style, Annotation (will contain the code), AnnotationText (will contain the name) 
+			constellationNameSerieIndex = ++serieIndex;
+			serieIndex += 3;
+			if (searchOptions.isDisplayConstellationBoundaries()) {
+				constellationBoundarySerieIndex = ++serieIndex;
+			}
+			
+			if (searchOptions.isDisplayConstellationShape()) {
+				constellationShapeSerieIndex = ++serieIndex;
+			}
 		}
 	}
 
@@ -108,6 +114,10 @@ public class DataSerieIndexes {
 		return quasarSerieIndex;
 	}
 
+	public int getConstellationNameSerieIndex() {
+		return constellationNameSerieIndex;
+	}
+
 	public int getConstellationBoundarySerieIndex() {
 		return constellationBoundarySerieIndex;
 	}
@@ -131,6 +141,7 @@ public class DataSerieIndexes {
 				+ ", nebulaSerieIndex=" + nebulaSerieIndex
 				+ ", snRemnantSerieIndex=" + snRemnantSerieIndex
 				+ ", quasarSerieIndex=" + quasarSerieIndex
+				+ ", constellationNameSerieIndex="+constellationNameSerieIndex
 				+ ", constellationBoundarySerieIndex="
 				+ constellationBoundarySerieIndex 
 				+ ", constellationShapeSerieIndex="

@@ -2,6 +2,7 @@ package com.nzv.gwt.dsocatalog.visualization;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.visualization.client.visualizations.corechart.Series;
+import com.google.gwt.visualization.client.visualizations.corechart.TextStyle;
 
 public class MySeries extends Series {
 	

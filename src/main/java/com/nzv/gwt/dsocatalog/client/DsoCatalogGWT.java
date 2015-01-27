@@ -12,7 +12,6 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.DecoratedStackPanel;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.google.gwt.visualization.client.AbstractDataTable;
@@ -57,6 +56,8 @@ public class DsoCatalogGWT implements EntryPoint {
 	/* Styles */
 	public static String STYLE_CHART_BACKGROUND_COLOR = "#132345";
 	public static String AXIS_TITLE_TEXT_STYLE = "color: #ffffff;";
+	public static String STYLE_CONSTELLATION_NAME = "point { size: 0; }";
+	public static String STYLE_CONSTELLATION_NAME_TEXT_COLOR = "#90AEF0";
 	public static String STYLE_CONSTELLATION_BORDER_COLOR = "#888888";
 	public static String STYLE_CONSTELLATION_SHAPE_COLOR = "#90AEF0";
 	public static String STYLE_STARS = "point {shape-type: star;shape-dent: 0.2; size: SIZE_STAR; fill-color: #f29500;}";
@@ -276,6 +277,12 @@ public class DsoCatalogGWT implements EntryPoint {
 			optimizedData.addStyleColumn(optimizedData);
 			optimizedData.addTooltipColumn(optimizedData);
 		}
+		if (searchOptions.isDisplayConstellationNames()) {
+			optimizedData.addColumn(ColumnType.NUMBER, "Constellation");
+			optimizedData.addStyleColumn(optimizedData);
+			optimizedData.addAnnotationColumn(optimizedData);
+			optimizedData.addAnnotationTextColumn(optimizedData);
+		}
 		
 		ArrayList<String> codeOfConstellationsToDisplay = new ArrayList<String>();
 		if (showOneConstellation) {
@@ -291,6 +298,9 @@ public class DsoCatalogGWT implements EntryPoint {
 		}
 		
 		optimizedData.addRows(objects.size());
+		if (searchOptions.isDisplayConstellationNames()) {
+			optimizedData.addRows(codeOfConstellationsToDisplay.size());
+		}
 		if (searchOptions.isDisplayConstellationBoundaries()) {
 			if (showOneConstellation) {
 				optimizedData.addRows(constellationsList.get(searchOptions.getRestrictedToConstellationCode()).getBoundaryPoints().size()+2);
@@ -407,11 +417,47 @@ public class DsoCatalogGWT implements EntryPoint {
 		}
 		
 		ArrayList<Constellation> constellationsToDisplay = new ArrayList<Constellation>();
-		if (searchOptions.isDisplayConstellationBoundaries() || searchOptions.isDisplayConstellationShape()) {
+		if (searchOptions.isDisplayConstellationNames()) {
 			if (showOneConstellation) {
 				constellationsToDisplay.add(constellationsList.get(appPanel.liConstellations.getValue(appPanel.liConstellations.getSelectedIndex())));
 			} else {
 				constellationsToDisplay.addAll(constellationsList.values());
+			}
+			
+			for (Constellation constellation : constellationsToDisplay) {
+				double X, Y;
+				EquatorialCoordinatesAdapter eca = new EquatorialCoordinatesAdapter(
+						new EquatorialCoordinates(constellation.getCenterRightAscension(), constellation.getCenterDeclinaison()));
+				switch (cs) {
+				case ALTAZ:
+					GeographicCoordinates observatory = new GeographicCoordinates(observer.getLatitude(), observer.getLongitude());
+					X = eca.getAzimuth(observatory, observer.getGreenwichSiderealTime());
+					Y = eca.getElevation(observatory, observer.getGreenwichSiderealTime());
+					break;
+				case ECL:
+					X = eca.getEcliptiqueLongitude();
+					Y = eca.getEcliptiqueLatitude();
+					break;
+				case GAL:
+					X = eca.getGalacticLongitude();
+					Y = eca.getGalacticLatitude();
+					MollweideProjection projection = new MollweideProjection();
+					Point2D mp = projection.project(Math.toRadians(X>=180?X-360:X), Math.toRadians(Y));
+					X = Math.toDegrees(mp.getX());
+					Y = Math.toDegrees(mp.getY());
+					break;
+				case EQ:
+				default:
+					X = constellation.getCenterRightAscension();
+					Y = constellation.getCenterDeclinaison();
+					break;
+				}
+				optimizedData.setValue(i, 0, X);
+				optimizedData.setValue(i, serieIndexes.getConstellationNameSerieIndex(), Y);
+				optimizedData.setValue(i, serieIndexes.getConstellationNameSerieIndex()+1, STYLE_CONSTELLATION_NAME);
+				optimizedData.setValue(i, serieIndexes.getConstellationNameSerieIndex()+2, constellation.getCode());
+				optimizedData.setValue(i, serieIndexes.getConstellationNameSerieIndex()+3, constellation.getName());
+				i++;
 			}
 		}
 		// Constellation(s) boundaries...
@@ -687,7 +733,11 @@ public class DsoCatalogGWT implements EntryPoint {
 		options.setHAxisOptions(hAxisOptions);
 		options.setVAxisOptions(vAxisOptions);
 		options.setLegendTextStyle(textStyle);
-		
+		if (searchOptions.isDisplayConstellationNames()) {
+			TextStyle annotationTextStyle = TextStyle.create();
+			annotationTextStyle.setColor(STYLE_CONSTELLATION_NAME_TEXT_COLOR);
+			options.setAnnotationTextStyle(annotationTextStyle);
+		}
 		// Trying to fine-tune the series representation options...
 		options = createSeriesOptions(options, searchOptions);
 		return options;
@@ -701,6 +751,12 @@ public class DsoCatalogGWT implements EntryPoint {
 			s.setLineWidth(0);
 			s.setVisibleInLegend(false);
 			options.setSeries(i, s);
+		}
+		if (searchOptions.isDisplayConstellationNames()) {
+			MySeries s = MySeries.create();
+			s.setVisibleInLegend(false);
+			options.setSeries(i, s);
+			i++;
 		}
 		if (searchOptions.isDisplayConstellationBoundaries()) {
 			MySeries s = MySeries.create();
@@ -770,8 +826,6 @@ public class DsoCatalogGWT implements EntryPoint {
 		
 		if (ao instanceof Star) {
 			Star o = (Star) ao;
-//			appPanel.objectDetailsTable.setText(row, 0, "NAME");
-//			appPanel.objectDetailsTable.setText(row++, 1, o.getName());
 			
 			appPanel.objectDetailsTable.setText(row, 0, "HR NUMBER");
 			appPanel.objectDetailsTable.setText(row++, 1, ""+o.getHrNumber());
@@ -802,8 +856,6 @@ public class DsoCatalogGWT implements EntryPoint {
 			
 		} else if (ao instanceof DeepSkyObject) {
 			DeepSkyObject o = (DeepSkyObject) ao;
-//			appPanel.objectDetailsTable.setText(row, 0, "NAME");
-//			appPanel.objectDetailsTable.setText(row++, 1, o.getName());
 			
 			appPanel.objectDetailsTable.setText(row, 0, "OTHER NAME");
 			appPanel.objectDetailsTable.setText(row++, 1, o.getOtherName());
@@ -834,7 +886,13 @@ public class DsoCatalogGWT implements EntryPoint {
 			
 			appPanel.objectDetailsTable.setText(row, 0, "IN MESSIER CATALOG");
 			appPanel.objectDetailsTable.setText(row++, 1, ""+o.isInMessierCatalog());
+			
+			appPanel.objectDetailsTable.setHTML(row, 0, "<a href='http://deepskypedia.com/w/index.php?search="+o.getName()+"' target='_blank'>[+]</a>");
+					appPanel.objectDetailsTable.getFlexCellFormatter().setColSpan(row, 0, 2);
+			row++;
+			
 		}
+		
 	}
 	
 }
