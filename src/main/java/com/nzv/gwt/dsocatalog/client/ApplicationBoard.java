@@ -259,6 +259,51 @@ public class ApplicationBoard extends SplitLayoutPanel {
 		
 		return appPanel;
 	}
+	
+	public CatalogSearchOptions getCatalogSearchOptions() {
+		CatalogSearchOptions options = new CatalogSearchOptions();
+		options.setRestrictedToConstellationCode(liConstellations.getValue(liConstellations.getSelectedIndex()));
+		options.setDisplayConstellationShape(chkDisplayConstellationShapes.getValue());
+		options.setDisplayConstellationBoundaries(chkDisplayConstellationBoundaries.getValue());
+		Double starLimitMagnitude = CatalogSearchOptions.DEFAULT_STAR_LIMIT_MAGNITUDE;
+		try {
+			starLimitMagnitude = Double.parseDouble(txtBoxStarLimitMagnitude
+					.getText());
+		} catch (NullPointerException ex) {
+			systemMessage.setText("Vous devez indiquer une magnitude limite");
+			txtBoxStarLimitMagnitude.setText("" + CatalogSearchOptions.DEFAULT_STAR_LIMIT_MAGNITUDE);
+		} catch (NumberFormatException ex) {
+			systemMessage
+					.setText("Veuillez vérifier la valeur de magnitude limite. Format : \"xx.yy\"");
+			txtBoxStarLimitMagnitude.setText("" + CatalogSearchOptions.DEFAULT_STAR_LIMIT_MAGNITUDE);
+		}
+		options.setStarLimitMagnitude(starLimitMagnitude);
+
+		Double dsoLimitMagnitude = CatalogSearchOptions.DEFAULT_DSO_LIMIT_MAGNITUDE;
+		try {
+			dsoLimitMagnitude = Double.parseDouble(txtBoxDsoLimitMagnitude
+					.getText());
+		} catch (NullPointerException ex) {
+			systemMessage.setText("Vous devez indiquer une magnitude limite");
+			txtBoxDsoLimitMagnitude.setText("" + CatalogSearchOptions.DEFAULT_DSO_LIMIT_MAGNITUDE);
+		} catch (NumberFormatException ex) {
+			systemMessage
+					.setText("Veuillez vérifier la valeur de magnitude limite. Format : \"xx.yy\"");
+			txtBoxDsoLimitMagnitude.setText("" + CatalogSearchOptions.DEFAULT_STAR_LIMIT_MAGNITUDE);
+		}
+		options.setDsoLimitMagnitude(dsoLimitMagnitude);
+		
+		options.setFindStars(chkDisplayStars.getValue());
+		options.setFindAsterisms(chkDisplayAsterisms.getValue());
+		options.setFindGalaxies(chkDisplayGalaxies.getValue());
+		options.setFindGlobularClusters(chkDisplayGlobularClusters.getValue());
+		options.setFindOpenClusters(chkDisplayOpenClusters.getValue());
+		options.setFindPlanetaryNebulas(chkDisplayPlanetaryNebulas.getValue());
+		options.setFindNebulas(chkDisplayNebulas.getValue());
+		options.setFindSupernovaRemnant(chkDisplaySupernovaRemnants.getValue());
+		options.setFindQuasars(chkDisplayQuasars.getValue());
+		return options;
+	}
 
 //	private void setObserverTimeFromComputerTime(ApplicationBoard application) {
 //		Date now = new Date();

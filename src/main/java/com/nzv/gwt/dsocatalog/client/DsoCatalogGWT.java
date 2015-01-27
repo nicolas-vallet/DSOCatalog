@@ -12,6 +12,7 @@ import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.DecoratedStackPanel;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.google.gwt.visualization.client.AbstractDataTable;
@@ -39,6 +40,7 @@ import com.nzv.gwt.dsocatalog.model.DeepSkyObject;
 import com.nzv.gwt.dsocatalog.model.Star;
 import com.nzv.gwt.dsocatalog.projection.MollweideProjection;
 import com.nzv.gwt.dsocatalog.projection.Point2D;
+import com.nzv.gwt.dsocatalog.projection.Projection;
 import com.nzv.gwt.dsocatalog.visualization.MyDataTable;
 import com.nzv.gwt.dsocatalog.visualization.MyLineChartOptions;
 import com.nzv.gwt.dsocatalog.visualization.MySeries;
@@ -53,19 +55,20 @@ public class DsoCatalogGWT implements EntryPoint {
 //	private static final DateTimeFormat dtfTime = DateTimeFormat.getFormat(TIME_FORMAT);
 	
 	/* Styles */
-	public static String STYLE_CHART_BACKGROUND_COLOR = "#110e3d";
+	public static String STYLE_CHART_BACKGROUND_COLOR = "#132345";
 	public static String AXIS_TITLE_TEXT_STYLE = "color: #ffffff;";
 	public static String STYLE_CONSTELLATION_BORDER_COLOR = "#888888";
-	public static String STYLE_CONSTELLATION_SHAPE_COLOR = "#32baf0";
+	public static String STYLE_CONSTELLATION_SHAPE_COLOR = "#90AEF0";
 	public static String STYLE_STARS = "point {shape-type: star;shape-dent: 0.2; size: SIZE_STAR; fill-color: #f29500;}";
-	public static int STYLE_STARS_SIZE_MAX_POINT = 7;
-	public static String STYLE_ASTERISMS = "point { shape-type: polygon; size: 4; fill-color: #110e3d; stroke-color: #f29500; stroke-width: 1;}";
-	public static String STYLE_GALAXIES = "point { shape-type: circle; size: 4; fill-color: #110e3d; stroke-color: #f42929; stroke-width: 2;}";
+	public static int STYLE_STARS_POINT_SIZE_MAX = 7;
+	public static String STYLE_ASTERISMS = "point { shape-type: polygon; size: 4; fill-color: #132345; stroke-color: #f29500; stroke-width: 1;}";
+	public static String STYLE_GALAXIES = "point { shape-type: circle; size: 4; fill-color: #132345; stroke-color: #f42929; stroke-width: 2;}";
+	public static int STYLE_GALAXIES_POINT_SIZE_MAX = 5;
 	public static String STYLE_GLOBULAR_CLUSTERS = "point {shape-type: circle; size: 4; fill-color: #9bf2bd; stroke-color: #000000; stroke-width: 1;}";
-	public static String STYLE_OPEN_CLUSTERS = "point { shape-type: circle; size: 4; fill-color: #110e3d; stroke-color: #04ea64; stroke-width: 1;}";
-	public static String STYLE_PLANETARY_NEBULAS = "point { shape-type: star; shape-sides: 4; shape-dent: 0.2; size: 6; fill-color: #0099c6;}";
+	public static String STYLE_OPEN_CLUSTERS = "point { shape-type: circle; size: 4; fill-color: #132345; stroke-color: #04ea64; stroke-width: 1;}";
+	public static String STYLE_PLANETARY_NEBULAS = "point { shape-type: star; shape-sides: 4; shape-dent: 0.2; size: 6; fill-color: #46EFF2;}";
 	public static String STYLE_NEBULAS = "point { shape-type: square; size: 6; fill-color: #f28787; stroke-color: #f42929; shape-rotation:45;}";
-	public static String STYLE_SN_REMNANTS = "point { shape-type: square; size: 5; fill-color: #110e3d; stroke-color: #f42929; stroke-width: 1; shape-rotation:45;}";
+	public static String STYLE_SN_REMNANTS = "point { shape-type: square; size: 5; fill-color: #132345; stroke-color: #f42929; stroke-width: 1; shape-rotation:45;}";
 	public static String STYLE_QUASARS = "point { shape-type: circle; size: 3; fill-color: #f42929;}";
 	
 
@@ -106,12 +109,11 @@ public class DsoCatalogGWT implements EntryPoint {
 	protected void updateMap() {
 		// We remove every data in details table
 		appPanel.objectDetailsTable.removeAllRows();
-		final CatalogSearchOptions searchOptions = createSearchOptions();
+		final CatalogSearchOptions searchOptions = appPanel.getCatalogSearchOptions();
 		catalogService.findObjectBrighterThan(searchOptions, new AsyncCallback<Set<AstroObject>>() {
 
 					@Override
 					public void onSuccess(final Set<AstroObject> objects) {
-//						systemMessage.setText("Displaying " + objects.size() + " object(s)...");
 						appPanel.systemMessage.setText("Rendering map...");
 						appPanel.visualizationPanel.clear();
 
@@ -203,51 +205,6 @@ public class DsoCatalogGWT implements EntryPoint {
 				jd, new Sexagesimal(H-Integer.valueOf(appPanel.txtGreenwichHourOffset.getText()), M, S));
 		observer.setGreenwichSiderealTime(gst);
 		return observer;
-	}
-	
-	private CatalogSearchOptions createSearchOptions() {
-		CatalogSearchOptions options = new CatalogSearchOptions();
-		options.setRestrictedToConstellationCode(appPanel.liConstellations.getValue(appPanel.liConstellations.getSelectedIndex()));
-		options.setDisplayConstellationShape(appPanel.chkDisplayConstellationShapes.getValue());
-		options.setDisplayConstellationBoundaries(appPanel.chkDisplayConstellationBoundaries.getValue());
-		Double starLimitMagnitude = CatalogSearchOptions.DEFAULT_STAR_LIMIT_MAGNITUDE;
-		try {
-			starLimitMagnitude = Double.parseDouble(appPanel.txtBoxStarLimitMagnitude
-					.getText());
-		} catch (NullPointerException ex) {
-			appPanel.systemMessage.setText("Vous devez indiquer une magnitude limite");
-			appPanel.txtBoxStarLimitMagnitude.setText("" + CatalogSearchOptions.DEFAULT_STAR_LIMIT_MAGNITUDE);
-		} catch (NumberFormatException ex) {
-			appPanel.systemMessage
-					.setText("Veuillez vérifier la valeur de magnitude limite. Format : \"xx.yy\"");
-			appPanel.txtBoxStarLimitMagnitude.setText("" + CatalogSearchOptions.DEFAULT_STAR_LIMIT_MAGNITUDE);
-		}
-		options.setStarLimitMagnitude(starLimitMagnitude);
-
-		Double dsoLimitMagnitude = CatalogSearchOptions.DEFAULT_DSO_LIMIT_MAGNITUDE;
-		try {
-			dsoLimitMagnitude = Double.parseDouble(appPanel.txtBoxDsoLimitMagnitude
-					.getText());
-		} catch (NullPointerException ex) {
-			appPanel.systemMessage.setText("Vous devez indiquer une magnitude limite");
-			appPanel.txtBoxDsoLimitMagnitude.setText("" + CatalogSearchOptions.DEFAULT_DSO_LIMIT_MAGNITUDE);
-		} catch (NumberFormatException ex) {
-			appPanel.systemMessage
-					.setText("Veuillez vérifier la valeur de magnitude limite. Format : \"xx.yy\"");
-			appPanel.txtBoxDsoLimitMagnitude.setText("" + CatalogSearchOptions.DEFAULT_STAR_LIMIT_MAGNITUDE);
-		}
-		options.setDsoLimitMagnitude(dsoLimitMagnitude);
-		
-		options.setFindStars(appPanel.chkDisplayStars.getValue());
-		options.setFindAsterisms(appPanel.chkDisplayAsterisms.getValue());
-		options.setFindGalaxies(appPanel.chkDisplayGalaxies.getValue());
-		options.setFindGlobularClusters(appPanel.chkDisplayGlobularClusters.getValue());
-		options.setFindOpenClusters(appPanel.chkDisplayOpenClusters.getValue());
-		options.setFindPlanetaryNebulas(appPanel.chkDisplayPlanetaryNebulas.getValue());
-		options.setFindNebulas(appPanel.chkDisplayNebulas.getValue());
-		options.setFindSupernovaRemnant(appPanel.chkDisplaySupernovaRemnants.getValue());
-		options.setFindQuasars(appPanel.chkDisplayQuasars.getValue());
-		return options;
 	}
 	
 	private static MyDataTable fillRowWithNullValues(MyDataTable data, int rowIndex) {
@@ -363,6 +320,22 @@ public class DsoCatalogGWT implements EntryPoint {
 		Observer observer = initializeObserver();
 		DataSerieIndexes serieIndexes = new DataSerieIndexes(searchOptions);
 		int i = 0;
+		
+//		double biggestAsterism = 0;
+//		double biggestGalaxy = 0;
+//		double biggestGlobularCluster = 0;
+//		double biggestOpenCluster = 0;
+//		double biggestPlanetarNebula = 0;
+//		double biggestNebula = 0;
+//		double biggestSnRemnant = 0;
+//		for (AstroObject o : objects) {
+//			if (o instanceof Star) continue;
+//			else {
+//				DeepSkyObject dso = (DeepSkyObject) o;
+//				if (dso.isAsterism() && dso.getM)
+//			}
+//		}
+		
 		for (AstroObject o : objects) {
 			// Should we show objects under horizon ?
 			if (cs == CoordinatesSystem.ALTAZ && !appPanel.chkShowObjectsUnderHorizon.getValue()) {
@@ -381,7 +354,7 @@ public class DsoCatalogGWT implements EntryPoint {
 				// We compute the size of point to use given star magnitude...
 				double mag = o.getVisualMagnitude();
 				double tmp = 10 / Math.exp(0.15 * mag);
-				int sizePoint = ((int)(Math.ceil(tmp))) * STYLE_STARS_SIZE_MAX_POINT / 12;
+				int sizePoint = ((int)(Math.ceil(tmp))) * STYLE_STARS_POINT_SIZE_MAX / 12;
 				styleToUse = STYLE_STARS.replaceAll("SIZE_STAR", ""+sizePoint);
 				objectReference = new ObjectReference(true, false, ((Star) o).getHrNumber());
 			} else if (o instanceof DeepSkyObject) {
@@ -414,12 +387,16 @@ public class DsoCatalogGWT implements EntryPoint {
 				objectReference = new ObjectReference(false, true, dso.getId());
 			}
 			if (cs == CoordinatesSystem.GAL) {
-				MollweideProjection projection = new MollweideProjection();
+				Projection projection = new MollweideProjection();
 				EquatorialCoordinatesAdapter eca = new EquatorialCoordinatesAdapter(new EquatorialCoordinates(o.getRightAscension(), o.getDeclinaison()));
 				Point2D p = projection.project(Math.toRadians(eca.getGalacticLongitude()>=180?eca.getGalacticLongitude()-360:eca.getGalacticLongitude()), Math.toRadians(eca.getGalacticLatitude()));
 				optimizedData.setValue(i, 0, Math.toDegrees(p.getX()));
 				optimizedData.setValue(i, serieIndexToUse, Math.toDegrees(p.getY()));
 			} else {
+//				projection = new MercatorProjection();
+//				Point2D p = projection.project(Math.toRadians(o.getXCoordinateForReferential(cs, observer)), Math.toRadians(o.getYCoordinateForReferential(cs, observer)));
+//				optimizedData.setValue(i, 0, Math.toDegrees(p.getX()));
+//				optimizedData.setValue(i, serieIndexToUse, Math.toDegrees(p.getY()));
 				optimizedData.setValue(i, 0, o.getXCoordinateForReferential(cs, observer));
 				optimizedData.setValue(i, serieIndexToUse, o.getYCoordinateForReferential(cs, observer));
 			}
@@ -778,6 +755,11 @@ public class DsoCatalogGWT implements EntryPoint {
 	private void displayObjectDetails(AstroObject ao) {
 		appPanel.objectDetailsTable.removeAllRows();
 		int row = 0;
+
+		appPanel.objectDetailsTable.setHTML(row, 0, "<b>"+ao.getIdentifier()+"</b>");
+		appPanel.objectDetailsTable.getFlexCellFormatter().setColSpan(row, 0, 2);
+		row++;
+		
 		Sexagesimal ra = new Sexagesimal(ao.getRightAscension() / 15);
 		appPanel.objectDetailsTable.setText(row, 0, "RIGHT ASCENSION (J2000)");
 		appPanel.objectDetailsTable.setText(row++, 1, ra.toString(SexagesimalType.HOURS));
@@ -788,8 +770,8 @@ public class DsoCatalogGWT implements EntryPoint {
 		
 		if (ao instanceof Star) {
 			Star o = (Star) ao;
-			appPanel.objectDetailsTable.setText(row, 0, "NAME");
-			appPanel.objectDetailsTable.setText(row++, 1, o.getName());
+//			appPanel.objectDetailsTable.setText(row, 0, "NAME");
+//			appPanel.objectDetailsTable.setText(row++, 1, o.getName());
 			
 			appPanel.objectDetailsTable.setText(row, 0, "HR NUMBER");
 			appPanel.objectDetailsTable.setText(row++, 1, ""+o.getHrNumber());
@@ -820,8 +802,8 @@ public class DsoCatalogGWT implements EntryPoint {
 			
 		} else if (ao instanceof DeepSkyObject) {
 			DeepSkyObject o = (DeepSkyObject) ao;
-			appPanel.objectDetailsTable.setText(row, 0, "NAME");
-			appPanel.objectDetailsTable.setText(row++, 1, o.getName());
+//			appPanel.objectDetailsTable.setText(row, 0, "NAME");
+//			appPanel.objectDetailsTable.setText(row++, 1, o.getName());
 			
 			appPanel.objectDetailsTable.setText(row, 0, "OTHER NAME");
 			appPanel.objectDetailsTable.setText(row++, 1, o.getOtherName());
