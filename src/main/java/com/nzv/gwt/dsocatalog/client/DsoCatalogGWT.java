@@ -30,6 +30,7 @@ import com.nzv.gwt.dsocatalog.model.ConstellationBoundaryPoint;
 import com.nzv.gwt.dsocatalog.model.ConstellationShapeLine;
 import com.nzv.gwt.dsocatalog.model.CoordinatesSystem;
 import com.nzv.gwt.dsocatalog.model.DeepSkyObject;
+import com.nzv.gwt.dsocatalog.model.Planet;
 import com.nzv.gwt.dsocatalog.model.Star;
 import com.nzv.gwt.dsocatalog.projection.MollweideProjection;
 import com.nzv.gwt.dsocatalog.projection.Point2D;
@@ -50,6 +51,7 @@ public class DsoCatalogGWT implements EntryPoint {
 	public static String STYLE_CONSTELLATION_NAME_TEXT_COLOR = "#90AEF0";
 	public static String STYLE_CONSTELLATION_BORDER_COLOR = "#888888";
 	public static String STYLE_CONSTELLATION_SHAPE_COLOR = "#90AEF0";
+	public static String STYLE_PLANETS = "point {shape-type: circle; size: 6; fill-color #F5F52A; }";
 	public static String STYLE_STARS = "point {shape-type: star;shape-dent: 0.2; size: SIZE_STAR; fill-color: #f29500;}";
 	public static int STYLE_STARS_POINT_SIZE_MAX = 7;
 	public static String STYLE_ASTERISMS = "point { shape-type: polygon; size: 4; fill-color: #132345; stroke-color: #f29500; stroke-width: 1;}";
@@ -219,7 +221,11 @@ public class DsoCatalogGWT implements EntryPoint {
 			int serieIndexToUse = 0;
 			String styleToUse = new String();
 			ObjectReference objectReference = null;
-			if (o instanceof Star) {
+			if (o instanceof Planet) {
+				serieIndexToUse = serieIndexes.getPlanetSerieIndex();
+				styleToUse = STYLE_PLANETS;
+				objectReference = new ObjectReference(true, false, false, ((Planet)o).getNumericIdentifier());
+			} else if (o instanceof Star) {
 				serieIndexToUse = serieIndexes.getStarSerieIndex();
 				
 				// We compute the size of point to use given star magnitude...
@@ -227,7 +233,7 @@ public class DsoCatalogGWT implements EntryPoint {
 				double tmp = 10 / Math.exp(0.15 * mag);
 				int sizePoint = ((int)(Math.ceil(tmp))) * STYLE_STARS_POINT_SIZE_MAX / 12;
 				styleToUse = STYLE_STARS.replaceAll("SIZE_STAR", ""+sizePoint);
-				objectReference = new ObjectReference(true, false, ((Star) o).getHrNumber());
+				objectReference = new ObjectReference(false, true, false, ((Star) o).getHrNumber());
 			} else if (o instanceof DeepSkyObject) {
 				DeepSkyObject dso = (DeepSkyObject) o;
 				if (dso.isAsterism()) {
@@ -255,7 +261,7 @@ public class DsoCatalogGWT implements EntryPoint {
 					serieIndexToUse = serieIndexes.getQuasarSerieIndex();
 					styleToUse = STYLE_QUASARS;
 				}
-				objectReference = new ObjectReference(false, true, dso.getId());
+				objectReference = new ObjectReference(false, false, true, dso.getId());
 			}
 			EquatorialCoordinatesAdapter eca = new EquatorialCoordinatesAdapter(new EquatorialCoordinates(o.getRightAscension(), o.getDeclinaison()));
 			Point2D p = new Point2D(0,0);

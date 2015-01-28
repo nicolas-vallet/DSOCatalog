@@ -2,6 +2,7 @@ package com.nzv.gwt.dsocatalog.client;
 
 
 public class DataSerieIndexes {
+	private int planetSerieIndex = 0;
 	private int starSerieIndex = 0;
 	private int asterismSerieIndex = 0;
 	private int galaxySerieIndex = 0;
@@ -19,6 +20,12 @@ public class DataSerieIndexes {
 	public DataSerieIndexes(CatalogSearchOptions searchOptions) {
 		int serieIndex = 0;
 
+		if (searchOptions.isDisplayPlanets()) {
+			planetSerieIndex = ++serieIndex;
+			serieIndex += 2;
+			objectSeriesCount++;
+		}
+		
 		if (searchOptions.isFindStars()) {
 			starSerieIndex = ++serieIndex;
 			serieIndex += 2;
@@ -78,6 +85,10 @@ public class DataSerieIndexes {
 			constellationShapeSerieIndex = ++serieIndex;
 		}
 	}
+	
+	public int getPlanetSerieIndex() {
+		return planetSerieIndex;
+	}
 
 	public int getStarSerieIndex() {
 		return starSerieIndex;
@@ -133,7 +144,8 @@ public class DataSerieIndexes {
 
 	@Override
 	public String toString() {
-		return "DataSerieIndexes [starSerieIndex=" + starSerieIndex
+		return "DataSerieIndexes [planetSerieIndex="+planetSerieIndex
+				+ ", starSerieIndex=" + starSerieIndex
 				+ ", asterismSerieIndex=" + asterismSerieIndex
 				+ ", galaxySerieIndex=" + galaxySerieIndex
 				+ ", globularClusterSerieIndex=" + globularClusterSerieIndex

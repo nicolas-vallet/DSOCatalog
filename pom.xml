@@ -21,6 +21,7 @@
 		<slf4j.version>1.6.1</slf4j.version>
 		<spring4gwt.version>0.0.1</spring4gwt.version>
 		<meeus-engine.version>1.0-SNAPSHOT</meeus-engine.version>
+		<planetary-ephemeris-engine.version>1.0-SNAPSHOT</planetary-ephemeris-engine.version>
 		<junit.version>4.12</junit.version>
 	</properties>
 
@@ -107,6 +108,11 @@
 			<groupId>com.nzv.astro</groupId>
 			<artifactId>meeus-engine</artifactId>
 			<version>${meeus-engine.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.nzv.astro</groupId>
+			<artifactId>planetary-ephemeris</artifactId>
+			<version>${planetary-ephemeris-engine.version}</version>
 		</dependency>
 		
 		<dependency>

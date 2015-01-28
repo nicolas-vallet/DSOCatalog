@@ -41,6 +41,7 @@ public class ApplicationBoard extends SplitLayoutPanel {
 	protected static final DateTimeFormat dtfTime = DateTimeFormat.getFormat(DsoCatalogGWT.TIME_FORMAT);
 
 	VerticalPanel filterPanel = new VerticalPanel();
+	CheckBox chkDisplayPlanets = new CheckBox("Afficher les planètes");
 	Label lbConstellation = new Label("Constellation : ");
 	ListBox liConstellations = new ListBox();
 	CheckBox chkDisplayConstellationNames = new CheckBox("Afficher les noms des constellations");
@@ -178,7 +179,11 @@ public class ApplicationBoard extends SplitLayoutPanel {
 		appPanel.observerPanel.add(appPanel.timeExplorerPanel);
 		
 		// We add the observer panel to configuration panel.
-		//appPanel.configurationPanel.add(appPanel.observerPanel, new Label("Observateur"), 28);
+		appPanel.configurationPanel.add(appPanel.observerPanel, new Label("Observateur"), 28);
+		
+		// We put the planet display checkbox in the filter panel.
+		appPanel.chkDisplayPlanets.addValueChangeHandler(new UpdateMapEventHandler(source));
+		appPanel.filterPanel.add(appPanel.chkDisplayPlanets);
 		
 		// We put the constellation select list in the filter panel.
 		appPanel.liConstellations.addChangeHandler(new UpdateMapEventHandler(source));
@@ -249,7 +254,6 @@ public class ApplicationBoard extends SplitLayoutPanel {
 		appPanel.dsoLimitMagnitudePanel.add(appPanel.btIncreaseDsoLimitMagnitude);
 		appPanel.dsoLimitMagnitudePanel.add(appPanel.btDecreaseDsoLimitMagnitude);
 		appPanel.filterPanel.add(appPanel.dsoLimitMagnitudePanel);
-//		appPanel.filterPanel.add(appPanel.txtBoxDsoLimitMagnitude);
 
 		// We add the filter panel to configuration panel.
 		appPanel.configurationPanel.add(appPanel.filterPanel, new Label("Filtres"), 28);
@@ -281,6 +285,7 @@ public class ApplicationBoard extends SplitLayoutPanel {
 	public CatalogSearchOptions getCatalogSearchOptions() {
 		CatalogSearchOptions options = new CatalogSearchOptions();
 		options.setRestrictedToConstellationCode(liConstellations.getValue(liConstellations.getSelectedIndex()));
+		options.setDisplayPlanets(chkDisplayPlanets.getValue());
 		options.setDisplayConstellationNames(chkDisplayConstellationNames.getValue());
 		options.setDisplayConstellationShape(chkDisplayConstellationShapes.getValue());
 		options.setDisplayConstellationBoundaries(chkDisplayConstellationBoundaries.getValue());
@@ -321,6 +326,8 @@ public class ApplicationBoard extends SplitLayoutPanel {
 		options.setFindNebulas(chkDisplayNebulas.getValue());
 		options.setFindSupernovaRemnant(chkDisplaySupernovaRemnants.getValue());
 		options.setFindQuasars(chkDisplayQuasars.getValue());
+		options.setObservatoryLatitude(Double.parseDouble(txtObserverLatitude.getText()));
+		options.setObservatoryLongitude(Double.parseDouble(txtObserverLongitude.getText()));
 		return options;
 	}
 

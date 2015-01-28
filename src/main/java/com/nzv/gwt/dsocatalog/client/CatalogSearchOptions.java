@@ -20,6 +20,7 @@ public class CatalogSearchOptions implements Serializable {
 		CatalogSearchOptions options = new CatalogSearchOptions();
 		options.setStarLimitMagnitude(DEFAULT_STAR_LIMIT_MAGNITUDE);
 		options.setDsoLimitMagnitude(DEFAULT_DSO_LIMIT_MAGNITUDE);
+		options.displayPlanets = false;
 		options.displayConstellationNames = false;
 		options.displayConstellationBoundaries = false;
 		options.displayConstellationShape = false;
@@ -35,6 +36,7 @@ public class CatalogSearchOptions implements Serializable {
 		return options;
 	}
 
+	private boolean displayPlanets = false;
 	private String restrictedToConstellationCode = null;
 	private boolean displayConstellationNames = false;
 	private boolean displayConstellationBoundaries = false;
@@ -51,6 +53,16 @@ public class CatalogSearchOptions implements Serializable {
 	private boolean findNebulas = false;
 	private boolean findSupernovaRemnant = false;
 	private boolean findQuasars = false;
+	private double observatoryLatitude = 0;
+	private double observatoryLongitude = 0;
+	
+	public boolean isDisplayPlanets() {
+		return displayPlanets;
+	}
+
+	public void setDisplayPlanets(boolean displayPlanets) {
+		this.displayPlanets = displayPlanets;
+	}
 
 	public String getRestrictedToConstellationCode() {
 		return restrictedToConstellationCode;
@@ -174,10 +186,26 @@ public class CatalogSearchOptions implements Serializable {
 		this.findQuasars = findQuasars;
 	}
 	
+	public double getObservatoryLatitude() {
+		return observatoryLatitude;
+	}
+
+	public void setObservatoryLatitude(double observatoryLatitude) {
+		this.observatoryLatitude = observatoryLatitude;
+	}
+
+	public double getObservatoryLongitude() {
+		return observatoryLongitude;
+	}
+
+	public void setObservatoryLongitude(double observatoryLongitude) {
+		this.observatoryLongitude = observatoryLongitude;
+	}
 
 	@Override
 	public String toString() {
-		return "CatalogSearchOptions [star mag max=" + starLimitMagnitude
+		return "CatalogSearchOptions [display planets="+displayPlanets
+				+ ", star mag max=" + starLimitMagnitude
 				+ ", dso mag max=" + dsoLimitMagnitude + " | stars="
 				+ findStars + ", asterisms=" + findAsterisms + ", galaxies="
 				+ findGalaxies + ", globular clusters=" + findGlobularClusters

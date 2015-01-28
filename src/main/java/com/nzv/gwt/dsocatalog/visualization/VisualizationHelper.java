@@ -23,6 +23,7 @@ import com.nzv.gwt.dsocatalog.model.AstroObject;
 import com.nzv.gwt.dsocatalog.model.Constellation;
 import com.nzv.gwt.dsocatalog.model.CoordinatesSystem;
 import com.nzv.gwt.dsocatalog.model.DeepSkyObject;
+import com.nzv.gwt.dsocatalog.model.Planet;
 import com.nzv.gwt.dsocatalog.model.Star;
 
 public class VisualizationHelper {
@@ -47,6 +48,11 @@ public class VisualizationHelper {
 		default:
 			optimizedData.addColumn(ColumnType.NUMBER, "RA");
 			break;
+		}
+		if (searchOptions.isDisplayPlanets()) {
+			optimizedData.addColumn(ColumnType.NUMBER, "Planetes");
+			optimizedData.addStyleColumn(optimizedData);
+			optimizedData.addTooltipColumn(optimizedData);
 		}
 		if (searchOptions.isFindStars()) {
 			optimizedData.addColumn(ColumnType.NUMBER, "Etoiles");
@@ -161,7 +167,10 @@ public class VisualizationHelper {
 	public static String generateTooltip(ApplicationBoard appPanel, AstroObject o, Observer observer) {
 		StringBuffer sb = new StringBuffer();
 		// Object type...
-		if (o instanceof Star) {
+		if (o instanceof Planet) {
+			Planet p = (Planet) o;
+			sb.append("Planet "+p.getIdentifier()+"\n ");
+		}else if (o instanceof Star) {
 			Star s = (Star) o;
 			sb.append("Star ");
 			if (s.getSpectralType() != null) {
@@ -185,7 +194,13 @@ public class VisualizationHelper {
 		sb.append("Mag.=" + o.getVisualMagnitude() + "\n");
 
 		// Coordinates...
-		if (o instanceof Star) {
+		if (o instanceof Planet) {
+			Planet p = (Planet) o;
+			Sexagesimal ra = new Sexagesimal(p.getRightAscension() / 15);
+			Sexagesimal dec = new Sexagesimal(p.getDeclinaison());
+			sb.append("RA="+ra.toString(SexagesimalType.HOURS)+"\n");
+			sb.append("DEC="+dec.toString(SexagesimalType.DEGREES)+"\n");
+		} else if (o instanceof Star) {
 			Star s = (Star) o;
 			sb.append("RA=" + s.getRightAscensionHour() + "h " + s.getRightAscensionMinute() + "m "
 					+ s.getRightAscensionSecond() + "s \n");

@@ -10,12 +10,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.nzv.astro.ephemeris.coordinate.impl.EquatorialCoordinates;
+import com.nzv.astro.ephemeris.planetary.DateOps;
+import com.nzv.astro.ephemeris.planetary.Latitude;
+import com.nzv.astro.ephemeris.planetary.Longitude;
+import com.nzv.astro.ephemeris.planetary.NoInitException;
+import com.nzv.astro.ephemeris.planetary.ObsInfo;
+import com.nzv.astro.ephemeris.planetary.PlanetData;
+import com.nzv.astro.ephemeris.planetary.Planets;
 import com.nzv.gwt.dsocatalog.client.CatalogSearchOptions;
 import com.nzv.gwt.dsocatalog.client.PublicCatalogService;
 import com.nzv.gwt.dsocatalog.model.AstroObject;
 import com.nzv.gwt.dsocatalog.model.Constellation;
 import com.nzv.gwt.dsocatalog.model.DeepSkyObject;
 import com.nzv.gwt.dsocatalog.model.DsoType;
+import com.nzv.gwt.dsocatalog.model.Planet;
 import com.nzv.gwt.dsocatalog.model.Star;
 import com.nzv.gwt.dsocatalog.repository.ConstellationRepository;
 import com.nzv.gwt.dsocatalog.repository.DeepSkyObjectRepository;
@@ -47,6 +55,11 @@ public class PublicCatalogServiceImpl implements PublicCatalogService {
 				&& !options.getRestrictedToConstellationCode().isEmpty()) {
 			constellation = findConstellationByCode(options
 					.getRestrictedToConstellationCode());
+		}
+		
+		if (options.isDisplayPlanets()) {
+			logger.info("Computing planets positions...");
+			result.addAll(computePlanetCurrentPositions(options));
 		}
 
 		if (options.isFindStars()) {
@@ -195,5 +208,55 @@ public class PublicCatalogServiceImpl implements PublicCatalogService {
 	@Transactional(readOnly = true)
 	public DeepSkyObject findObjectById(Integer id) {
 		return dsoRepository.findOne(id);
+	}
+	
+	private Set<Planet> computePlanetCurrentPositions(CatalogSearchOptions options) {
+		Set<Planet> planets = new HashSet<Planet>();
+		PlanetData planetaryEngine = new PlanetData();
+		ObsInfo observatory = new ObsInfo(new Latitude(options.getObservatoryLatitude()), new Longitude(options.getObservatoryLongitude()));
+		
+		// TODO : compute the Julian day based on the observer configuration...
+		long jd = DateOps.nowToDay();
+		
+		try {
+			// Mercury
+			planetaryEngine.calc(Planets.MERCURY, jd, observatory);
+			planets.add(new Planet(Planets.MERCURY, "MERCURE", null, 
+					Math.toDegrees(planetaryEngine.getRightAscension()), Math.toDegrees(planetaryEngine.getDeclination())));
+			
+			// Venus
+			planetaryEngine.calc(Planets.VENUS, jd, observatory);
+			planets.add(new Planet(Planets.VENUS, "VENUS", null,
+					Math.toDegrees(planetaryEngine.getRightAscension()), Math.toDegrees(planetaryEngine.getDeclination())));
+			
+			// Mars
+			planetaryEngine.calc(Planets.MARS, jd, observatory);
+			planets.add(new Planet(Planets.MARS, "MARS", null, 
+					Math.toDegrees(planetaryEngine.getRightAscension()), Math.toDegrees(planetaryEngine.getDeclination())));
+			
+			// Saturn
+			planetaryEngine.calc(Planets.SATURN, jd, observatory);
+			planets.add(new Planet(Planets.SATURN, "SATURN", null, 
+					Math.toDegrees(planetaryEngine.getRightAscension()), Math.toDegrees(planetaryEngine.getDeclination())));
+			
+			// Jupiter
+			planetaryEngine.calc(Planets.JUPITER, jd, observatory);
+			planets.add(new Planet(Planets.JUPITER, "JUPITER", null, 
+					Math.toDegrees(planetaryEngine.getRightAscension()), Math.toDegrees(planetaryEngine.getDeclination())));
+			
+			// Uranus
+			planetaryEngine.calc(Planets.URANUS, jd, observatory);
+			planets.add(new Planet(Planets.URANUS, "URANUS", null,
+					Math.toDegrees(planetaryEngine.getRightAscension()), Math.toDegrees(planetaryEngine.getDeclination())));
+			
+			// Neptune
+			planetaryEngine.calc(Planets.NEPTUNE, jd, observatory);
+			planets.add(new Planet(Planets.NEPTUNE, "NEPTUNE", null, 
+					Math.toDegrees(planetaryEngine.getRightAscension()), Math.toDegrees(planetaryEngine.getDeclination())));
+			
+		} catch (NoInitException e) {
+			logger.error(e);
+		}
+		return planets;
 	}
 }
