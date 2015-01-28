@@ -167,10 +167,7 @@ public class VisualizationHelper {
 	public static String generateTooltip(ApplicationBoard appPanel, AstroObject o, Observer observer) {
 		StringBuffer sb = new StringBuffer();
 		// Object type...
-		if (o instanceof Planet) {
-			Planet p = (Planet) o;
-			sb.append("Planet "+p.getIdentifier()+"\n ");
-		}else if (o instanceof Star) {
+		if (o instanceof Star) {
 			Star s = (Star) o;
 			sb.append("Star ");
 			if (s.getSpectralType() != null) {

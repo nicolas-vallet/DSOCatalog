@@ -29,7 +29,11 @@ public class Planet extends AstroObject implements Serializable {
 
 	@Override
 	public double getRightAscension() {
-		return this.rightAscension;
+		if (this.rightAscension < 0) {
+			return this.rightAscension + 360;
+		} else {
+			return this.rightAscension;
+		}
 	}
 
 	@Override
