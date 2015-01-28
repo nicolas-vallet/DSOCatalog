@@ -64,17 +64,18 @@ public class DataSerieIndexes {
 			serieIndex += 2;
 			objectSeriesCount++;
 		}
-		if (searchOptions.isDisplayConstellationBoundaries() || searchOptions.isDisplayConstellationShape()) {
+		if (searchOptions.isDisplayConstellationNames()) {
 			// Constellation name display requires columns for RA center, DEC center, Style, Annotation (will contain the code), AnnotationText (will contain the name) 
 			constellationNameSerieIndex = ++serieIndex;
 			serieIndex += 3;
-			if (searchOptions.isDisplayConstellationBoundaries()) {
-				constellationBoundarySerieIndex = ++serieIndex;
-			}
 			
-			if (searchOptions.isDisplayConstellationShape()) {
-				constellationShapeSerieIndex = ++serieIndex;
-			}
+		}
+		if (searchOptions.isDisplayConstellationBoundaries()) {
+			constellationBoundarySerieIndex = ++serieIndex;
+		}
+		
+		if (searchOptions.isDisplayConstellationShape()) {
+			constellationShapeSerieIndex = ++serieIndex;
 		}
 	}
 

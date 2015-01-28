@@ -20,6 +20,7 @@ public class CatalogSearchOptions implements Serializable {
 		CatalogSearchOptions options = new CatalogSearchOptions();
 		options.setStarLimitMagnitude(DEFAULT_STAR_LIMIT_MAGNITUDE);
 		options.setDsoLimitMagnitude(DEFAULT_DSO_LIMIT_MAGNITUDE);
+		options.displayConstellationNames = false;
 		options.displayConstellationBoundaries = false;
 		options.displayConstellationShape = false;
 		options.findStars = true;
@@ -35,6 +36,7 @@ public class CatalogSearchOptions implements Serializable {
 	}
 
 	private String restrictedToConstellationCode = null;
+	private boolean displayConstellationNames = false;
 	private boolean displayConstellationBoundaries = false;
 	private boolean displayConstellationShape = false;
 	private double starLimitMagnitude = 0d;
@@ -59,6 +61,14 @@ public class CatalogSearchOptions implements Serializable {
 		this.restrictedToConstellationCode = restrictedToConstellationCode;
 	}
 	
+	public boolean isDisplayConstellationNames() {
+		return displayConstellationNames;
+	}
+
+	public void setDisplayConstellationNames(boolean displayConstellationNames) {
+		this.displayConstellationNames = displayConstellationNames;
+	}
+
 	public boolean isDisplayConstellationBoundaries() {
 		return displayConstellationBoundaries;
 	}
@@ -164,9 +174,6 @@ public class CatalogSearchOptions implements Serializable {
 		this.findQuasars = findQuasars;
 	}
 	
-	public boolean isDisplayConstellationNames() {
-		return displayConstellationBoundaries || displayConstellationShape;
-	}
 
 	@Override
 	public String toString() {

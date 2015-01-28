@@ -20,7 +20,19 @@ import com.nzv.gwt.dsocatalog.model.CoordinatesSystem;
 
 public class ApplicationBoard extends SplitLayoutPanel {
 
+	public ListBox getLiConstellations() {
+		return liConstellations;
+	}
+
+	public ListBox getLiCoordinatesMode() {
+		return liCoordinatesMode;
+	}
+
 	public static int LEFT_PANEL_WIDTH = 280;
+	public CheckBox getChkShowObjectsUnderHorizon() {
+		return chkShowObjectsUnderHorizon;
+	}
+
 	public static int RIGHT_PANEL_WIDTH = 280;
 	public static int PANEL_SPLITTER_WIDTH = 2;
 	
@@ -31,13 +43,14 @@ public class ApplicationBoard extends SplitLayoutPanel {
 	VerticalPanel filterPanel = new VerticalPanel();
 	Label lbConstellation = new Label("Constellation : ");
 	ListBox liConstellations = new ListBox();
+	CheckBox chkDisplayConstellationNames = new CheckBox("Afficher les noms des constellations");
 	CheckBox chkDisplayConstellationShapes = new CheckBox("Afficher les formes des constellations");
 	CheckBox chkDisplayConstellationBoundaries = new CheckBox(
 			"Afficher les limites des constellations");
 	CheckBox chkDisplayStars = new CheckBox("Afficher les étoiles");
 	Label lbStarLimitMagnitude = new Label("Vmag. max étoiles :");
+	HorizontalPanel starLimitMagnitudePanel = new HorizontalPanel();
 	TextBox txtBoxStarLimitMagnitude = new TextBox();
-	HorizontalPanel starLimitMagnitudeButtonsPanel = new HorizontalPanel();
 	PushButton btIncreaseStarLimitMagnitude = new PushButton("+");
 	PushButton btDecreaseStarLimitMagnitude = new PushButton("-");
 
@@ -51,10 +64,10 @@ public class ApplicationBoard extends SplitLayoutPanel {
 	CheckBox chkDisplayQuasars = new CheckBox("Quasars");
 
 	Label lbDsoLimitMagnitude = new Label("Vmag. max ciel profond :");
-	HorizontalPanel dsoLimitMagnitudeButtonsPanel = new HorizontalPanel();
+	HorizontalPanel dsoLimitMagnitudePanel = new HorizontalPanel();
+	TextBox txtBoxDsoLimitMagnitude = new TextBox();
 	PushButton btIncreaseDsoLimitMagnitude = new PushButton("+");
 	PushButton btDecreaseDsoLimitMagnitude = new PushButton("-");
-	TextBox txtBoxDsoLimitMagnitude = new TextBox();
 
 	Label lbCoordinatesMode = new Label("Système de coordonnées");
 	ListBox liCoordinatesMode = new ListBox();
@@ -109,11 +122,11 @@ public class ApplicationBoard extends SplitLayoutPanel {
 		appPanel.liCoordinatesMode.addItem("Equatoriaux", ""+CoordinatesSystem.EQ);
 		appPanel.liCoordinatesMode.addItem("Ecliptiques", ""+CoordinatesSystem.ECL);
 		appPanel.liCoordinatesMode.addItem("Galactiques", ""+CoordinatesSystem.GAL);
-		appPanel.liCoordinatesMode.addItem("Alt-Az", ""+CoordinatesSystem.ALTAZ);
+		//appPanel.liCoordinatesMode.addItem("Alt-Az", ""+CoordinatesSystem.ALTAZ);
 		appPanel.liCoordinatesMode.addChangeHandler(new UpdateMapEventHandler(source));
 		appPanel.coordinatesPanel.add(appPanel.liCoordinatesMode);
 		appPanel.chkShowObjectsUnderHorizon.addClickHandler(new UpdateMapEventHandler(source));
-		appPanel.coordinatesPanel.add(appPanel.chkShowObjectsUnderHorizon);
+		//appPanel.coordinatesPanel.add(appPanel.chkShowObjectsUnderHorizon);
 
 		// We add the coordinates panel to configuration panel.
 		appPanel.configurationPanel.add(appPanel.coordinatesPanel, new Label("Projection"), 28);
@@ -165,12 +178,14 @@ public class ApplicationBoard extends SplitLayoutPanel {
 		appPanel.observerPanel.add(appPanel.timeExplorerPanel);
 		
 		// We add the observer panel to configuration panel.
-		appPanel.configurationPanel.add(appPanel.observerPanel, new Label("Observateur"), 28);
+		//appPanel.configurationPanel.add(appPanel.observerPanel, new Label("Observateur"), 28);
 		
 		// We put the constellation select list in the filter panel.
 		appPanel.liConstellations.addChangeHandler(new UpdateMapEventHandler(source));
 		appPanel.filterPanel.add(appPanel.lbConstellation);
 		appPanel.filterPanel.add(appPanel.liConstellations);
+		appPanel.chkDisplayConstellationNames.addValueChangeHandler(new UpdateMapEventHandler(source));
+		appPanel.filterPanel.add(appPanel.chkDisplayConstellationNames);
 		appPanel.chkDisplayConstellationShapes.addValueChangeHandler(new UpdateMapEventHandler(source));
 		appPanel.filterPanel.add(appPanel.chkDisplayConstellationShapes);
 		appPanel.chkDisplayConstellationBoundaries.addValueChangeHandler(new UpdateMapEventHandler(source));
@@ -180,15 +195,16 @@ public class ApplicationBoard extends SplitLayoutPanel {
 		appPanel.chkDisplayStars.setValue(true);
 		appPanel.chkDisplayStars.addValueChangeHandler(new UpdateMapEventHandler(source));
 		appPanel.filterPanel.add(appPanel.chkDisplayStars);
-		appPanel.btIncreaseStarLimitMagnitude.addClickHandler(new ChangeLimitMagnitudeClickEventHandler(source, appPanel.txtBoxStarLimitMagnitude, +1));
-		appPanel.starLimitMagnitudeButtonsPanel.add(appPanel.btIncreaseStarLimitMagnitude);
-		appPanel.btDecreaseStarLimitMagnitude.addClickHandler(new ChangeLimitMagnitudeClickEventHandler(source, appPanel.txtBoxStarLimitMagnitude, -1));
-		appPanel.starLimitMagnitudeButtonsPanel.add(appPanel.btDecreaseStarLimitMagnitude);
-		appPanel.filterPanel.add(appPanel.starLimitMagnitudeButtonsPanel);
+		
 		appPanel.filterPanel.add(appPanel.lbStarLimitMagnitude);
 		appPanel.txtBoxStarLimitMagnitude.setText("" + CatalogSearchOptions.DEFAULT_STAR_LIMIT_MAGNITUDE);
 		appPanel.txtBoxStarLimitMagnitude.setWidth("100px");
-		appPanel.filterPanel.add(appPanel.txtBoxStarLimitMagnitude);
+		appPanel.starLimitMagnitudePanel.add(appPanel.txtBoxStarLimitMagnitude);
+		appPanel.btIncreaseStarLimitMagnitude.addClickHandler(new ChangeLimitMagnitudeClickEventHandler(source, appPanel.txtBoxStarLimitMagnitude, +1));
+		appPanel.btDecreaseStarLimitMagnitude.addClickHandler(new ChangeLimitMagnitudeClickEventHandler(source, appPanel.txtBoxStarLimitMagnitude, -1));
+		appPanel.starLimitMagnitudePanel.add(appPanel.btIncreaseStarLimitMagnitude);
+		appPanel.starLimitMagnitudePanel.add(appPanel.btDecreaseStarLimitMagnitude);
+		appPanel.filterPanel.add(appPanel.starLimitMagnitudePanel);
 		
 		// We set the DSO filter fields
 		appPanel.chkDisplayAsterisms.setValue(true);
@@ -224,14 +240,16 @@ public class ApplicationBoard extends SplitLayoutPanel {
 		appPanel.filterPanel.add(appPanel.chkDisplayQuasars);
 		
 		appPanel.filterPanel.add(appPanel.lbDsoLimitMagnitude);
-		appPanel.btIncreaseDsoLimitMagnitude.addClickHandler(new ChangeLimitMagnitudeClickEventHandler(source, appPanel.txtBoxDsoLimitMagnitude, +1));
-		appPanel.dsoLimitMagnitudeButtonsPanel.add(appPanel.btIncreaseDsoLimitMagnitude);
-		appPanel.btDecreaseDsoLimitMagnitude.addClickHandler(new ChangeLimitMagnitudeClickEventHandler(source, appPanel.txtBoxDsoLimitMagnitude, -1));
-		appPanel.dsoLimitMagnitudeButtonsPanel.add(appPanel.btDecreaseDsoLimitMagnitude);
-		appPanel.filterPanel.add(appPanel.dsoLimitMagnitudeButtonsPanel);
+		
 		appPanel.txtBoxDsoLimitMagnitude.setText("" + CatalogSearchOptions.DEFAULT_DSO_LIMIT_MAGNITUDE);
 		appPanel.txtBoxDsoLimitMagnitude.setWidth("100px");
-		appPanel.filterPanel.add(appPanel.txtBoxDsoLimitMagnitude);
+		appPanel.dsoLimitMagnitudePanel.add(appPanel.txtBoxDsoLimitMagnitude);
+		appPanel.btIncreaseDsoLimitMagnitude.addClickHandler(new ChangeLimitMagnitudeClickEventHandler(source, appPanel.txtBoxDsoLimitMagnitude, +1));
+		appPanel.btDecreaseDsoLimitMagnitude.addClickHandler(new ChangeLimitMagnitudeClickEventHandler(source, appPanel.txtBoxDsoLimitMagnitude, -1));
+		appPanel.dsoLimitMagnitudePanel.add(appPanel.btIncreaseDsoLimitMagnitude);
+		appPanel.dsoLimitMagnitudePanel.add(appPanel.btDecreaseDsoLimitMagnitude);
+		appPanel.filterPanel.add(appPanel.dsoLimitMagnitudePanel);
+//		appPanel.filterPanel.add(appPanel.txtBoxDsoLimitMagnitude);
 
 		// We add the filter panel to configuration panel.
 		appPanel.configurationPanel.add(appPanel.filterPanel, new Label("Filtres"), 28);
@@ -263,6 +281,7 @@ public class ApplicationBoard extends SplitLayoutPanel {
 	public CatalogSearchOptions getCatalogSearchOptions() {
 		CatalogSearchOptions options = new CatalogSearchOptions();
 		options.setRestrictedToConstellationCode(liConstellations.getValue(liConstellations.getSelectedIndex()));
+		options.setDisplayConstellationNames(chkDisplayConstellationNames.getValue());
 		options.setDisplayConstellationShape(chkDisplayConstellationShapes.getValue());
 		options.setDisplayConstellationBoundaries(chkDisplayConstellationBoundaries.getValue());
 		Double starLimitMagnitude = CatalogSearchOptions.DEFAULT_STAR_LIMIT_MAGNITUDE;

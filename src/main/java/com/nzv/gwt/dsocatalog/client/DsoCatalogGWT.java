@@ -10,22 +10,16 @@ import java.util.Set;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.shared.GWT;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.google.gwt.visualization.client.AbstractDataTable;
-import com.google.gwt.visualization.client.AbstractDataTable.ColumnType;
-import com.google.gwt.visualization.client.ChartArea;
 import com.google.gwt.visualization.client.Selection;
 import com.google.gwt.visualization.client.VisualizationUtils;
 import com.google.gwt.visualization.client.events.SelectHandler;
-import com.google.gwt.visualization.client.visualizations.corechart.AxisOptions;
 import com.google.gwt.visualization.client.visualizations.corechart.LineChart;
 import com.google.gwt.visualization.client.visualizations.corechart.Options;
-import com.google.gwt.visualization.client.visualizations.corechart.TextStyle;
 import com.nzv.astro.ephemeris.Sexagesimal;
-import com.nzv.astro.ephemeris.Sexagesimal.SexagesimalType;
 import com.nzv.astro.ephemeris.coordinate.GeographicCoordinates;
 import com.nzv.astro.ephemeris.coordinate.adapter.EquatorialCoordinatesAdapter;
 import com.nzv.astro.ephemeris.coordinate.impl.EquatorialCoordinates;
@@ -40,19 +34,15 @@ import com.nzv.gwt.dsocatalog.model.Star;
 import com.nzv.gwt.dsocatalog.projection.MollweideProjection;
 import com.nzv.gwt.dsocatalog.projection.Point2D;
 import com.nzv.gwt.dsocatalog.projection.Projection;
+import com.nzv.gwt.dsocatalog.projection.StereographicProjection;
 import com.nzv.gwt.dsocatalog.visualization.MyDataTable;
-import com.nzv.gwt.dsocatalog.visualization.MyLineChartOptions;
-import com.nzv.gwt.dsocatalog.visualization.MySeries;
+import com.nzv.gwt.dsocatalog.visualization.VisualizationHelper;
 
 public class DsoCatalogGWT implements EntryPoint {
 
 	public static String DATE_FORMAT = "dd/MM/yyyy";
 	public static String TIME_FORMAT = "HH:mm:ss";
-	
-//	private static final DateTimeFormat dtfDateAndTime = DateTimeFormat.getFormat(DATE_FORMAT+" "+TIME_FORMAT);
-//	private static final DateTimeFormat dtfDate = DateTimeFormat.getFormat(DATE_FORMAT);
-//	private static final DateTimeFormat dtfTime = DateTimeFormat.getFormat(TIME_FORMAT);
-	
+
 	/* Styles */
 	public static String STYLE_CHART_BACKGROUND_COLOR = "#132345";
 	public static String AXIS_TITLE_TEXT_STYLE = "color: #ffffff;";
@@ -127,7 +117,7 @@ public class DsoCatalogGWT implements EntryPoint {
 								final Map<ObjectReferenceAddressInTable, ObjectReference> displayedObjectReferences = 
 										new HashMap<ObjectReferenceAddressInTable, ObjectReference>();
 								AbstractDataTable data = createDataTableOptimized(searchOptions, displayedObjectReferences);
-								Options options = createLineChartOptions(searchOptions);
+								Options options = VisualizationHelper.createLineChartOptions(searchOptions, appPanel, constellationsList);
 								final LineChart chart = new LineChart(data, options);
 								chart.addSelectHandler(new SelectHandler() {
 									@Override
@@ -153,7 +143,7 @@ public class DsoCatalogGWT implements EntryPoint {
 							private MyDataTable createDataTableOptimized(CatalogSearchOptions searchOptions,
 									Map<ObjectReferenceAddressInTable, ObjectReference> displayedObjectReferences) {
 								MyDataTable optimizedData = MyDataTable.create();
-								optimizedData = initializeDataTable(searchOptions, optimizedData, objects);
+								optimizedData = VisualizationHelper.initializeDataTable(appPanel, optimizedData, objects, constellationsList);
 								optimizedData = fillDataTableWithValues(searchOptions, optimizedData, displayedObjectReferences, objects);
 								return optimizedData;
 							}
@@ -208,120 +198,6 @@ public class DsoCatalogGWT implements EntryPoint {
 		return observer;
 	}
 	
-	private static MyDataTable fillRowWithNullValues(MyDataTable data, int rowIndex) {
-		for (int i=0 ; i<data.getNumberOfColumns(); i++) {
-			data.setValueNull(rowIndex, i);
-		}
-		return data;
-	}
-	
-	private MyDataTable initializeDataTable(CatalogSearchOptions searchOptions, MyDataTable optimizedData, Set<AstroObject> objects) {
-		boolean showOneConstellation = searchOptions.getRestrictedToConstellationCode() != null && 
-				!searchOptions.getRestrictedToConstellationCode().isEmpty();
-		CoordinatesSystem cs = CoordinatesSystem.valueOf(appPanel.liCoordinatesMode.getValue(appPanel.liCoordinatesMode.getSelectedIndex()));
-		switch(cs) {
-		case ECL:
-		case GAL:
-			optimizedData.addColumn(ColumnType.NUMBER, "LONGITUDE");
-			break;
-		case ALTAZ:
-			optimizedData.addColumn(ColumnType.NUMBER, "AZIMUTH");
-			break;
-		case EQ:
-		default:
-			optimizedData.addColumn(ColumnType.NUMBER, "RA");
-			break;
-		}
-		if (searchOptions.isFindStars()) {
-			optimizedData.addColumn(ColumnType.NUMBER, "Etoiles");
-			optimizedData.addStyleColumn(optimizedData);
-			optimizedData.addTooltipColumn(optimizedData);
-		}
-		if (searchOptions.isFindAsterisms()) {
-			optimizedData.addColumn(ColumnType.NUMBER, "Asterismes");
-			optimizedData.addStyleColumn(optimizedData);
-			optimizedData.addTooltipColumn(optimizedData);
-		}
-		if (searchOptions.isFindGalaxies()) {
-			optimizedData.addColumn(ColumnType.NUMBER, "Galaxies");
-			optimizedData.addStyleColumn(optimizedData);
-			optimizedData.addTooltipColumn(optimizedData);
-		}
-		if (searchOptions.isFindGlobularClusters()) {
-			optimizedData.addColumn(ColumnType.NUMBER, "Amas globulaires");
-			optimizedData.addStyleColumn(optimizedData);
-			optimizedData.addTooltipColumn(optimizedData);
-		}
-		if (searchOptions.isFindOpenClusters()) {
-			optimizedData.addColumn(ColumnType.NUMBER, "Amas ouverts");
-			optimizedData.addStyleColumn(optimizedData);
-			optimizedData.addTooltipColumn(optimizedData);
-		}
-		if (searchOptions.isFindPlanetaryNebulas()) {
-			optimizedData.addColumn(ColumnType.NUMBER, "Nébuleuses planétaires");
-			optimizedData.addStyleColumn(optimizedData);
-			optimizedData.addTooltipColumn(optimizedData);
-		}
-		if (searchOptions.isFindNebulas()) {
-			optimizedData.addColumn(ColumnType.NUMBER, "Nébuleuses");
-			optimizedData.addStyleColumn(optimizedData);
-			optimizedData.addTooltipColumn(optimizedData);
-		}
-		if (searchOptions.isFindSupernovaRemnant()) {
-			optimizedData.addColumn(ColumnType.NUMBER, "Rémanants de supernova");
-			optimizedData.addStyleColumn(optimizedData);
-			optimizedData.addTooltipColumn(optimizedData);
-		}
-		if (searchOptions.isFindQuasars()) {
-			optimizedData.addColumn(ColumnType.NUMBER, "Quasars");
-			optimizedData.addStyleColumn(optimizedData);
-			optimizedData.addTooltipColumn(optimizedData);
-		}
-		if (searchOptions.isDisplayConstellationNames()) {
-			optimizedData.addColumn(ColumnType.NUMBER, "Constellation");
-			optimizedData.addStyleColumn(optimizedData);
-			optimizedData.addAnnotationColumn(optimizedData);
-			optimizedData.addAnnotationTextColumn(optimizedData);
-		}
-		
-		ArrayList<String> codeOfConstellationsToDisplay = new ArrayList<String>();
-		if (showOneConstellation) {
-			codeOfConstellationsToDisplay.add(appPanel.liConstellations.getValue(appPanel.liConstellations.getSelectedIndex()));
-		} else {
-			codeOfConstellationsToDisplay.addAll(constellationsList.keySet());
-		}
-		if (searchOptions.isDisplayConstellationBoundaries()) {
-			optimizedData.addColumn(ColumnType.NUMBER, "Limites constellation");
-		}
-		if (searchOptions.isDisplayConstellationShape()) {
-			optimizedData.addColumn(ColumnType.NUMBER, "Forme constellation");
-		}
-		
-		optimizedData.addRows(objects.size());
-		if (searchOptions.isDisplayConstellationNames()) {
-			optimizedData.addRows(codeOfConstellationsToDisplay.size());
-		}
-		if (searchOptions.isDisplayConstellationBoundaries()) {
-			if (showOneConstellation) {
-				optimizedData.addRows(constellationsList.get(searchOptions.getRestrictedToConstellationCode()).getBoundaryPoints().size()+2);
-			} else {
-				for (Constellation constellation : constellationsList.values()) {
-					optimizedData.addRows(constellation.getBoundaryPoints().size()+2);
-				}
-			}
-		}
-		if (searchOptions.isDisplayConstellationShape()) {
-			if (showOneConstellation) {
-				optimizedData.addRows(constellationsList.get(searchOptions.getRestrictedToConstellationCode()).getShapeLines().size()*3);
-			} else {
-				for (Constellation constellation : constellationsList.values()) {
-					optimizedData.addRows(constellation.getShapeLines().size()*3);
-				}
-			}
-		}
-		return optimizedData;
-	}
-	
 	private MyDataTable fillDataTableWithValues(CatalogSearchOptions searchOptions, MyDataTable optimizedData, 
 			Map<ObjectReferenceAddressInTable, ObjectReference> displayedObjectReferences, Set<AstroObject> objects) {
 		boolean showOneConstellation = searchOptions.getRestrictedToConstellationCode() != null && 
@@ -331,21 +207,6 @@ public class DsoCatalogGWT implements EntryPoint {
 		DataSerieIndexes serieIndexes = new DataSerieIndexes(searchOptions);
 		int i = 0;
 		
-//		double biggestAsterism = 0;
-//		double biggestGalaxy = 0;
-//		double biggestGlobularCluster = 0;
-//		double biggestOpenCluster = 0;
-//		double biggestPlanetarNebula = 0;
-//		double biggestNebula = 0;
-//		double biggestSnRemnant = 0;
-//		for (AstroObject o : objects) {
-//			if (o instanceof Star) continue;
-//			else {
-//				DeepSkyObject dso = (DeepSkyObject) o;
-//				if (dso.isAsterism() && dso.getM)
-//			}
-//		}
-		
 		for (AstroObject o : objects) {
 			// Should we show objects under horizon ?
 			if (cs == CoordinatesSystem.ALTAZ && !appPanel.chkShowObjectsUnderHorizon.getValue()) {
@@ -354,7 +215,7 @@ public class DsoCatalogGWT implements EntryPoint {
 				}
 			}
 			
-			optimizedData = fillRowWithNullValues(optimizedData, i);
+			optimizedData = VisualizationHelper.fillRowWithNullValues(optimizedData, i);
 			int serieIndexToUse = 0;
 			String styleToUse = new String();
 			ObjectReference objectReference = null;
@@ -396,61 +257,78 @@ public class DsoCatalogGWT implements EntryPoint {
 				}
 				objectReference = new ObjectReference(false, true, dso.getId());
 			}
+			EquatorialCoordinatesAdapter eca = new EquatorialCoordinatesAdapter(new EquatorialCoordinates(o.getRightAscension(), o.getDeclinaison()));
+			Point2D p = new Point2D(0,0);
+			boolean useProjection = false;
 			if (cs == CoordinatesSystem.GAL) {
 				Projection projection = new MollweideProjection();
-				EquatorialCoordinatesAdapter eca = new EquatorialCoordinatesAdapter(new EquatorialCoordinates(o.getRightAscension(), o.getDeclinaison()));
-				Point2D p = projection.project(Math.toRadians(eca.getGalacticLongitude()>=180?eca.getGalacticLongitude()-360:eca.getGalacticLongitude()), Math.toRadians(eca.getGalacticLatitude()));
+				p = projection.project(Math.toRadians(eca.getGalacticLongitude()>=180?eca.getGalacticLongitude()-360:eca.getGalacticLongitude()), Math.toRadians(eca.getGalacticLatitude()));
+				useProjection = true;
+			} else if (cs == CoordinatesSystem.ALTAZ) {
+				if (o.getYCoordinateForReferential(cs, observer) < 0) continue;
+				Projection projection = new StereographicProjection();
+				p = projection.project(Math.toRadians(o.getXCoordinateForReferential(cs, observer)), Math.toRadians(o.getYCoordinateForReferential(cs, observer)));
+				useProjection = true;
+			}
+			if (useProjection) {
 				optimizedData.setValue(i, 0, Math.toDegrees(p.getX()));
 				optimizedData.setValue(i, serieIndexToUse, Math.toDegrees(p.getY()));
 			} else {
-//				projection = new MercatorProjection();
-//				Point2D p = projection.project(Math.toRadians(o.getXCoordinateForReferential(cs, observer)), Math.toRadians(o.getYCoordinateForReferential(cs, observer)));
-//				optimizedData.setValue(i, 0, Math.toDegrees(p.getX()));
-//				optimizedData.setValue(i, serieIndexToUse, Math.toDegrees(p.getY()));
-				optimizedData.setValue(i, 0, o.getXCoordinateForReferential(cs, observer));
-				optimizedData.setValue(i, serieIndexToUse, o.getYCoordinateForReferential(cs, observer));
+				optimizedData.setValue(i, 0, o.getXCoordinateForReferential(cs));
+				optimizedData.setValue(i, serieIndexToUse, o.getYCoordinateForReferential(cs));
 			}
 			optimizedData.setValue(i, serieIndexToUse+1, styleToUse);
-			optimizedData.setValue(i, serieIndexToUse+2, generateTooltip(o, observer));
+			optimizedData.setValue(i, serieIndexToUse+2, VisualizationHelper.generateTooltip(appPanel, o, observer));
 			displayedObjectReferences.put(new ObjectReferenceAddressInTable(i, serieIndexToUse), objectReference);
 			i++;
 		}
 		
 		ArrayList<Constellation> constellationsToDisplay = new ArrayList<Constellation>();
+		if (showOneConstellation) {
+			constellationsToDisplay.add(constellationsList.get(appPanel.liConstellations.getValue(appPanel.liConstellations.getSelectedIndex())));
+		} else {
+			constellationsToDisplay.addAll(constellationsList.values());
+		}
+		
+		// Constellation(s) names
 		if (searchOptions.isDisplayConstellationNames()) {
-			if (showOneConstellation) {
-				constellationsToDisplay.add(constellationsList.get(appPanel.liConstellations.getValue(appPanel.liConstellations.getSelectedIndex())));
-			} else {
-				constellationsToDisplay.addAll(constellationsList.values());
-			}
 			
 			for (Constellation constellation : constellationsToDisplay) {
 				double X, Y;
 				EquatorialCoordinatesAdapter eca = new EquatorialCoordinatesAdapter(
 						new EquatorialCoordinates(constellation.getCenterRightAscension(), constellation.getCenterDeclinaison()));
 				switch (cs) {
-				case ALTAZ:
-					GeographicCoordinates observatory = new GeographicCoordinates(observer.getLatitude(), observer.getLongitude());
-					X = eca.getAzimuth(observatory, observer.getGreenwichSiderealTime());
-					Y = eca.getElevation(observatory, observer.getGreenwichSiderealTime());
-					break;
-				case ECL:
-					X = eca.getEcliptiqueLongitude();
-					Y = eca.getEcliptiqueLatitude();
-					break;
-				case GAL:
-					X = eca.getGalacticLongitude();
-					Y = eca.getGalacticLatitude();
-					MollweideProjection projection = new MollweideProjection();
-					Point2D mp = projection.project(Math.toRadians(X>=180?X-360:X), Math.toRadians(Y));
-					X = Math.toDegrees(mp.getX());
-					Y = Math.toDegrees(mp.getY());
-					break;
-				case EQ:
-				default:
-					X = constellation.getCenterRightAscension();
-					Y = constellation.getCenterDeclinaison();
-					break;
+					case ALTAZ: {
+						GeographicCoordinates observatory = new GeographicCoordinates(observer.getLatitude(), observer.getLongitude());
+						X = eca.getAzimuth(observatory, observer.getGreenwichSiderealTime());
+						Y = eca.getElevation(observatory, observer.getGreenwichSiderealTime());
+						if (Y < 0) continue;
+						Projection projection = new StereographicProjection();
+						Point2D mp = projection.project(Math.toRadians(X), Math.toRadians(Y));
+						X = Math.toDegrees(mp.getX());
+						Y = Math.toDegrees(mp.getY());
+						break;
+					}
+					case ECL: {
+						X = eca.getEcliptiqueLongitude();
+						Y = eca.getEcliptiqueLatitude();
+						break;
+					}
+					case GAL: {
+						X = eca.getGalacticLongitude();
+						Y = eca.getGalacticLatitude();
+						Projection projection = new MollweideProjection();
+						Point2D mp = projection.project(Math.toRadians(X>=180?X-360:X), Math.toRadians(Y));
+						X = Math.toDegrees(mp.getX());
+						Y = Math.toDegrees(mp.getY());
+						break;
+					}
+					case EQ:
+					default: {
+						X = constellation.getCenterRightAscension();
+						Y = constellation.getCenterDeclinaison();
+						break;
+					}
 				}
 				optimizedData.setValue(i, 0, X);
 				optimizedData.setValue(i, serieIndexes.getConstellationNameSerieIndex(), Y);
@@ -463,34 +341,42 @@ public class DsoCatalogGWT implements EntryPoint {
 		// Constellation(s) boundaries...
 		if (searchOptions.isDisplayConstellationBoundaries()) {
 			for (Constellation constellation : constellationsToDisplay) {
-				double X;
-				double Y;
+				double X, Y;
 				for (ConstellationBoundaryPoint p : constellation.getBoundaryPoints()) {
 					EquatorialCoordinatesAdapter eca = new EquatorialCoordinatesAdapter(
 							new EquatorialCoordinates(p.getRightAscensionAsDecimalDegrees(), p.getDeclinaisonAsDecimalDegrees()));
 					switch(cs) {
-					case ALTAZ:
-						GeographicCoordinates observatory = new GeographicCoordinates(observer.getLatitude(), observer.getLongitude());
-						X = eca.getAzimuth(observatory, observer.getGreenwichSiderealTime());
-						Y = eca.getElevation(observatory, observer.getGreenwichSiderealTime());
-						break;
-					case ECL:
-						X = eca.getEcliptiqueLongitude();
-						Y = eca.getEcliptiqueLatitude();
-						break;
-					case GAL:
-						X = eca.getGalacticLongitude();
-						Y = eca.getGalacticLatitude();
-						MollweideProjection projection = new MollweideProjection();
-						Point2D mp = projection.project(Math.toRadians(X>=180?X-360:X), Math.toRadians(Y));
-						X = Math.toDegrees(mp.getX());
-						Y = Math.toDegrees(mp.getY());
-						break;
-					case EQ:
-					default:
-						X = p.getRightAscensionAsDecimalDegrees();
-						Y = p.getDeclinaisonAsDecimalDegrees();
-						break;
+						case ALTAZ: {
+							GeographicCoordinates observatory = new GeographicCoordinates(observer.getLatitude(), observer.getLongitude());
+							X = eca.getAzimuth(observatory, observer.getGreenwichSiderealTime());
+							Y = eca.getElevation(observatory, observer.getGreenwichSiderealTime());
+							if (Y < 0) Y = 0;
+							Projection projection = new StereographicProjection();
+							Point2D mp = projection.project(Math.toRadians(X), Math.toRadians(Y));
+							X = Math.toDegrees(mp.getX());
+							Y = Math.toDegrees(mp.getY());
+							break;
+						}
+						case ECL: {
+							X = eca.getEcliptiqueLongitude();
+							Y = eca.getEcliptiqueLatitude();
+							break;
+						}
+						case GAL: {
+							X = eca.getGalacticLongitude();
+							Y = eca.getGalacticLatitude();
+							Projection projection = new MollweideProjection();
+							Point2D mp = projection.project(Math.toRadians(X>=180?X-360:X), Math.toRadians(Y));
+							X = Math.toDegrees(mp.getX());
+							Y = Math.toDegrees(mp.getY());
+							break;
+						}
+						case EQ:
+						default: {
+							X = p.getRightAscensionAsDecimalDegrees();
+							Y = p.getDeclinaisonAsDecimalDegrees();
+							break;
+						}
 					}
 					optimizedData.setValue(i, 0, X);
 					optimizedData.setValue(i, serieIndexes.getConstellationBoundarySerieIndex(), Y);
@@ -501,28 +387,37 @@ public class DsoCatalogGWT implements EntryPoint {
 				EquatorialCoordinatesAdapter eca = new EquatorialCoordinatesAdapter(
 						new EquatorialCoordinates(lastPoint.getRightAscensionAsDecimalDegrees(), lastPoint.getDeclinaisonAsDecimalDegrees()));
 				switch(cs) {
-				case ALTAZ:
-					GeographicCoordinates observatory = new GeographicCoordinates(observer.getLatitude(), observer.getLongitude());
-					X = eca.getAzimuth(observatory, observer.getGreenwichSiderealTime());
-					Y = eca.getElevation(observatory, observer.getGreenwichSiderealTime());
-					break;
-				case ECL:
-					X = eca.getEcliptiqueLongitude();
-					Y = eca.getEcliptiqueLatitude();
-					break;
-				case GAL:
-					X = eca.getGalacticLongitude();
-					Y = eca.getGalacticLatitude();
-					MollweideProjection projection = new MollweideProjection();
-					Point2D mp = projection.project(Math.toRadians(X>=180?X-360:X), Math.toRadians(Y));
-					X = Math.toDegrees(mp.getX());
-					Y = Math.toDegrees(mp.getY());
-					break;
-				case EQ:
-				default:
-					X = lastPoint.getRightAscensionAsDecimalDegrees();
-					Y = lastPoint.getDeclinaisonAsDecimalDegrees();
-					break;
+					case ALTAZ: {
+						GeographicCoordinates observatory = new GeographicCoordinates(observer.getLatitude(), observer.getLongitude());
+						X = eca.getAzimuth(observatory, observer.getGreenwichSiderealTime());
+						Y = eca.getElevation(observatory, observer.getGreenwichSiderealTime());
+						if (Y < 0) Y = 0;
+						Projection projection = new StereographicProjection();
+						Point2D mp = projection.project(Math.toRadians(X), Math.toRadians(Y));
+						X = Math.toDegrees(mp.getX());
+						Y = Math.toDegrees(mp.getY());
+						break;
+					}
+					case ECL: {
+						X = eca.getEcliptiqueLongitude();
+						Y = eca.getEcliptiqueLatitude();
+						break;
+					}
+					case GAL: {
+						X = eca.getGalacticLongitude();
+						Y = eca.getGalacticLatitude();
+						MollweideProjection projection = new MollweideProjection();
+						Point2D mp = projection.project(Math.toRadians(X>=180?X-360:X), Math.toRadians(Y));
+						X = Math.toDegrees(mp.getX());
+						Y = Math.toDegrees(mp.getY());
+						break;
+					}
+					case EQ:
+					default: {
+						X = lastPoint.getRightAscensionAsDecimalDegrees();
+						Y = lastPoint.getDeclinaisonAsDecimalDegrees();
+						break;
+					}
 				}
 				optimizedData.setValue(i, 0, X);
 				optimizedData.setValue(i, serieIndexes.getConstellationBoundarySerieIndex(), Y);
@@ -551,41 +446,56 @@ public class DsoCatalogGWT implements EntryPoint {
 					double endX = 0;
 					double endY = 0;
 					switch(cs) {
-					case ALTAZ:
-						GeographicCoordinates observatory = new GeographicCoordinates(observer.getLatitude(), observer.getLongitude()); 
-						startX = lineStart.getAzimuth(observatory, observer.getGreenwichSiderealTime());
-						startY = lineStart.getElevation(observatory, observer.getGreenwichSiderealTime());
-						endX = lineEnd.getAzimuth(observatory, observer.getGreenwichSiderealTime());
-						endY = lineEnd.getElevation(observatory, observer.getGreenwichSiderealTime());
-						break;
-					case ECL:
-						startX = lineStart.getEcliptiqueLongitude();
-						startY = lineStart.getEcliptiqueLatitude();
-						endX = lineEnd.getEcliptiqueLongitude();
-						endY = lineEnd.getEcliptiqueLatitude();
-						break;
-					case GAL:
-						MollweideProjection projection = new MollweideProjection();
-						
-						startX = lineStart.getGalacticLongitude();
-						startY = lineStart.getGalacticLatitude();
-						Point2D pStart = projection.project(Math.toRadians(startX>=180?startX-360:startX), Math.toRadians(startY));
-						startX = Math.toDegrees(pStart.getX());
-						startY = Math.toDegrees(pStart.getY());
-
-						endX = lineEnd.getGalacticLongitude();
-						endY = lineEnd.getGalacticLatitude();
-						Point2D pEnd = projection.project(Math.toRadians(endX>=180?endX-360:endX), Math.toRadians(endY));
-						endX = Math.toDegrees(pEnd.getX());
-						endY = Math.toDegrees(pEnd.getY());
-						break;
-					case EQ:
-					default:
-						startX = l.getStartRightAscension();
-						startY = l.getStartDeclinaison();
-						endX = l.getEndRightAscension();
-						endY = l.getEndDeclinaison();
-						break;
+						case ALTAZ: {
+							Projection projection = new StereographicProjection();
+							
+							GeographicCoordinates observatory = new GeographicCoordinates(observer.getLatitude(), observer.getLongitude()); 
+							startX = lineStart.getAzimuth(observatory, observer.getGreenwichSiderealTime());
+							startY = lineStart.getElevation(observatory, observer.getGreenwichSiderealTime());
+							if (startY < 0) startY = 0;
+							Point2D pStart = projection.project(Math.toRadians(startX), Math.toRadians(startY));
+							startX = Math.toDegrees(pStart.getX());
+							startY = Math.toDegrees(pStart.getY());
+							
+							endX = lineEnd.getAzimuth(observatory, observer.getGreenwichSiderealTime());
+							endY = lineEnd.getElevation(observatory, observer.getGreenwichSiderealTime());
+							if (endY < 0) endY = 0;
+							Point2D pEnd = projection.project(Math.toRadians(endX), Math.toRadians(endY));
+							endX = Math.toDegrees(pEnd.getX());
+							endY = Math.toDegrees(pEnd.getY());
+							break;
+						}
+						case ECL: {
+							startX = lineStart.getEcliptiqueLongitude();
+							startY = lineStart.getEcliptiqueLatitude();
+							endX = lineEnd.getEcliptiqueLongitude();
+							endY = lineEnd.getEcliptiqueLatitude();
+							break;
+						}
+						case GAL: {
+							Projection projection = new MollweideProjection();
+							
+							startX = lineStart.getGalacticLongitude();
+							startY = lineStart.getGalacticLatitude();
+							Point2D pStart = projection.project(Math.toRadians(startX>=180?startX-360:startX), Math.toRadians(startY));
+							startX = Math.toDegrees(pStart.getX());
+							startY = Math.toDegrees(pStart.getY());
+	
+							endX = lineEnd.getGalacticLongitude();
+							endY = lineEnd.getGalacticLatitude();
+							Point2D pEnd = projection.project(Math.toRadians(endX>=180?endX-360:endX), Math.toRadians(endY));
+							endX = Math.toDegrees(pEnd.getX());
+							endY = Math.toDegrees(pEnd.getY());
+							break;
+						}
+						case EQ:
+						default: {
+							startX = l.getStartRightAscension();
+							startY = l.getStartDeclinaison();
+							endX = l.getEndRightAscension();
+							endY = l.getEndDeclinaison();
+							break;
+						}
 					}
 					
 					
@@ -606,180 +516,6 @@ public class DsoCatalogGWT implements EntryPoint {
 		return optimizedData;
 	}
 	
-	private String generateTooltip(AstroObject o, Observer observer) {
-		StringBuffer sb = new StringBuffer();
-		// Object type...
-		if (o instanceof Star) {
-			Star s = (Star) o;
-			sb.append("Star ");
-			if (s.getSpectralType() != null) {
-				sb.append(s.getSpectralType());
-			}
-			sb.append(" \n");
-		} else if (o instanceof DeepSkyObject) {
-			DeepSkyObject dso = (DeepSkyObject) o;
-			sb.append(dso.getType().getComment());
-			if (dso.getClasstype() != null) {
-				sb.append(" "+dso.getClasstype());
-			}
-			sb.append(" \n");
-		}
-		
-		// Identifier and magnitude...
-		sb.append(o.getIdentifier()+"\n");
-		if (o instanceof Star && ((Star)o).getSaoNumber() != null) {
-			sb.append("SAO " + ((Star)o).getSaoNumber() + "\n");
-		}
-		sb.append("Mag.="+o.getVisualMagnitude()+"\n");
-		
-		// Coordinates...
-		if (o instanceof Star) {
-			Star s = (Star) o;
-			sb.append("RA="+s.getRightAscensionHour()+"h "+s.getRightAscensionMinute()+"m "+s.getRightAscensionSecond()+"s \n");
-			sb.append("DEC="+s.getDeclinaisonSignus()+s.getDeclinaisonDegree()+"° "+s.getDeclinaisonMinute()+"m "+s.getDeclinaisonSecond()+"s \n");
-		} else if (o instanceof DeepSkyObject) {
-			DeepSkyObject dso = (DeepSkyObject) o;
-			sb.append("RA="+dso.getRightAscensionHour()+"h "+dso.getRightAscensionMinute()+"m \n");
-			sb.append("DEC="+dso.getDeclinaisonDegree()+"° "+dso.getDeclinaisonMinute()+"m \n");
-		}
-		
-		CoordinatesSystem cs =
-				CoordinatesSystem.instanceOf(appPanel.liCoordinatesMode.getValue(appPanel.liCoordinatesMode.getSelectedIndex())); 
-		switch(cs) {
-			case ECL:
-				sb.append("Longitude ecl.="+o.getXCoordinateForReferential(cs)+"° \n");
-				sb.append("Latitude ecl.="+o.getYCoordinateForReferential(cs)+"° \n");
-				break;
-			case GAL:
-				sb.append("Longitude gal.="+o.getXCoordinateForReferential(cs)+"° \n");
-				sb.append("Latitude gal.="+o.getYCoordinateForReferential(cs)+"° \n");
-				break;
-			case EQ:
-				break;
-			case ALTAZ:
-				sb.append("Azimuth="+o.getXCoordinateForReferential(cs, observer)+"° \n");
-				sb.append("Elevation="+o.getYCoordinateForReferential(cs, observer)+"° \n");
-				break;
-		}
-		return sb.toString();
-	}
-	
-	private Options createLineChartOptions(CatalogSearchOptions searchOptions) {
-		String coordinatesMode = appPanel.liCoordinatesMode.getValue(appPanel.liCoordinatesMode.getSelectedIndex());
-		MyLineChartOptions options = MyLineChartOptions.create();
-		int chartWidth = Window.getClientWidth() - (2 * ApplicationBoard.PANEL_SPLITTER_WIDTH) - ApplicationBoard.LEFT_PANEL_WIDTH - ApplicationBoard.RIGHT_PANEL_WIDTH;
-		int chartHeight = Window.getClientHeight() - 25;
-		options.setWidth(chartWidth);
-		options.setHeight(chartHeight);
-		ChartArea area = ChartArea.create();
-		area.setLeft(25);
-		area.setTop(25);
-		area.setWidth("85%");
-		area.setHeight("85%");
-		options.setChartArea(area);
-		options.setBackgroundColor(STYLE_CHART_BACKGROUND_COLOR);
-		AxisOptions hAxisOptions = AxisOptions.create();
-		AxisOptions vAxisOptions = AxisOptions.create();
-		TextStyle axisTitleTextStyle = TextStyle.create();
-		axisTitleTextStyle.setColor("#ffffff");
-		hAxisOptions.setTitleTextStyle(axisTitleTextStyle);
-		vAxisOptions.setTitleTextStyle(axisTitleTextStyle);
-		if (coordinatesMode.equals(""+CoordinatesSystem.ALTAZ) && appPanel.chkShowObjectsUnderHorizon.getValue() == false) {
-			vAxisOptions.setMinValue(0);
-		} else {
-			vAxisOptions.setMinValue(-90);
-		}
-		vAxisOptions.setMaxValue(90);
-		if ((""+CoordinatesSystem.ECL).equals(coordinatesMode)) {
-			hAxisOptions.setMinValue(-180);
-			hAxisOptions.setMaxValue(180);
-			hAxisOptions.setTitle("LONGITUDE ECLIPTIQUE");
-			vAxisOptions.setTitle("LATITUDE ECLIPTIQUE");
-		} else if ((""+CoordinatesSystem.GAL).equals(coordinatesMode)) {
-			hAxisOptions.setMinValue(-180);
-			hAxisOptions.setMaxValue(180);
-			hAxisOptions.setTitle("LONGITUDE GALACTIQUE");
-			vAxisOptions.setTitle("LATITUDE GALACTIQUE");
-		} else if ((""+CoordinatesSystem.ALTAZ).equals(coordinatesMode)) {
-			hAxisOptions.setMinValue(-180);
-			hAxisOptions.setMaxValue(180);
-			hAxisOptions.setTitle("AZIMUTH");
-			vAxisOptions.setTitle("ELEVATION");
-		} else if ((""+CoordinatesSystem.EQ).equals(coordinatesMode)) {
-			if (!appPanel.liConstellations.getValue(appPanel.liConstellations.getSelectedIndex()).isEmpty()) {
-				// We set the limit of the map to the limit of the selected constellation...
-				String constellation = appPanel.liConstellations.getValue(appPanel.liConstellations.getSelectedIndex());
-				EquatorialCoordinates upperWesterMapLimit = constellationsList.get(constellation).getUpperWesternMapLimit(1);
-				EquatorialCoordinates lowerEasterMapLimit = constellationsList.get(constellation).getLowerEasternMapLimit(1);
-				hAxisOptions.setMinValue((int)upperWesterMapLimit.getRightAscension());
-				hAxisOptions.setMaxValue((int)(lowerEasterMapLimit.getRightAscension()+1));
-				vAxisOptions.setMinValue((int)lowerEasterMapLimit.getDeclinaison());
-				vAxisOptions.setMaxValue((int)(upperWesterMapLimit.getDeclinaison()+1));
-			} else {
-				hAxisOptions.setMinValue(0);
-				hAxisOptions.setMaxValue(360);
-			}
-			hAxisOptions.setTitle("ASCENSION DROITE");
-			vAxisOptions.setTitle("DECLINAISON");
-		}
-		options.set("pointShape", "star");
-		options.setPointSize(5);
-		options.setLineWidth(0);
-		TextStyle textStyle = TextStyle.create();
-		textStyle.setColor("#ffffff");
-		hAxisOptions.setDirection(-1);
-		hAxisOptions.setTextStyle(textStyle);
-		vAxisOptions.setTextStyle(textStyle);
-		options.setHAxisOptions(hAxisOptions);
-		options.setVAxisOptions(vAxisOptions);
-		options.setLegendTextStyle(textStyle);
-		if (searchOptions.isDisplayConstellationNames()) {
-			TextStyle annotationTextStyle = TextStyle.create();
-			annotationTextStyle.setColor(STYLE_CONSTELLATION_NAME_TEXT_COLOR);
-			options.setAnnotationTextStyle(annotationTextStyle);
-		}
-		// Trying to fine-tune the series representation options...
-		options = createSeriesOptions(options, searchOptions);
-		return options;
-	}
-	
-	private static MyLineChartOptions createSeriesOptions(MyLineChartOptions options, CatalogSearchOptions searchOptions) {
-		DataSerieIndexes serieIndexes = new DataSerieIndexes(searchOptions);
-		int i=0;
-		for (i=0 ; i<serieIndexes.getObjectSeriesCount() ; i++) {
-			MySeries s = MySeries.create();
-			s.setLineWidth(0);
-			s.setVisibleInLegend(false);
-			options.setSeries(i, s);
-		}
-		if (searchOptions.isDisplayConstellationNames()) {
-			MySeries s = MySeries.create();
-			s.setVisibleInLegend(false);
-			options.setSeries(i, s);
-			i++;
-		}
-		if (searchOptions.isDisplayConstellationBoundaries()) {
-			MySeries s = MySeries.create();
-			s.setLineWidth(1);
-			s.setPointSize(0);
-			s.setLineDashStyle(new int[]{5, 1, 3});
-			s.setColor(STYLE_CONSTELLATION_BORDER_COLOR);
-			s.setVisibleInLegend(false);
-			options.setSeries(i, s);
-			i++;
-		}
-		if (searchOptions.isDisplayConstellationShape()) {
-			MySeries s = MySeries.create();
-			s.setLineWidth(1);
-			s.setPointSize(0);
-			s.setColor(STYLE_CONSTELLATION_SHAPE_COLOR);
-			s.setVisibleInLegend(false);
-			options.setSeries(i, s);
-			i++;
-		}
-		return options;
-	}
-	
 	private void fetchObjectDetails(final ObjectReference objectReference) {
 		if (objectReference.isStar()) {
 			catalogService.findStarByHrNumber(objectReference.getId(), new AsyncCallback<Star>() {
@@ -790,7 +526,7 @@ public class DsoCatalogGWT implements EntryPoint {
 
 				@Override
 				public void onSuccess(Star result) {
-					displayObjectDetails(result);
+					VisualizationHelper.displayObjectDetails(result, appPanel.objectDetailsTable);
 				}
 			});
 		} else if (objectReference.isDeepSkyObject()) {
@@ -802,97 +538,10 @@ public class DsoCatalogGWT implements EntryPoint {
 				
 				@Override
 				public void onSuccess(DeepSkyObject result) {
-					displayObjectDetails(result);
+					VisualizationHelper.displayObjectDetails(result, appPanel.objectDetailsTable);
 				}
 			});
 		}
-	}
-	
-	private void displayObjectDetails(AstroObject ao) {
-		appPanel.objectDetailsTable.removeAllRows();
-		int row = 0;
-
-		appPanel.objectDetailsTable.setHTML(row, 0, "<b>"+ao.getIdentifier()+"</b>");
-		appPanel.objectDetailsTable.getFlexCellFormatter().setColSpan(row, 0, 2);
-		row++;
-		
-		Sexagesimal ra = new Sexagesimal(ao.getRightAscension() / 15);
-		appPanel.objectDetailsTable.setText(row, 0, "RIGHT ASCENSION (J2000)");
-		appPanel.objectDetailsTable.setText(row++, 1, ra.toString(SexagesimalType.HOURS));
-		
-		Sexagesimal dec = new Sexagesimal(ao.getDeclinaison());
-		appPanel.objectDetailsTable.setText(row, 0, "DECLINAISON (J2000)");
-		appPanel.objectDetailsTable.setText(row++, 1, dec.toString(SexagesimalType.DEGREES));
-		
-		if (ao instanceof Star) {
-			Star o = (Star) ao;
-			
-			appPanel.objectDetailsTable.setText(row, 0, "HR NUMBER");
-			appPanel.objectDetailsTable.setText(row++, 1, ""+o.getHrNumber());
-			
-			appPanel.objectDetailsTable.setText(row, 0, "HD NUMBER");
-			appPanel.objectDetailsTable.setText(row++, 1, ""+o.getHdNumber());
-			
-			appPanel.objectDetailsTable.setText(row, 0, "SAO NUMBER");
-			appPanel.objectDetailsTable.setText(row++, 1, ""+o.getSaoNumber());
-			
-			appPanel.objectDetailsTable.setText(row, 0, "MAGNITUDE");
-			appPanel.objectDetailsTable.setText(row++, 1, ""+o.getVisualMagnitude());
-			
-			appPanel.objectDetailsTable.setText(row, 0, "MAGNITUDE B-V");
-			appPanel.objectDetailsTable.setText(row++, 1, ""+o.getBvMag()+(o.isUncertainBvMag() ? " (uncertain) " : ""));
-			
-			appPanel.objectDetailsTable.setText(row, 0, "MAGNITUDE U-B");
-			appPanel.objectDetailsTable.setText(row++, 1, ""+o.getUbMag()+(o.isUncertainUbMag() ? " (uncertain) " : ""));
-			
-			appPanel.objectDetailsTable.setText(row, 0, "MAGNITUDE R-I");
-			appPanel.objectDetailsTable.setText(row++, 1, ""+o.getRiMag());
-			
-			appPanel.objectDetailsTable.setText(row, 0,  "SPECTRAL TYPE");
-			appPanel.objectDetailsTable.setText(row++, 1, o.getSpectralType());
-			
-			appPanel.objectDetailsTable.setText(row, 0, "IR SOURCE ?");
-			appPanel.objectDetailsTable.setText(row++, 1, ""+o.isIrSource());
-			
-		} else if (ao instanceof DeepSkyObject) {
-			DeepSkyObject o = (DeepSkyObject) ao;
-			
-			appPanel.objectDetailsTable.setText(row, 0, "OTHER NAME");
-			appPanel.objectDetailsTable.setText(row++, 1, o.getOtherName());
-			
-			appPanel.objectDetailsTable.setText(row, 0, "OBJECT TYPE");
-			appPanel.objectDetailsTable.setText(row++, 1, o.getObjectType());
-			
-			appPanel.objectDetailsTable.setText(row, 0, "CONSTELLATION");
-			appPanel.objectDetailsTable.setText(row++, 1, o.getConstellation().getName());
-			
-			appPanel.objectDetailsTable.setText(row, 0, "MAGNITUDE");
-			appPanel.objectDetailsTable.setText(row++, 1, ""+o.getMagnitude());
-			
-			appPanel.objectDetailsTable.setText(row, 0, "SURFACE BRIGHTNESS");
-			appPanel.objectDetailsTable.setText(row++, 1, ""+o.getSurfaceBrightness());
-			
-			appPanel.objectDetailsTable.setText(row, 0, "SIZE");
-			appPanel.objectDetailsTable.setText(row++, 1, ""+o.getSizeHumanReadable());
-			
-			appPanel.objectDetailsTable.setText(row, 0, "IN BEST NGC CATALOG");
-			appPanel.objectDetailsTable.setText(row++, 1, ""+o.isInBestNgcCatalog());
-			
-			appPanel.objectDetailsTable.setText(row, 0, "IN CALDWELL CATALOG");
-			appPanel.objectDetailsTable.setText(row++, 1, ""+o.isInCaldwellCalatalog());
-			
-			appPanel.objectDetailsTable.setText(row, 0, "IN HERSCHEL CATALOG");
-			appPanel.objectDetailsTable.setText(row++, 1, ""+o.isInHerschelCatalog());
-			
-			appPanel.objectDetailsTable.setText(row, 0, "IN MESSIER CATALOG");
-			appPanel.objectDetailsTable.setText(row++, 1, ""+o.isInMessierCatalog());
-			
-			appPanel.objectDetailsTable.setHTML(row, 0, "<a href='http://deepskypedia.com/w/index.php?search="+o.getName()+"' target='_blank'>[+]</a>");
-					appPanel.objectDetailsTable.getFlexCellFormatter().setColSpan(row, 0, 2);
-			row++;
-			
-		}
-		
 	}
 	
 }
