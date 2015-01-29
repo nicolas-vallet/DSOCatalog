@@ -23,6 +23,7 @@
 		<meeus-engine.version>1.0-SNAPSHOT</meeus-engine.version>
 		<planetary-ephemeris-engine.version>1.0-SNAPSHOT</planetary-ephemeris-engine.version>
 		<junit.version>4.12</junit.version>
+		<joda-time.version>2.7</joda-time.version>
 	</properties>
 
 	<dependencies>
@@ -126,6 +127,11 @@
 			<artifactId>junit</artifactId>
 			<version>${junit.version}</version>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>joda-time</groupId>
+			<artifactId>joda-time</artifactId>
+			<version>${joda-time.version}</version>
 		</dependency>
 	</dependencies>
 	

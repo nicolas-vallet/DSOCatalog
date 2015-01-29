@@ -5,12 +5,14 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeUtils;
+import org.joda.time.DateTimeZone;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.nzv.astro.ephemeris.coordinate.impl.EquatorialCoordinates;
-import com.nzv.astro.ephemeris.planetary.DateOps;
 import com.nzv.astro.ephemeris.planetary.Latitude;
 import com.nzv.astro.ephemeris.planetary.Longitude;
 import com.nzv.astro.ephemeris.planetary.NoInitException;
@@ -216,7 +218,17 @@ public class PublicCatalogServiceImpl implements PublicCatalogService {
 		ObsInfo observatory = new ObsInfo(new Latitude(options.getObservatoryLatitude()), new Longitude(options.getObservatoryLongitude()));
 		
 		// TODO : compute the Julian day based on the observer configuration...
-		double jd = options.getObserverCurrentJulianDay();
+		String[] date = options.getObserverCurrentDateAsString().split("/");
+		int j = Integer.valueOf(date[0]);
+		int m = Integer.valueOf(date[1]);
+		int a = Integer.valueOf(date[2]);
+		String[] time = options.getObserverCurrentTimeAsString().split(":");
+		int H = Integer.valueOf(time[0]);
+		int M = Integer.valueOf(time[1]);
+		int S = Integer.valueOf(time[2]);
+		
+		DateTime dt = new DateTime(a, m, j, H, M, S, DateTimeZone.forOffsetHours(options.getObserverGreenwhichHourOffset()));
+		double jd = DateTimeUtils.toJulianDay(dt.getMillis());
 		logger.info("CURRENT JULIAN DAY="+jd);
 		
 		try {

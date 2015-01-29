@@ -19,7 +19,6 @@ import com.google.gwt.visualization.client.VisualizationUtils;
 import com.google.gwt.visualization.client.events.SelectHandler;
 import com.google.gwt.visualization.client.visualizations.corechart.LineChart;
 import com.google.gwt.visualization.client.visualizations.corechart.Options;
-import com.nzv.astro.ephemeris.JulianDay;
 import com.nzv.astro.ephemeris.Sexagesimal;
 import com.nzv.astro.ephemeris.coordinate.GeographicCoordinates;
 import com.nzv.astro.ephemeris.coordinate.adapter.EquatorialCoordinatesAdapter;
@@ -207,9 +206,6 @@ public class DsoCatalogGWT implements EntryPoint {
 		Sexagesimal T = new Sexagesimal(H-Integer.valueOf(appPanel.txtGreenwichHourOffset.getText()), M, S);
 		double gst = DateComputation.getMeanSiderealTimeAsHoursFromJulianDay(jd, T);
 		observer.setGreenwichSiderealTime(gst);
-		
-		jd = DateComputation.getJulianDayFromDateAsDouble(Double.valueOf(a+"."+m+j), T);
-		observer.setCurrentJulianDay(jd);
 		return observer;
 	}
 	
@@ -235,6 +231,25 @@ public class DsoCatalogGWT implements EntryPoint {
 			String styleToUse = new String();
 			ObjectReference objectReference = null;
 			if (o instanceof Planet) {
+				// In case we are only displaying one constellation, we must check than this planet is actually inside the desired constellation's boundary.
+				if (showOneConstellation && cs == CoordinatesSystem.EQ) {
+					Constellation c = constellationsList.get(searchOptions.getRestrictedToConstellationCode());
+					if (!c.isSpreadOnBothSidesOfRightAscensionOriginAxis()) {
+						if (c.getUpperWesternMapLimit(0).getRightAscension() < o.getRightAscension() ||
+								c.getUpperWesternMapLimit(0).getDeclinaison() < o.getDeclinaison() ||
+								c.getLowerEasternMapLimit(0).getRightAscension() > o.getRightAscension() ||
+								c.getLowerEasternMapLimit(0).getDeclinaison() > o.getDeclinaison()) {
+							continue;
+						}
+					} else {
+						if (c.getUpperWesternMapLimit(0).getRightAscension() > o.getRightAscension() ||
+								c.getUpperWesternMapLimit(0).getDeclinaison() > o.getDeclinaison() ||
+								c.getLowerEasternMapLimit(0).getRightAscension() < o.getRightAscension() ||
+								c.getLowerEasternMapLimit(0).getDeclinaison() < o.getDeclinaison()) {
+							continue;
+						}
+					}
+				}
 				serieIndexToUse = serieIndexes.getPlanetSerieIndex();
 				styleToUse = STYLE_PLANETS.get(((Planet)o).getNumericIdentifier());
 				objectReference = new ObjectReference(true, false, false, ((Planet)o).getNumericIdentifier());

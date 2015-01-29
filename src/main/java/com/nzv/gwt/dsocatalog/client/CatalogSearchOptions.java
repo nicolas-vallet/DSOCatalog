@@ -53,7 +53,9 @@ public class CatalogSearchOptions implements Serializable {
 	private boolean findNebulas = false;
 	private boolean findSupernovaRemnant = false;
 	private boolean findQuasars = false;
-	private double observerCurrentJulianDay = 0;
+	private String observerCurrentDateAsString;
+	private String observerCurrentTimeAsString;
+	private int observerGreenwhichHourOffset;
 	private double observatoryLatitude = 0;
 	private double observatoryLongitude = 0;
 	
@@ -187,16 +189,40 @@ public class CatalogSearchOptions implements Serializable {
 		this.findQuasars = findQuasars;
 	}
 	
-	public double getObserverCurrentJulianDay() {
-		return observerCurrentJulianDay;
-	}
-
-	public void setObserverCurrentJulianDay(double observerCurrentJulianDay) {
-		this.observerCurrentJulianDay = observerCurrentJulianDay;
-	}
-
+//	public double getObserverCurrentJulianDay() {
+//		return observerCurrentJulianDay;
+//	}
+//
+//	public void setObserverCurrentJulianDay(double observerCurrentJulianDay) {
+//		this.observerCurrentJulianDay = observerCurrentJulianDay;
+//	}
+	
 	public double getObservatoryLatitude() {
 		return observatoryLatitude;
+	}
+
+	public String getObserverCurrentDateAsString() {
+		return observerCurrentDateAsString;
+	}
+
+	public void setObserverCurrentDateAsString(String observerCurrentDateAsString) {
+		this.observerCurrentDateAsString = observerCurrentDateAsString;
+	}
+
+	public String getObserverCurrentTimeAsString() {
+		return observerCurrentTimeAsString;
+	}
+
+	public void setObserverCurrentTimeAsString(String observerCurrentTimeAsString) {
+		this.observerCurrentTimeAsString = observerCurrentTimeAsString;
+	}
+
+	public int getObserverGreenwhichHourOffset() {
+		return observerGreenwhichHourOffset;
+	}
+
+	public void setObserverGreenwhichHourOffset(int observerGreenwhichHourOffset) {
+		this.observerGreenwhichHourOffset = observerGreenwhichHourOffset;
 	}
 
 	public void setObservatoryLatitude(double observatoryLatitude) {

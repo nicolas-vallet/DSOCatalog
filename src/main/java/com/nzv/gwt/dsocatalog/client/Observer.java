@@ -8,7 +8,7 @@ public class Observer implements Serializable {
 	private double latitude;
 	private double longitude;
 	private double greenwichSiderealTime;
-	private double currentJulianDay;
+//	private double currentJulianDay;
 
 	public double getLatitude() {
 		return latitude;
@@ -34,12 +34,12 @@ public class Observer implements Serializable {
 		this.greenwichSiderealTime = greenwichSiderealTime;
 	}
 
-	public double getCurrentJulianDay() {
-		return currentJulianDay;
-	}
-
-	public void setCurrentJulianDay(double currentJulianDay) {
-		this.currentJulianDay = currentJulianDay;
-	}
+//	public double getCurrentJulianDay() {
+//		return currentJulianDay;
+//	}
+//
+//	public void setCurrentJulianDay(double currentJulianDay) {
+//		this.currentJulianDay = currentJulianDay;
+//	}
 
 }

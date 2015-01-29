@@ -322,7 +322,9 @@ public class ApplicationBoard extends SplitLayoutPanel {
 		options.setFindSupernovaRemnant(chkDisplaySupernovaRemnants.getValue());
 		options.setFindQuasars(chkDisplayQuasars.getValue());
 		Observer observer = application.initializeObserver();
-		options.setObserverCurrentJulianDay(observer.getCurrentJulianDay());
+		options.setObserverCurrentDateAsString(txtObserverDate.getText());
+		options.setObserverCurrentTimeAsString(txtObserverLocalTime.getText());
+		options.setObserverGreenwhichHourOffset(Integer.parseInt(txtGreenwichHourOffset.getText()));
 		options.setObservatoryLatitude(observer.getLatitude());
 		options.setObservatoryLongitude(observer.getLongitude());
 		return options;
