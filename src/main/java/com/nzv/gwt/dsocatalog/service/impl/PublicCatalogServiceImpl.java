@@ -216,22 +216,28 @@ public class PublicCatalogServiceImpl implements PublicCatalogService {
 		ObsInfo observatory = new ObsInfo(new Latitude(options.getObservatoryLatitude()), new Longitude(options.getObservatoryLongitude()));
 		
 		// TODO : compute the Julian day based on the observer configuration...
-		long jd = DateOps.nowToDay();
+		double jd = options.getObserverCurrentJulianDay();
+		logger.info("CURRENT JULIAN DAY="+jd);
 		
 		try {
+			// Sun
+			planetaryEngine.calc(Planets.SUN, jd, observatory);
+			planets.add(new Planet(Planet.SUN, "SUN", null, 
+					Math.toDegrees(planetaryEngine.getRightAscension()), Math.toDegrees(planetaryEngine.getDeclination())));
+			
 			// Mercury
 			planetaryEngine.calc(Planets.MERCURY, jd, observatory);
-			planets.add(new Planet(Planets.MERCURY, "MERCURE", null, 
+			planets.add(new Planet(Planet.MERCURY, "MERCURE", null, 
 					Math.toDegrees(planetaryEngine.getRightAscension()), Math.toDegrees(planetaryEngine.getDeclination())));
 			
 			// Venus
 			planetaryEngine.calc(Planets.VENUS, jd, observatory);
-			planets.add(new Planet(Planets.VENUS, "VENUS", null,
+			planets.add(new Planet(Planet.VENUS, "VENUS", null,
 					Math.toDegrees(planetaryEngine.getRightAscension()), Math.toDegrees(planetaryEngine.getDeclination())));
 			
 			// Mars
 			planetaryEngine.calc(Planets.MARS, jd, observatory);
-			planets.add(new Planet(Planets.MARS, "MARS", null, 
+			planets.add(new Planet(Planet.MARS, "MARS", null, 
 					Math.toDegrees(planetaryEngine.getRightAscension()), Math.toDegrees(planetaryEngine.getDeclination())));
 			
 			// Saturn
@@ -241,17 +247,17 @@ public class PublicCatalogServiceImpl implements PublicCatalogService {
 			
 			// Jupiter
 			planetaryEngine.calc(Planets.JUPITER, jd, observatory);
-			planets.add(new Planet(Planets.JUPITER, "JUPITER", null, 
+			planets.add(new Planet(Planet.JUPITER, "JUPITER", null, 
 					Math.toDegrees(planetaryEngine.getRightAscension()), Math.toDegrees(planetaryEngine.getDeclination())));
 			
 			// Uranus
 			planetaryEngine.calc(Planets.URANUS, jd, observatory);
-			planets.add(new Planet(Planets.URANUS, "URANUS", null,
+			planets.add(new Planet(Planet.URANUS, "URANUS", null,
 					Math.toDegrees(planetaryEngine.getRightAscension()), Math.toDegrees(planetaryEngine.getDeclination())));
 			
 			// Neptune
 			planetaryEngine.calc(Planets.NEPTUNE, jd, observatory);
-			planets.add(new Planet(Planets.NEPTUNE, "NEPTUNE", null, 
+			planets.add(new Planet(Planet.NEPTUNE, "NEPTUNE", null, 
 					Math.toDegrees(planetaryEngine.getRightAscension()), Math.toDegrees(planetaryEngine.getDeclination())));
 			
 		} catch (NoInitException e) {

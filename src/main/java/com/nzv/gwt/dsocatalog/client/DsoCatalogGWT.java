@@ -19,6 +19,7 @@ import com.google.gwt.visualization.client.VisualizationUtils;
 import com.google.gwt.visualization.client.events.SelectHandler;
 import com.google.gwt.visualization.client.visualizations.corechart.LineChart;
 import com.google.gwt.visualization.client.visualizations.corechart.Options;
+import com.nzv.astro.ephemeris.JulianDay;
 import com.nzv.astro.ephemeris.Sexagesimal;
 import com.nzv.astro.ephemeris.coordinate.GeographicCoordinates;
 import com.nzv.astro.ephemeris.coordinate.adapter.EquatorialCoordinatesAdapter;
@@ -51,7 +52,19 @@ public class DsoCatalogGWT implements EntryPoint {
 	public static String STYLE_CONSTELLATION_NAME_TEXT_COLOR = "#90AEF0";
 	public static String STYLE_CONSTELLATION_BORDER_COLOR = "#888888";
 	public static String STYLE_CONSTELLATION_SHAPE_COLOR = "#90AEF0";
-	public static String STYLE_PLANETS = "point {shape-type: circle; size: 6; fill-color #F5F52A; }";
+//	public static String STYLE_PLANETS = "point {shape-type: circle; size: 6; fill-color #f5f52a; }";
+	public static Map<Integer, String> STYLE_PLANETS = new HashMap<Integer, String>(); 
+	static {
+		STYLE_PLANETS.put(Planet.MERCURY, "point {shape-type: circle; size: 2; fill-color: #b8b8b8; }");
+		STYLE_PLANETS.put(Planet.VENUS, "point {shape-type: circle; size: 3; fill-color: #d1d1c2; }");
+		STYLE_PLANETS.put(Planet.MARS, "point {shape-type: circle; size: 2; fill-color: #fc9935; }");
+		STYLE_PLANETS.put(Planet.JUPITER, "point {shape-type: circle; size: 6; fill-color: #f7be6d; }");
+		STYLE_PLANETS.put(Planet.SATURN, "point {shape-type: circle; size: 6; fill-color: #ebdbc5; }");
+		STYLE_PLANETS.put(Planet.URANUS, "point {shape-type: circle; size: 4; fill-color: #7aebe9; }");
+		STYLE_PLANETS.put(Planet.NEPTUNE, "point {shape-type: circle; size: 4; fill-color: #107fe0; }");
+		STYLE_PLANETS.put(Planet.SUN, "point {shape-type: circle; size: 10; fill-color: #ffff30; }");
+		STYLE_PLANETS.put(Planet.MOON, "point {shape-type: circle; size: 8; fill-color: #dbdbdb; }");
+	}
 	public static String STYLE_STARS = "point {shape-type: star;shape-dent: 0.2; size: SIZE_STAR; fill-color: #f29500;}";
 	public static int STYLE_STARS_POINT_SIZE_MAX = 7;
 	public static String STYLE_ASTERISMS = "point { shape-type: polygon; size: 4; fill-color: #132345; stroke-color: #f29500; stroke-width: 1;}";
@@ -160,7 +173,7 @@ public class DsoCatalogGWT implements EntryPoint {
 				});
 	}
 	
-	private Observer initializeObserver() {
+	protected Observer initializeObserver() {
 		Observer observer = new Observer();
 		observer.setLatitude(Double.valueOf(appPanel.txtObserverLatitude.getText()));
 		observer.setLongitude(Double.valueOf(appPanel.txtObserverLongitude.getText()));
@@ -181,7 +194,6 @@ public class DsoCatalogGWT implements EntryPoint {
 			j = Integer.valueOf(date[0]);
 			m = Integer.valueOf(date[1]);
 			a = Integer.valueOf(date[2]);
-			jd = DateComputation.getJulianDayFromDateAsDouble(Double.valueOf(a+"."+m+j));
 		} else if (H + Integer.valueOf(appPanel.txtGreenwichHourOffset.getText()) > 23) {
 			// We must consider the day after the one specified...
 			Date dateInGreenwhich = ApplicationBoard.dtfDate.parse(appPanel.txtObserverDate.getText());
@@ -190,13 +202,14 @@ public class DsoCatalogGWT implements EntryPoint {
 			j = Integer.valueOf(date[0]);
 			m = Integer.valueOf(date[1]);
 			a = Integer.valueOf(date[2]);
-			jd = DateComputation.getJulianDayFromDateAsDouble(Double.valueOf(a+"."+m+j));
-		} else {
-			jd = DateComputation.getJulianDayFromDateAsDouble(Double.valueOf(a+"."+m+j));
 		}
-		double gst = DateComputation.getMeanSiderealTimeAsHoursFromJulianDay(
-				jd, new Sexagesimal(H-Integer.valueOf(appPanel.txtGreenwichHourOffset.getText()), M, S));
+		jd = DateComputation.getJulianDayFromDateAsDouble(Double.valueOf(a+"."+m+j));
+		Sexagesimal T = new Sexagesimal(H-Integer.valueOf(appPanel.txtGreenwichHourOffset.getText()), M, S);
+		double gst = DateComputation.getMeanSiderealTimeAsHoursFromJulianDay(jd, T);
 		observer.setGreenwichSiderealTime(gst);
+		
+		jd = DateComputation.getJulianDayFromDateAsDouble(Double.valueOf(a+"."+m+j), T);
+		observer.setCurrentJulianDay(jd);
 		return observer;
 	}
 	
@@ -223,7 +236,7 @@ public class DsoCatalogGWT implements EntryPoint {
 			ObjectReference objectReference = null;
 			if (o instanceof Planet) {
 				serieIndexToUse = serieIndexes.getPlanetSerieIndex();
-				styleToUse = STYLE_PLANETS;
+				styleToUse = STYLE_PLANETS.get(((Planet)o).getNumericIdentifier());
 				objectReference = new ObjectReference(true, false, false, ((Planet)o).getNumericIdentifier());
 			} else if (o instanceof Star) {
 				serieIndexToUse = serieIndexes.getStarSerieIndex();
@@ -549,5 +562,4 @@ public class DsoCatalogGWT implements EntryPoint {
 			});
 		}
 	}
-	
 }

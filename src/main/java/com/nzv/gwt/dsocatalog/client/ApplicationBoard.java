@@ -40,6 +40,7 @@ public class ApplicationBoard extends SplitLayoutPanel {
 	protected static final DateTimeFormat dtfDate = DateTimeFormat.getFormat(DsoCatalogGWT.DATE_FORMAT);
 	protected static final DateTimeFormat dtfTime = DateTimeFormat.getFormat(DsoCatalogGWT.TIME_FORMAT);
 
+	DsoCatalogGWT application;
 	VerticalPanel filterPanel = new VerticalPanel();
 	CheckBox chkDisplayPlanets = new CheckBox("Afficher les planètes");
 	Label lbConstellation = new Label("Constellation : ");
@@ -114,6 +115,8 @@ public class ApplicationBoard extends SplitLayoutPanel {
 	public static ApplicationBoard buildApplicationBoard(DsoCatalogGWT source) {
 		final ApplicationBoard appPanel = new ApplicationBoard();
 		
+		appPanel.application = source;
+		
 		// We set the size of the stack panel.
 		appPanel.configurationPanel.setPixelSize(LEFT_PANEL_WIDTH, 500);
 		
@@ -145,15 +148,7 @@ public class ApplicationBoard extends SplitLayoutPanel {
 		appPanel.txtObserverDate.setText(dtfDate.format(now));
 		appPanel.txtObserverDate.addKeyUpHandler(new UpdateMapEventHandler(source));
 		appPanel.observerPanel.add(appPanel.txtObserverDate);
-//		appPanel.chkObserverUseComputerDateAndTime.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
-//
-//			@Override
-//			public void onValueChange(ValueChangeEvent<Boolean> event) {
-//				if (event.getValue() == true) {
-//					setObserverTimeFromComputerTime(appPanel);
-//				}
-//			}
-//		});
+		appPanel.chkObserverUseComputerDateAndTime.addValueChangeHandler(new UseComputerDateAndTimeValueChangeHandler(source, appPanel));
 		appPanel.observerPanel.add(appPanel.chkObserverUseComputerDateAndTime);
 		appPanel.observerPanel.add(appPanel.lbObserverLocalTime);
 		appPanel.txtObserverLocalTime.setText(dtfTime.format(now));
@@ -212,7 +207,7 @@ public class ApplicationBoard extends SplitLayoutPanel {
 		appPanel.filterPanel.add(appPanel.starLimitMagnitudePanel);
 		
 		// We set the DSO filter fields
-		appPanel.chkDisplayAsterisms.setValue(true);
+		appPanel.chkDisplayAsterisms.setValue(false);
 		appPanel.chkDisplayAsterisms.addValueChangeHandler(new UpdateMapEventHandler(source));
 		appPanel.filterPanel.add(appPanel.chkDisplayAsterisms);
 		
@@ -326,15 +321,10 @@ public class ApplicationBoard extends SplitLayoutPanel {
 		options.setFindNebulas(chkDisplayNebulas.getValue());
 		options.setFindSupernovaRemnant(chkDisplaySupernovaRemnants.getValue());
 		options.setFindQuasars(chkDisplayQuasars.getValue());
-		options.setObservatoryLatitude(Double.parseDouble(txtObserverLatitude.getText()));
-		options.setObservatoryLongitude(Double.parseDouble(txtObserverLongitude.getText()));
+		Observer observer = application.initializeObserver();
+		options.setObserverCurrentJulianDay(observer.getCurrentJulianDay());
+		options.setObservatoryLatitude(observer.getLatitude());
+		options.setObservatoryLongitude(observer.getLongitude());
 		return options;
 	}
-
-//	private void setObserverTimeFromComputerTime(ApplicationBoard application) {
-//		Date now = new Date();
-//		application.txtObserverDate.setText(ApplicationBoard.dtfDate.format(now));
-//		application.txtObserverLocalTime.setText(ApplicationBoard.dtfTime.format(now));
-//		updateMap();
-//	}
 }

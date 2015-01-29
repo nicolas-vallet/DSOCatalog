@@ -53,6 +53,7 @@ public class CatalogSearchOptions implements Serializable {
 	private boolean findNebulas = false;
 	private boolean findSupernovaRemnant = false;
 	private boolean findQuasars = false;
+	private double observerCurrentJulianDay = 0;
 	private double observatoryLatitude = 0;
 	private double observatoryLongitude = 0;
 	
@@ -186,6 +187,14 @@ public class CatalogSearchOptions implements Serializable {
 		this.findQuasars = findQuasars;
 	}
 	
+	public double getObserverCurrentJulianDay() {
+		return observerCurrentJulianDay;
+	}
+
+	public void setObserverCurrentJulianDay(double observerCurrentJulianDay) {
+		this.observerCurrentJulianDay = observerCurrentJulianDay;
+	}
+
 	public double getObservatoryLatitude() {
 		return observatoryLatitude;
 	}

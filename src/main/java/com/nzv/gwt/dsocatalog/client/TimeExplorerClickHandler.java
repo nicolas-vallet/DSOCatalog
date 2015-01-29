@@ -37,6 +37,7 @@ public class TimeExplorerClickHandler implements ClickHandler {
 		}
 		ihm.txtObserverDate.setText(ApplicationBoard.dtfDate.format(currentConfiguredDate));
 		ihm.txtObserverLocalTime.setText(ApplicationBoard.dtfTime.format(currentConfiguredDate));
+		ihm.chkObserverUseComputerDateAndTime.setValue(false);
 		application.updateMap();
 	}
 	

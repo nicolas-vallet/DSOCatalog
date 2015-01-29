@@ -49,16 +49,6 @@ public class VisualizationHelper {
 			optimizedData.addColumn(ColumnType.NUMBER, "RA");
 			break;
 		}
-		if (searchOptions.isDisplayPlanets()) {
-			optimizedData.addColumn(ColumnType.NUMBER, "Planetes");
-			optimizedData.addStyleColumn(optimizedData);
-			optimizedData.addTooltipColumn(optimizedData);
-		}
-		if (searchOptions.isFindStars()) {
-			optimizedData.addColumn(ColumnType.NUMBER, "Etoiles");
-			optimizedData.addStyleColumn(optimizedData);
-			optimizedData.addTooltipColumn(optimizedData);
-		}
 		if (searchOptions.isFindAsterisms()) {
 			optimizedData.addColumn(ColumnType.NUMBER, "Asterismes");
 			optimizedData.addStyleColumn(optimizedData);
@@ -96,6 +86,16 @@ public class VisualizationHelper {
 		}
 		if (searchOptions.isFindQuasars()) {
 			optimizedData.addColumn(ColumnType.NUMBER, "Quasars");
+			optimizedData.addStyleColumn(optimizedData);
+			optimizedData.addTooltipColumn(optimizedData);
+		}
+		if (searchOptions.isFindStars()) {
+			optimizedData.addColumn(ColumnType.NUMBER, "Etoiles");
+			optimizedData.addStyleColumn(optimizedData);
+			optimizedData.addTooltipColumn(optimizedData);
+		}
+		if (searchOptions.isDisplayPlanets()) {
+			optimizedData.addColumn(ColumnType.NUMBER, "Planetes");
 			optimizedData.addStyleColumn(optimizedData);
 			optimizedData.addTooltipColumn(optimizedData);
 		}
@@ -188,7 +188,9 @@ public class VisualizationHelper {
 		if (o instanceof Star && ((Star) o).getSaoNumber() != null) {
 			sb.append("SAO " + ((Star) o).getSaoNumber() + "\n");
 		}
-		sb.append("Mag.=" + o.getVisualMagnitude() + "\n");
+		if (!(o instanceof Planet)) {
+			sb.append("Mag.=" + o.getVisualMagnitude() + "\n");
+		}
 
 		// Coordinates...
 		if (o instanceof Planet) {

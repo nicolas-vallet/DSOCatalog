@@ -77,6 +77,21 @@ public class DateComputation {
 				.doubleValue();
 	}
 
+	public static double getJulianDayFromDateAsDouble(double dt, Sexagesimal time) {
+		BigDecimal date = BigDecimal.valueOf(dt);
+		try {
+			date.multiply(BigDecimal.valueOf(10000)).remainder(date.movePointRight(4)).intValueExact();
+		} catch(ArithmeticException ex) {
+			throw new IllegalArgumentException("The provided date should correspond to midnight !");
+		}
+		BigDecimal result = BigDecimal.valueOf(getJulianDayFromDateAsDouble(date.doubleValue()));
+		BigDecimal dayFraction = 
+				BigDecimal.valueOf(time.getUnit()).divide(BigDecimal.valueOf(24), Constants.BIG_DECIMAL_PRECISION)
+				.add(BigDecimal.valueOf(time.getMinute()).divide(BigDecimal.valueOf(1440), Constants.BIG_DECIMAL_PRECISION))
+				.add(BigDecimal.valueOf(time.getSecond()).divide(BigDecimal.valueOf(86400), Constants.BIG_DECIMAL_PRECISION));
+		return result.add(dayFraction).doubleValue();
+	}
+	
 	private static boolean isInGregorianCalendar(double date) {
 		return date >= Constants.GREGORIAN_CALENDAR_START_DATE;
 	}

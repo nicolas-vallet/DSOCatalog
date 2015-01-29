@@ -20,17 +20,6 @@ public class DataSerieIndexes {
 	public DataSerieIndexes(CatalogSearchOptions searchOptions) {
 		int serieIndex = 0;
 
-		if (searchOptions.isDisplayPlanets()) {
-			planetSerieIndex = ++serieIndex;
-			serieIndex += 2;
-			objectSeriesCount++;
-		}
-		
-		if (searchOptions.isFindStars()) {
-			starSerieIndex = ++serieIndex;
-			serieIndex += 2;
-			objectSeriesCount++;
-		}
 		if (searchOptions.isFindAsterisms()) {
 			asterismSerieIndex = ++serieIndex;
 			serieIndex += 2;
@@ -71,6 +60,17 @@ public class DataSerieIndexes {
 			serieIndex += 2;
 			objectSeriesCount++;
 		}
+		if (searchOptions.isFindStars()) {
+			starSerieIndex = ++serieIndex;
+			serieIndex += 2;
+			objectSeriesCount++;
+		}
+		if (searchOptions.isDisplayPlanets()) {
+			planetSerieIndex = ++serieIndex;
+			serieIndex += 2;
+			objectSeriesCount++;
+		}
+		
 		if (searchOptions.isDisplayConstellationNames()) {
 			// Constellation name display requires columns for RA center, DEC center, Style, Annotation (will contain the code), AnnotationText (will contain the name) 
 			constellationNameSerieIndex = ++serieIndex;
