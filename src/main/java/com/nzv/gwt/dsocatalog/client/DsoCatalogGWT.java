@@ -32,6 +32,7 @@ import com.nzv.gwt.dsocatalog.model.CoordinatesSystem;
 import com.nzv.gwt.dsocatalog.model.DeepSkyObject;
 import com.nzv.gwt.dsocatalog.model.Planet;
 import com.nzv.gwt.dsocatalog.model.Star;
+import com.nzv.gwt.dsocatalog.projection.AngleUtils;
 import com.nzv.gwt.dsocatalog.projection.MollweideProjection;
 import com.nzv.gwt.dsocatalog.projection.Point2D;
 import com.nzv.gwt.dsocatalog.projection.Projection;
@@ -51,16 +52,16 @@ public class DsoCatalogGWT implements EntryPoint {
 	public static String STYLE_CONSTELLATION_NAME_TEXT_COLOR = "#90AEF0";
 	public static String STYLE_CONSTELLATION_BORDER_COLOR = "#888888";
 	public static String STYLE_CONSTELLATION_SHAPE_COLOR = "#90AEF0";
-//	public static String STYLE_PLANETS = "point {shape-type: circle; size: 6; fill-color #f5f52a; }";
 	public static Map<Integer, String> STYLE_PLANETS = new HashMap<Integer, String>(); 
 	static {
-		STYLE_PLANETS.put(Planet.MERCURY, "point {shape-type: circle; size: 2; fill-color: #b8b8b8; }");
-		STYLE_PLANETS.put(Planet.VENUS, "point {shape-type: circle; size: 3; fill-color: #d1d1c2; }");
-		STYLE_PLANETS.put(Planet.MARS, "point {shape-type: circle; size: 2; fill-color: #fc9935; }");
+		STYLE_PLANETS.put(Planet.MERCURY, "point {shape-type: circle; size: 3; fill-color: #b8b8b8; }");
+		STYLE_PLANETS.put(Planet.VENUS, "point {shape-type: circle; size: 4; fill-color: #d1d1c2; }");
+		STYLE_PLANETS.put(Planet.MARS, "point {shape-type: circle; size: 3; fill-color: #fc9935; }");
 		STYLE_PLANETS.put(Planet.JUPITER, "point {shape-type: circle; size: 6; fill-color: #f7be6d; }");
 		STYLE_PLANETS.put(Planet.SATURN, "point {shape-type: circle; size: 6; fill-color: #ebdbc5; }");
 		STYLE_PLANETS.put(Planet.URANUS, "point {shape-type: circle; size: 4; fill-color: #7aebe9; }");
 		STYLE_PLANETS.put(Planet.NEPTUNE, "point {shape-type: circle; size: 4; fill-color: #107fe0; }");
+		STYLE_PLANETS.put(Planet.PLUTO, "point {shape-type: circle; size: 2; fill-color: #c4bcaf; }");
 		STYLE_PLANETS.put(Planet.SUN, "point {shape-type: circle; size: 10; fill-color: #ffff30; }");
 		STYLE_PLANETS.put(Planet.MOON, "point {shape-type: circle; size: 8; fill-color: #dbdbdb; }");
 	}
@@ -296,7 +297,8 @@ public class DsoCatalogGWT implements EntryPoint {
 			boolean useProjection = false;
 			if (cs == CoordinatesSystem.GAL) {
 				Projection projection = new MollweideProjection();
-				p = projection.project(Math.toRadians(eca.getGalacticLongitude()>=180?eca.getGalacticLongitude()-360:eca.getGalacticLongitude()), Math.toRadians(eca.getGalacticLatitude()));
+				p = projection.project(Math.toRadians(AngleUtils.normalizeAngleInDegrees(eca.getGalacticLongitude(), -180, 180)), 
+						Math.toRadians(AngleUtils.normalizeAngleInDegrees(eca.getGalacticLatitude(), -90, 90)));
 				useProjection = true;
 			} else if (cs == CoordinatesSystem.ALTAZ) {
 				if (o.getYCoordinateForReferential(cs, observer) < 0) continue;

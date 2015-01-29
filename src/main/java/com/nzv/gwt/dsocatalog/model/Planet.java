@@ -2,12 +2,22 @@ package com.nzv.gwt.dsocatalog.model;
 
 import java.io.Serializable;
 
+import com.nzv.astro.ephemeris.planetary.Planets;
+
 @SuppressWarnings("serial")
 public class Planet extends AstroObject implements Serializable {
 	
-	public static final int
-    SUN=0, MERCURY=1, VENUS=2, EARTH=3, MARS=4,
-    JUPITER=5, SATURN=6, URANUS=7, NEPTUNE=8, PLUTO=9, MOON=10;
+	public static final int SUN = Planets.SUN;
+	public static final int MERCURY = Planets.MERCURY;
+	public static final int VENUS = Planets.VENUS;
+	public static final int EARTH = Planets.EARTH;
+	public static final int MARS = Planets.MARS;
+	public static final int JUPITER = Planets.JUPITER;
+	public static final int SATURN = Planets.SATURN;
+	public static final int URANUS = Planets.URANUS;
+	public static final int NEPTUNE = Planets.NEPTUNE;
+	public static final int PLUTO = Planets.PLUTO;
+	public static final int MOON = Planets.LUNA;
 	
 	private double rightAscension;
 	private double declinaison;

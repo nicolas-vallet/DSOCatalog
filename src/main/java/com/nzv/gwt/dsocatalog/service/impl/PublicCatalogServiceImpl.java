@@ -237,6 +237,11 @@ public class PublicCatalogServiceImpl implements PublicCatalogService {
 			planets.add(new Planet(Planet.SUN, "SUN", null, 
 					Math.toDegrees(planetaryEngine.getRightAscension()), Math.toDegrees(planetaryEngine.getDeclination())));
 			
+			// Moon
+			planetaryEngine.calc(Planets.LUNA, jd, observatory);
+			planets.add(new Planet(Planet.MOON, "MOON", null,
+					Math.toDegrees(planetaryEngine.getRightAscension()), Math.toDegrees(planetaryEngine.getDeclination())));
+			
 			// Mercury
 			planetaryEngine.calc(Planets.MERCURY, jd, observatory);
 			planets.add(new Planet(Planet.MERCURY, "MERCURE", null, 
@@ -270,6 +275,11 @@ public class PublicCatalogServiceImpl implements PublicCatalogService {
 			// Neptune
 			planetaryEngine.calc(Planets.NEPTUNE, jd, observatory);
 			planets.add(new Planet(Planet.NEPTUNE, "NEPTUNE", null, 
+					Math.toDegrees(planetaryEngine.getRightAscension()), Math.toDegrees(planetaryEngine.getDeclination())));
+			
+			// Pluto
+			planetaryEngine.calc(Planets.PLUTO, jd, observatory);
+			planets.add(new Planet(Planet.PLUTO, "PLUTO", null,
 					Math.toDegrees(planetaryEngine.getRightAscension()), Math.toDegrees(planetaryEngine.getDeclination())));
 			
 		} catch (NoInitException e) {
