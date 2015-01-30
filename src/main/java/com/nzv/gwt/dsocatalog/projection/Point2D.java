@@ -12,7 +12,7 @@ public class Point2D {
 		this.x = 0;
 		this.y = 0;
 	}
-	
+
 	public Point2D(double x, double y) {
 		super();
 		this.x = x;
@@ -33,6 +33,11 @@ public class Point2D {
 
 	public void setY(double y) {
 		this.y = y;
+	}
+
+	@Override
+	public String toString() {
+		return "Point2D [x=" + x + ", y=" + y + "]";
 	}
 
 }

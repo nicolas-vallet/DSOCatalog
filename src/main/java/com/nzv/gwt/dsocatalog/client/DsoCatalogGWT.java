@@ -7,12 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.math3.ml.neuralnet.twod.NeuronSquareMesh2D;
-
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.shared.GWT;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.datepicker.client.CalendarUtil;
@@ -473,6 +470,7 @@ public class DsoCatalogGWT implements EntryPoint {
 			
 		// Constellation shape lines...
 		if (searchOptions.isDisplayConstellationShape()) {
+			Projection projection = new NeutralProjection();
 			for (Constellation constellation : constellationsToDisplay) {
 				for (ConstellationShapeLine l : constellation.getShapeLines()) {
 					// Start
@@ -488,7 +486,7 @@ public class DsoCatalogGWT implements EntryPoint {
 					double endY = 0;
 					switch(cs) {
 						case ALTAZ: {
-							Projection projection = new StereographicProjection();
+							projection = new StereographicProjection();
 							
 							GeographicCoordinates observatory = new GeographicCoordinates(observer.getLatitude(), observer.getLongitude()); 
 							startX = lineStart.getAzimuth(observatory, observer.getGreenwichSiderealTime());
@@ -514,19 +512,12 @@ public class DsoCatalogGWT implements EntryPoint {
 							break;
 						}
 						case GAL: {
-							Projection projection = new MollweideProjection();
+							projection = new MollweideProjection();
 							
-							startX = lineStart.getGalacticLongitude();
+							startX = GeometryUtils.normalizeAngleInDegrees(lineStart.getGalacticLongitude(), -180, 180);
 							startY = lineStart.getGalacticLatitude();
-							Point2D pStart = projection.project(Math.toRadians(GeometryUtils.normalizeAngleInDegrees(startX, -180, 180)), Math.toRadians(startY));
-							startX = Math.toDegrees(pStart.getX());
-							startY = Math.toDegrees(pStart.getY());
-	
-							endX = lineEnd.getGalacticLongitude();
+							endX = GeometryUtils.normalizeAngleInDegrees(lineEnd.getGalacticLongitude(), -180, 180);
 							endY = lineEnd.getGalacticLatitude();
-							Point2D pEnd = projection.project(Math.toRadians(GeometryUtils.normalizeAngleInDegrees(endX, -180, 180)), Math.toRadians(endY));
-							endX = Math.toDegrees(pEnd.getX());
-							endY = Math.toDegrees(pEnd.getY());
 							break;
 						}
 						case EQ:
@@ -546,38 +537,41 @@ public class DsoCatalogGWT implements EntryPoint {
 					}
 					
 					boolean isCrossingChartLimitX = GeometryUtils.isCrossingChartLimitX(startX, endX, cs);
+					Point2D pStart = projection.project(Math.toRadians(startX), Math.toRadians(startY));
+					Point2D pEnd = projection.project(Math.toRadians(endX), Math.toRadians(endY));
 					if (!isCrossingChartLimitX) {
-						optimizedData.setValue(i, 0, startX);
-						optimizedData.setValue(i, serieIndexes.getConstellationShapeSerieIndex(), startY);
-						optimizedData.setValue(i+1, 0, endX);
-						optimizedData.setValue(i+1, serieIndexes.getConstellationShapeSerieIndex(), endY);
-						optimizedData.setValue(i+2, 0, endX);
+						optimizedData.setValue(i, 0, Math.toDegrees(pStart.getX()));
+						optimizedData.setValue(i, serieIndexes.getConstellationShapeSerieIndex(), Math.toDegrees(pStart.getY()));
+						optimizedData.setValue(i+1, 0, Math.toDegrees(pEnd.getX()));
+						optimizedData.setValue(i+1, serieIndexes.getConstellationShapeSerieIndex(), Math.toDegrees(pEnd.getY()));
+						optimizedData.setValue(i+2, 0, Math.toDegrees(pStart.getX()));
 						optimizedData.setValueNull(i+2, serieIndexes.getConstellationShapeSerieIndex());
 						i += 3;
 					} else {
 						// We have to generate intermediate points...
-						Point2D intermediatePoint = 
+						Point2D intermediatePointOnRight = 
 								GeometryUtils.giveIntermediatePointOnChartLimit(
 										new Point2D(startX, startY), 
 										new Point2D(endX, endY),
 										cs);
-//						Window.alert("Generating intermediate point in constellation["+constellation.getCode()+"] \n"
-//								+ "between point("+startX+" / "+startY+") and point("+endX+" / "+endY+") : \n"
-//								+ "intermediate("+intermediatePoint.getX()+" / "+intermediatePoint.getY()+")");
-						optimizedData.setValue(i, 0, startX);
-						optimizedData.setValue(i, serieIndexes.getConstellationShapeSerieIndex(), startY);
-						optimizedData.setValue(i+1, 0, intermediatePoint.getX()+360);
-						optimizedData.setValue(i+1, serieIndexes.getConstellationShapeSerieIndex(), intermediatePoint.getY());
-						optimizedData.setValue(i+2, 0, intermediatePoint.getX()+360);
+						Point2D intermediatePointOnLeft = new Point2D(intermediatePointOnRight.getX()+360, intermediatePointOnRight.getY());
+						intermediatePointOnRight = projection.project(Math.toRadians(intermediatePointOnRight.getX()), Math.toRadians(intermediatePointOnRight.getY()));
+						intermediatePointOnLeft = projection.project(Math.toRadians(intermediatePointOnLeft.getX()), Math.toRadians(intermediatePointOnLeft.getY()));
+						
+						optimizedData.setValue(i, 0, Math.toDegrees(pStart.getX()));
+						optimizedData.setValue(i, serieIndexes.getConstellationShapeSerieIndex(), Math.toDegrees(pStart.getY()));
+						optimizedData.setValue(i+1, 0, Math.toDegrees(intermediatePointOnLeft.getX()));
+						optimizedData.setValue(i+1, serieIndexes.getConstellationShapeSerieIndex(), Math.toDegrees(intermediatePointOnLeft.getY()));
+						optimizedData.setValue(i+2, 0, Math.toDegrees(intermediatePointOnLeft.getX()));
 						optimizedData.setValueNull(i+2, serieIndexes.getConstellationShapeSerieIndex());
 						i += 3;
 						
 						optimizedData.addRows(3);
-						optimizedData.setValue(i, 0, intermediatePoint.getX());
-						optimizedData.setValue(i, serieIndexes.getConstellationShapeSerieIndex(), intermediatePoint.getY());
-						optimizedData.setValue(i+1, 0, endX);
-						optimizedData.setValue(i+1, serieIndexes.getConstellationShapeSerieIndex(), endY);
-						optimizedData.setValue(i+2, 0, endX);
+						optimizedData.setValue(i, 0, Math.toDegrees(intermediatePointOnRight.getX()));
+						optimizedData.setValue(i, serieIndexes.getConstellationShapeSerieIndex(), Math.toDegrees(intermediatePointOnRight.getY()));
+						optimizedData.setValue(i+1, 0, Math.toDegrees(pEnd.getX()));
+						optimizedData.setValue(i+1, serieIndexes.getConstellationShapeSerieIndex(), Math.toDegrees(pEnd.getY()));
+						optimizedData.setValue(i+2, 0, Math.toDegrees(pEnd.getX()));
 						optimizedData.setValueNull(i+2, serieIndexes.getConstellationShapeSerieIndex());
 						i += 3;
 					}

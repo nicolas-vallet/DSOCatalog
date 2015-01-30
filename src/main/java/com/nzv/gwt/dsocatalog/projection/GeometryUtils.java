@@ -70,12 +70,19 @@ public class GeometryUtils {
 	
 	public static Point2D giveIntermediatePointOnChartLimit(Point2D p1, Point2D p2, CoordinatesSystem cs) {
 		double iX, iY, a, b;
+		double x1 = p1.getX();
+		double x2 = p2.getX();
+		double y1 = p1.getY();
+		double y2 = p2.getY();
 		
-		if (p1.getX() < p2.getX()) {
-			p2.setX(p2.getX()-360);
+		if (x1 < x2) {
+			x2 -= 360;
 		} else {
-			p1.setX(p1.getX()-360);
+			x1 -= 360;
 		}
+		
+		a = (y2 - y1) / (x2 - x1);
+		b = y1 - a * x1;
 		
 		a = (p2.getY() - p1.getY()) / (p2.getX() - p1.getX());
 		b = (p1.getY() - a * p1.getX());
