@@ -1,32 +1,19 @@
 package com.nzv.gwt.dsocatalog;
 
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeUtils;
+import com.nzv.gwt.dsocatalog.model.CoordinatesSystem;
+import com.nzv.gwt.dsocatalog.projection.GeometryUtils;
+import com.nzv.gwt.dsocatalog.projection.Point2D;
 
-import com.nzv.astro.ephemeris.Sexagesimal;
-import com.nzv.astro.ephemeris.Sexagesimal.SexagesimalType;
-import com.nzv.astro.ephemeris.planetary.Latitude;
-import com.nzv.astro.ephemeris.planetary.Longitude;
-import com.nzv.astro.ephemeris.planetary.NoInitException;
-import com.nzv.astro.ephemeris.planetary.ObsInfo;
-import com.nzv.astro.ephemeris.planetary.PlanetData;
-import com.nzv.astro.ephemeris.planetary.Planets;
-import com.nzv.gwt.dsocatalog.projection.AngleUtils;
 
 public class DsoCatalogTest {
 
-	public static final double LIMIT_MAGNITUDE = 2.5d;
-
-	public static void main(String[] args) throws NoInitException {
-		DateTime dt = new DateTime();
-		System.out.println("via JodaTime, JD=" + DateTimeUtils.toJulianDay(dt.getMillis()));
-
-		PlanetData planetaryEngine = new PlanetData();
-		ObsInfo observatory = new ObsInfo(new Latitude(49), new Longitude(2));
-		planetaryEngine.calc(Planets.PLUTO, DateTimeUtils.toJulianDay(dt.getMillis()), observatory);
+	public static void main(String[] args) {
+		Point2D start = new Point2D(3.3, 15.18);
+		Point2D end = new Point2D(346.185, 15.2);
+		Point2D intermediate = GeometryUtils.giveIntermediatePointOnChartLimit(start, end, CoordinatesSystem.EQ);
+		System.out.println("RA="+intermediate.getX()+" / DEC="+intermediate.getY());
 		
-		Sexagesimal ra = new Sexagesimal(AngleUtils.normalizeAngleInDegrees(Math.toDegrees(planetaryEngine.getRightAscension()), 0, 360) / 15);
-		Sexagesimal dec = new Sexagesimal(Math.toDegrees(planetaryEngine.getDeclination()));
-		System.out.println("Pluton : RA="+ra.toString(SexagesimalType.HOURS)+" / DEC="+dec.toString(SexagesimalType.DEGREES));
+		intermediate = GeometryUtils.giveIntermediatePointOnChartLimit(end, start, CoordinatesSystem.EQ);
+		System.out.println("RA="+intermediate.getX()+" / DEC="+intermediate.getY());
 	}
 }
