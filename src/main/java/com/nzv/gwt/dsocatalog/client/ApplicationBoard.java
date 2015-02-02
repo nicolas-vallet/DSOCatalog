@@ -14,12 +14,17 @@ import com.google.gwt.user.client.ui.PushButton;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.SplitLayoutPanel;
 import com.google.gwt.user.client.ui.StackLayoutPanel;
+import com.google.gwt.user.client.ui.TabLayoutPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.nzv.gwt.dsocatalog.model.CoordinatesSystem;
 
 public class ApplicationBoard extends SplitLayoutPanel {
 
+	public static int LEFT_PANEL_WIDTH = 280;
+	public static int SOUTH_PANEL_HEIGHT = 300;
+	public static int PANEL_SPLITTER_WIDTH = 2;
+	
 	public ListBox getLiConstellations() {
 		return liConstellations;
 	}
@@ -28,13 +33,10 @@ public class ApplicationBoard extends SplitLayoutPanel {
 		return liCoordinatesMode;
 	}
 
-	public static int LEFT_PANEL_WIDTH = 280;
 	public CheckBox getChkShowObjectsUnderHorizon() {
 		return chkShowObjectsUnderHorizon;
 	}
 
-	public static int RIGHT_PANEL_WIDTH = 280;
-	public static int PANEL_SPLITTER_WIDTH = 2;
 	
 	protected static final DateTimeFormat dtfDateAndTime = DateTimeFormat.getFormat(DsoCatalogGWT.DATE_FORMAT+" "+DsoCatalogGWT.TIME_FORMAT);
 	protected static final DateTimeFormat dtfDate = DateTimeFormat.getFormat(DsoCatalogGWT.DATE_FORMAT);
@@ -98,6 +100,11 @@ public class ApplicationBoard extends SplitLayoutPanel {
 
 	Panel visualizationPanel = new SimplePanel();
 	FlexTable objectDetailsTable = new FlexTable();
+	FlexTable objectDetailsTableIdentifiers = new FlexTable();
+	FlexTable objectDetailsTableCoordinates = new FlexTable();
+	FlexTable objectDetailsTableBrightness = new FlexTable();
+	FlexTable objectDetailsTableSpecificCharacteristics = new FlexTable();
+	FlexTable objectDetailsTableExternalResources = new FlexTable();
 
 	PushButton btUpdateMap = new PushButton("Update map");
 	Label systemMessage = new Label("");
@@ -105,7 +112,8 @@ public class ApplicationBoard extends SplitLayoutPanel {
 	StackLayoutPanel configurationPanel = new StackLayoutPanel(Unit.PX);
 	VerticalPanel leftPanel = new VerticalPanel();
 	VerticalPanel centerPanel = new VerticalPanel();
-	VerticalPanel rightPanel = new VerticalPanel();
+	VerticalPanel southPanel = new VerticalPanel();
+	TabLayoutPanel southPanelNew = new TabLayoutPanel(25, Unit.PX);
 	
 	
 	private ApplicationBoard() {
@@ -267,11 +275,16 @@ public class ApplicationBoard extends SplitLayoutPanel {
 		appPanel.centerPanel.add(appPanel.visualizationPanel);
 		
 		// We add the table that will be used to display object details
-		appPanel.rightPanel.add(appPanel.objectDetailsTable);
+		appPanel.southPanel.add(appPanel.objectDetailsTable);
+		appPanel.southPanelNew.add(appPanel.objectDetailsTableIdentifiers, new Label("Identification"));
+		appPanel.southPanelNew.add(appPanel.objectDetailsTableCoordinates, new Label("Coordonnées"));
+		appPanel.southPanelNew.add(appPanel.objectDetailsTableBrightness, new Label("Aspect visuel"));
+		appPanel.southPanelNew.add(appPanel.objectDetailsTableSpecificCharacteristics, new Label("Spécificités"));
+		appPanel.southPanelNew.add(appPanel.objectDetailsTableExternalResources, new Label("Resources externes"));
 		
 		// We place the left and the right panels in the main one.
 		appPanel.addWest(appPanel.leftPanel, LEFT_PANEL_WIDTH);
-		appPanel.addEast(appPanel.rightPanel, RIGHT_PANEL_WIDTH);
+		appPanel.addSouth(appPanel.southPanelNew, SOUTH_PANEL_HEIGHT);
 		appPanel.add(appPanel.centerPanel);
 		
 		return appPanel;
@@ -280,7 +293,7 @@ public class ApplicationBoard extends SplitLayoutPanel {
 	public CatalogSearchOptions getCatalogSearchOptions() {
 		CatalogSearchOptions options = new CatalogSearchOptions();
 		options.setRestrictedToConstellationCode(liConstellations.getValue(liConstellations.getSelectedIndex()));
-		options.setDisplayPlanets(chkDisplayPlanets.getValue());
+		options.setFindPlanets(chkDisplayPlanets.getValue());
 		options.setDisplayConstellationNames(chkDisplayConstellationNames.getValue());
 		options.setDisplayConstellationShape(chkDisplayConstellationShapes.getValue());
 		options.setDisplayConstellationBoundaries(chkDisplayConstellationBoundaries.getValue());

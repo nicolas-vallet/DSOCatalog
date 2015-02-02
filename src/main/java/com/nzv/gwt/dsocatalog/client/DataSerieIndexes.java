@@ -65,7 +65,7 @@ public class DataSerieIndexes {
 			serieIndex += 2;
 			objectSeriesCount++;
 		}
-		if (searchOptions.isDisplayPlanets()) {
+		if (searchOptions.isFindPlanets()) {
 			planetSerieIndex = ++serieIndex;
 			serieIndex += 2;
 			objectSeriesCount++;
@@ -79,10 +79,12 @@ public class DataSerieIndexes {
 		}
 		if (searchOptions.isDisplayConstellationBoundaries()) {
 			constellationBoundarySerieIndex = ++serieIndex;
+			serieIndex++;
 		}
 		
 		if (searchOptions.isDisplayConstellationShape()) {
 			constellationShapeSerieIndex = ++serieIndex;
+			serieIndex++;
 		}
 	}
 	

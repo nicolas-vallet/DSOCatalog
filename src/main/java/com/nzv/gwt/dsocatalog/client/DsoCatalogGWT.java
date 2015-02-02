@@ -10,7 +10,6 @@ import java.util.Set;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.shared.GWT;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.datepicker.client.CalendarUtil;
@@ -28,7 +27,6 @@ import com.nzv.gwt.dsocatalog.date.DateComputation;
 import com.nzv.gwt.dsocatalog.model.AstroObject;
 import com.nzv.gwt.dsocatalog.model.Constellation;
 import com.nzv.gwt.dsocatalog.model.ConstellationBoundaryLine;
-import com.nzv.gwt.dsocatalog.model.ConstellationBoundaryPoint;
 import com.nzv.gwt.dsocatalog.model.ConstellationShapeLine;
 import com.nzv.gwt.dsocatalog.model.CoordinatesSystem;
 import com.nzv.gwt.dsocatalog.model.DeepSkyObject;
@@ -439,8 +437,10 @@ public class DsoCatalogGWT implements EntryPoint {
 					if (!isCrossingChartLimitX) {
 						optimizedData.setValue(i, 0, Math.toDegrees(pStart.getX()));
 						optimizedData.setValue(i, serieIndexes.getConstellationBoundarySerieIndex(), Math.toDegrees(pStart.getY()));
+						optimizedData.setValue(i, serieIndexes.getConstellationBoundarySerieIndex()+1, constellation.getName());
 						optimizedData.setValue(i+1, 0, Math.toDegrees(pEnd.getX()));
 						optimizedData.setValue(i+1, serieIndexes.getConstellationBoundarySerieIndex(), Math.toDegrees(pEnd.getY()));
+						optimizedData.setValue(i+1, serieIndexes.getConstellationBoundarySerieIndex()+1, constellation.getName());
 						optimizedData.setValue(i+2, 0, Math.toDegrees(pStart.getX()));
 						optimizedData.setValueNull(i+2, serieIndexes.getConstellationBoundarySerieIndex());
 						i += 3;
@@ -457,8 +457,10 @@ public class DsoCatalogGWT implements EntryPoint {
 						
 						optimizedData.setValue(i, 0, Math.toDegrees(pStart.getX()));
 						optimizedData.setValue(i, serieIndexes.getConstellationBoundarySerieIndex(), Math.toDegrees(pStart.getY()));
+						optimizedData.setValue(i, serieIndexes.getConstellationBoundarySerieIndex()+1, constellation.getName());
 						optimizedData.setValue(i+1, 0, Math.toDegrees(intermediatePointOnLeft.getX()));
 						optimizedData.setValue(i+1, serieIndexes.getConstellationBoundarySerieIndex(), Math.toDegrees(intermediatePointOnLeft.getY()));
+						optimizedData.setValue(i+1, serieIndexes.getConstellationBoundarySerieIndex()+1, constellation.getName());
 						optimizedData.setValue(i+2, 0, Math.toDegrees(intermediatePointOnLeft.getX()));
 						optimizedData.setValueNull(i+2, serieIndexes.getConstellationBoundarySerieIndex());
 						i += 3;
@@ -466,8 +468,10 @@ public class DsoCatalogGWT implements EntryPoint {
 						optimizedData.addRows(3);
 						optimizedData.setValue(i, 0, Math.toDegrees(intermediatePointOnRight.getX()));
 						optimizedData.setValue(i, serieIndexes.getConstellationBoundarySerieIndex(), Math.toDegrees(intermediatePointOnRight.getY()));
+						optimizedData.setValue(i, serieIndexes.getConstellationBoundarySerieIndex()+1, constellation.getName());
 						optimizedData.setValue(i+1, 0, Math.toDegrees(pEnd.getX()));
 						optimizedData.setValue(i+1, serieIndexes.getConstellationBoundarySerieIndex(), Math.toDegrees(pEnd.getY()));
+						optimizedData.setValue(i+1, serieIndexes.getConstellationBoundarySerieIndex()+1, constellation.getName());
 						optimizedData.setValue(i+2, 0, Math.toDegrees(pEnd.getX()));
 						optimizedData.setValueNull(i+2, serieIndexes.getConstellationBoundarySerieIndex());
 						i += 3;
@@ -551,8 +555,10 @@ public class DsoCatalogGWT implements EntryPoint {
 					if (!isCrossingChartLimitX) {
 						optimizedData.setValue(i, 0, Math.toDegrees(pStart.getX()));
 						optimizedData.setValue(i, serieIndexes.getConstellationShapeSerieIndex(), Math.toDegrees(pStart.getY()));
+						optimizedData.setValue(i, serieIndexes.getConstellationShapeSerieIndex()+1, constellation.getName());
 						optimizedData.setValue(i+1, 0, Math.toDegrees(pEnd.getX()));
 						optimizedData.setValue(i+1, serieIndexes.getConstellationShapeSerieIndex(), Math.toDegrees(pEnd.getY()));
+						optimizedData.setValue(i+1, serieIndexes.getConstellationShapeSerieIndex()+1, constellation.getName());
 						optimizedData.setValue(i+2, 0, Math.toDegrees(pStart.getX()));
 						optimizedData.setValueNull(i+2, serieIndexes.getConstellationShapeSerieIndex());
 						i += 3;
@@ -569,8 +575,10 @@ public class DsoCatalogGWT implements EntryPoint {
 						
 						optimizedData.setValue(i, 0, Math.toDegrees(pStart.getX()));
 						optimizedData.setValue(i, serieIndexes.getConstellationShapeSerieIndex(), Math.toDegrees(pStart.getY()));
+						optimizedData.setValue(i, serieIndexes.getConstellationShapeSerieIndex()+1, constellation.getName());
 						optimizedData.setValue(i+1, 0, Math.toDegrees(intermediatePointOnLeft.getX()));
 						optimizedData.setValue(i+1, serieIndexes.getConstellationShapeSerieIndex(), Math.toDegrees(intermediatePointOnLeft.getY()));
+						optimizedData.setValue(i+1, serieIndexes.getConstellationShapeSerieIndex()+1, constellation.getName());
 						optimizedData.setValue(i+2, 0, Math.toDegrees(intermediatePointOnLeft.getX()));
 						optimizedData.setValueNull(i+2, serieIndexes.getConstellationShapeSerieIndex());
 						i += 3;
@@ -578,8 +586,10 @@ public class DsoCatalogGWT implements EntryPoint {
 						optimizedData.addRows(3);
 						optimizedData.setValue(i, 0, Math.toDegrees(intermediatePointOnRight.getX()));
 						optimizedData.setValue(i, serieIndexes.getConstellationShapeSerieIndex(), Math.toDegrees(intermediatePointOnRight.getY()));
+						optimizedData.setValue(i, serieIndexes.getConstellationShapeSerieIndex()+1, constellation.getName());
 						optimizedData.setValue(i+1, 0, Math.toDegrees(pEnd.getX()));
 						optimizedData.setValue(i+1, serieIndexes.getConstellationShapeSerieIndex(), Math.toDegrees(pEnd.getY()));
+						optimizedData.setValue(i+1, serieIndexes.getConstellationShapeSerieIndex()+1, constellation.getName());
 						optimizedData.setValue(i+2, 0, Math.toDegrees(pEnd.getX()));
 						optimizedData.setValueNull(i+2, serieIndexes.getConstellationShapeSerieIndex());
 						i += 3;
@@ -603,7 +613,9 @@ public class DsoCatalogGWT implements EntryPoint {
 
 				@Override
 				public void onSuccess(Star result) {
-					VisualizationHelper.displayObjectDetails(result, appPanel.objectDetailsTable);
+					VisualizationHelper.displayObjectDetails(result, appPanel.objectDetailsTableIdentifiers, 
+							appPanel.objectDetailsTableCoordinates, appPanel.objectDetailsTableBrightness, 
+							appPanel.objectDetailsTableSpecificCharacteristics, appPanel.objectDetailsTableExternalResources);
 				}
 			});
 		} else if (objectReference.isDeepSkyObject()) {
@@ -615,7 +627,9 @@ public class DsoCatalogGWT implements EntryPoint {
 				
 				@Override
 				public void onSuccess(DeepSkyObject result) {
-					VisualizationHelper.displayObjectDetails(result, appPanel.objectDetailsTable);
+					VisualizationHelper.displayObjectDetails(result, appPanel.objectDetailsTableIdentifiers, 
+							appPanel.objectDetailsTableCoordinates, appPanel.objectDetailsTableBrightness, 
+							appPanel.objectDetailsTableSpecificCharacteristics, appPanel.objectDetailsTableExternalResources);
 				}
 			});
 		}

@@ -20,7 +20,7 @@ public class CatalogSearchOptions implements Serializable {
 		CatalogSearchOptions options = new CatalogSearchOptions();
 		options.setStarLimitMagnitude(DEFAULT_STAR_LIMIT_MAGNITUDE);
 		options.setDsoLimitMagnitude(DEFAULT_DSO_LIMIT_MAGNITUDE);
-		options.displayPlanets = false;
+		options.findPlanets = false;
 		options.displayConstellationNames = false;
 		options.displayConstellationBoundaries = false;
 		options.displayConstellationShape = false;
@@ -36,7 +36,7 @@ public class CatalogSearchOptions implements Serializable {
 		return options;
 	}
 
-	private boolean displayPlanets = false;
+	private boolean findPlanets = false;
 	private String restrictedToConstellationCode = null;
 	private boolean displayConstellationNames = false;
 	private boolean displayConstellationBoundaries = false;
@@ -59,12 +59,12 @@ public class CatalogSearchOptions implements Serializable {
 	private double observatoryLatitude = 0;
 	private double observatoryLongitude = 0;
 	
-	public boolean isDisplayPlanets() {
-		return displayPlanets;
+	public boolean isFindPlanets() {
+		return findPlanets;
 	}
 
-	public void setDisplayPlanets(boolean displayPlanets) {
-		this.displayPlanets = displayPlanets;
+	public void setFindPlanets(boolean findPlanets) {
+		this.findPlanets = findPlanets;
 	}
 
 	public String getRestrictedToConstellationCode() {
@@ -189,14 +189,6 @@ public class CatalogSearchOptions implements Serializable {
 		this.findQuasars = findQuasars;
 	}
 	
-//	public double getObserverCurrentJulianDay() {
-//		return observerCurrentJulianDay;
-//	}
-//
-//	public void setObserverCurrentJulianDay(double observerCurrentJulianDay) {
-//		this.observerCurrentJulianDay = observerCurrentJulianDay;
-//	}
-	
 	public double getObservatoryLatitude() {
 		return observatoryLatitude;
 	}
@@ -239,10 +231,9 @@ public class CatalogSearchOptions implements Serializable {
 
 	@Override
 	public String toString() {
-		return "CatalogSearchOptions [display planets="+displayPlanets
-				+ ", star mag max=" + starLimitMagnitude
-				+ ", dso mag max=" + dsoLimitMagnitude + " | stars="
-				+ findStars + ", asterisms=" + findAsterisms + ", galaxies="
+		return "CatalogSearchOptions [star mag max=" + starLimitMagnitude
+				+ ", dso mag max=" + dsoLimitMagnitude + " | planets=" + findPlanets
+				+ ", stars=" + findStars + ", asterisms=" + findAsterisms + ", galaxies="
 				+ findGalaxies + ", globular clusters=" + findGlobularClusters
 				+ ", open clusters=" + findOpenClusters
 				+ ", planetary nebulas=" + findPlanetaryNebulas + ", nebulas="

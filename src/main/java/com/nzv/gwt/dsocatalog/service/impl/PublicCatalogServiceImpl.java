@@ -59,8 +59,7 @@ public class PublicCatalogServiceImpl implements PublicCatalogService {
 					.getRestrictedToConstellationCode());
 		}
 		
-		if (options.isDisplayPlanets()) {
-			logger.info("Computing planets positions...");
+		if (options.isFindPlanets()) {
 			result.addAll(computePlanetCurrentPositions(options));
 		}
 
@@ -229,7 +228,6 @@ public class PublicCatalogServiceImpl implements PublicCatalogService {
 		
 		DateTime dt = new DateTime(a, m, j, H, M, S, DateTimeZone.forOffsetHours(options.getObserverGreenwhichHourOffset()));
 		double jd = DateTimeUtils.toJulianDay(dt.getMillis());
-		logger.info("CURRENT JULIAN DAY="+jd);
 		
 		try {
 			// Sun
