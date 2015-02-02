@@ -5,6 +5,7 @@ import static java.lang.Math.sin;
 import static java.lang.Math.toRadians;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -99,6 +100,25 @@ public class Constellation implements Serializable {
 
 	public List<ConstellationBoundaryPoint> getBoundaryPoints() {
 		return boundaryPoints;
+	}
+	
+	public List<ConstellationBoundaryLine> getBoundaryLines() {
+		List<ConstellationBoundaryLine> result = new ArrayList<ConstellationBoundaryLine>();
+		if (boundaryPoints.size() > 2) {
+			for (int i=0 ; i<boundaryPoints.size() ; i++) {
+				ConstellationBoundaryPoint start = boundaryPoints.get(i);
+				ConstellationBoundaryPoint end = null;
+				if (i == boundaryPoints.size() -1) {
+					// We use the first point of the list as end of the last line.
+					end = boundaryPoints.get(0);
+				} else {
+					end = boundaryPoints.get(i+1);
+				}
+				result.add(new ConstellationBoundaryLine(start, end));
+			}
+			return result;
+		}
+		return result;
 	}
 
 	public void setBoundaryPoints(List<ConstellationBoundaryPoint> boundaryPoints) {

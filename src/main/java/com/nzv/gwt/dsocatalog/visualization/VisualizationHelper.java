@@ -127,11 +127,10 @@ public class VisualizationHelper {
 		if (searchOptions.isDisplayConstellationBoundaries()) {
 			if (showOneConstellation) {
 				optimizedData.addRows(constellationsList
-						.get(searchOptions.getRestrictedToConstellationCode()).getBoundaryPoints()
-						.size() + 2);
+						.get(searchOptions.getRestrictedToConstellationCode()).getBoundaryLines().size() * 3);
 			} else {
 				for (Constellation constellation : constellationsList.values()) {
-					optimizedData.addRows(constellation.getBoundaryPoints().size() + 2);
+					optimizedData.addRows(constellation.getBoundaryPoints().size() * 3);
 				}
 			}
 		}

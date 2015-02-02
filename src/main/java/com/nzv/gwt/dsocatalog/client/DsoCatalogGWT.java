@@ -10,6 +10,7 @@ import java.util.Set;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.shared.GWT;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.RootLayoutPanel;
 import com.google.gwt.user.datepicker.client.CalendarUtil;
@@ -26,6 +27,7 @@ import com.nzv.astro.ephemeris.coordinate.impl.EquatorialCoordinates;
 import com.nzv.gwt.dsocatalog.date.DateComputation;
 import com.nzv.gwt.dsocatalog.model.AstroObject;
 import com.nzv.gwt.dsocatalog.model.Constellation;
+import com.nzv.gwt.dsocatalog.model.ConstellationBoundaryLine;
 import com.nzv.gwt.dsocatalog.model.ConstellationBoundaryPoint;
 import com.nzv.gwt.dsocatalog.model.ConstellationShapeLine;
 import com.nzv.gwt.dsocatalog.model.CoordinatesSystem;
@@ -378,93 +380,100 @@ public class DsoCatalogGWT implements EntryPoint {
 		}
 		// Constellation(s) boundaries...
 		if (searchOptions.isDisplayConstellationBoundaries()) {
+			Projection projection = new NeutralProjection();
 			for (Constellation constellation : constellationsToDisplay) {
-				double X, Y;
-				for (ConstellationBoundaryPoint p : constellation.getBoundaryPoints()) {
-					EquatorialCoordinatesAdapter eca = new EquatorialCoordinatesAdapter(
-							new EquatorialCoordinates(p.getRightAscensionAsDecimalDegrees(), p.getDeclinaisonAsDecimalDegrees()));
+				for (ConstellationBoundaryLine l : constellation.getBoundaryLines()) {
+					// Start
+					EquatorialCoordinatesAdapter lineStart = new EquatorialCoordinatesAdapter(
+							new EquatorialCoordinates(l.getStart().getRightAscensionAsDecimalDegrees(), l.getStart().getDeclinaisonAsDecimalDegrees()));
+					// End
+					EquatorialCoordinatesAdapter lineEnd = new EquatorialCoordinatesAdapter(
+							new EquatorialCoordinates(l.getEnd().getRightAscensionAsDecimalDegrees(), l.getEnd().getDeclinaisonAsDecimalDegrees()));
+					
+					double startX = 0; 
+					double startY = 0;
+					double endX = 0;
+					double endY = 0;
+					
 					switch(cs) {
 						case ALTAZ: {
-							GeographicCoordinates observatory = new GeographicCoordinates(observer.getLatitude(), observer.getLongitude());
-							X = eca.getAzimuth(observatory, observer.getGreenwichSiderealTime());
-							Y = eca.getElevation(observatory, observer.getGreenwichSiderealTime());
-							if (Y < 0) Y = 0;
-							Projection projection = new StereographicProjection();
-							Point2D mp = projection.project(Math.toRadians(X), Math.toRadians(Y));
-							X = Math.toDegrees(mp.getX());
-							Y = Math.toDegrees(mp.getY());
+							// TODO : Implementation
 							break;
 						}
 						case ECL: {
-							X = eca.getEcliptiqueLongitude();
-							Y = eca.getEcliptiqueLatitude();
+							projection = new NeutralProjection();
+							startX = lineStart.getEcliptiqueLongitude();
+							startY = lineStart.getEcliptiqueLatitude();
+							endX = lineEnd.getEcliptiqueLongitude();
+							endY = lineEnd.getEcliptiqueLatitude();
 							break;
 						}
 						case GAL: {
-							X = eca.getGalacticLongitude();
-							Y = eca.getGalacticLatitude();
-							Projection projection = new MollweideProjection();
-							Point2D mp = projection.project(Math.toRadians(X>=180?X-360:X), Math.toRadians(Y));
-							X = Math.toDegrees(mp.getX());
-							Y = Math.toDegrees(mp.getY());
+							projection = new MollweideProjection();
+							startX = GeometryUtils.normalizeAngleInDegrees(lineStart.getGalacticLongitude(), -180, 180);
+							startY = lineStart.getGalacticLatitude();
+							endX = GeometryUtils.normalizeAngleInDegrees(lineEnd.getGalacticLongitude(), -180, 180);
+							endY = lineEnd.getGalacticLatitude();
 							break;
 						}
 						case EQ:
 						default: {
-							X = p.getRightAscensionAsDecimalDegrees();
-							Y = p.getDeclinaisonAsDecimalDegrees();
+							projection = new NeutralProjection();
+							startX = lineStart.getEquatorialCoordinates().getRightAscension();
+							startY = lineStart.getEquatorialCoordinates().getDeclinaison();
+							endX = lineEnd.getEquatorialCoordinates().getRightAscension();
+							endY = lineEnd.getEquatorialCoordinates().getDeclinaison();
 							break;
 						}
 					}
-					optimizedData.setValue(i, 0, X);
-					optimizedData.setValue(i, serieIndexes.getConstellationBoundarySerieIndex(), Y);
-					i++;
+					
+					if (startX < endX) {
+						// We swap the two points in view to draw the line from left to right...
+						double t = startX; startX = endX; endX = t;
+						t = startY; startY = endY; endY = t;
+					}
+					
+					boolean isCrossingChartLimitX = GeometryUtils.isCrossingChartLimitX(startX, endX, cs);
+					Point2D pStart = projection.project(Math.toRadians(startX), Math.toRadians(startY));
+					Point2D pEnd = projection.project(Math.toRadians(endX), Math.toRadians(endY));
+					if (!isCrossingChartLimitX) {
+						optimizedData.setValue(i, 0, Math.toDegrees(pStart.getX()));
+						optimizedData.setValue(i, serieIndexes.getConstellationBoundarySerieIndex(), Math.toDegrees(pStart.getY()));
+						optimizedData.setValue(i+1, 0, Math.toDegrees(pEnd.getX()));
+						optimizedData.setValue(i+1, serieIndexes.getConstellationBoundarySerieIndex(), Math.toDegrees(pEnd.getY()));
+						optimizedData.setValue(i+2, 0, Math.toDegrees(pStart.getX()));
+						optimizedData.setValueNull(i+2, serieIndexes.getConstellationBoundarySerieIndex());
+						i += 3;
+					} else {
+						// We have to generate intermediate points...
+						Point2D intermediatePointOnRight = 
+								GeometryUtils.giveIntermediatePointOnChartLimit(
+										new Point2D(startX, startY), 
+										new Point2D(endX, endY),
+										cs);
+						Point2D intermediatePointOnLeft = new Point2D(intermediatePointOnRight.getX()+360, intermediatePointOnRight.getY());
+						intermediatePointOnRight = projection.project(Math.toRadians(intermediatePointOnRight.getX()), Math.toRadians(intermediatePointOnRight.getY()));
+						intermediatePointOnLeft = projection.project(Math.toRadians(intermediatePointOnLeft.getX()), Math.toRadians(intermediatePointOnLeft.getY()));
+						
+						optimizedData.setValue(i, 0, Math.toDegrees(pStart.getX()));
+						optimizedData.setValue(i, serieIndexes.getConstellationBoundarySerieIndex(), Math.toDegrees(pStart.getY()));
+						optimizedData.setValue(i+1, 0, Math.toDegrees(intermediatePointOnLeft.getX()));
+						optimizedData.setValue(i+1, serieIndexes.getConstellationBoundarySerieIndex(), Math.toDegrees(intermediatePointOnLeft.getY()));
+						optimizedData.setValue(i+2, 0, Math.toDegrees(intermediatePointOnLeft.getX()));
+						optimizedData.setValueNull(i+2, serieIndexes.getConstellationBoundarySerieIndex());
+						i += 3;
+						
+						optimizedData.addRows(3);
+						optimizedData.setValue(i, 0, Math.toDegrees(intermediatePointOnRight.getX()));
+						optimizedData.setValue(i, serieIndexes.getConstellationBoundarySerieIndex(), Math.toDegrees(intermediatePointOnRight.getY()));
+						optimizedData.setValue(i+1, 0, Math.toDegrees(pEnd.getX()));
+						optimizedData.setValue(i+1, serieIndexes.getConstellationBoundarySerieIndex(), Math.toDegrees(pEnd.getY()));
+						optimizedData.setValue(i+2, 0, Math.toDegrees(pEnd.getX()));
+						optimizedData.setValueNull(i+2, serieIndexes.getConstellationBoundarySerieIndex());
+						i += 3;
+					}
 				}
-				// We put the first point again to close the boundary of the constellation...
-				ConstellationBoundaryPoint lastPoint = constellation.getBoundaryPoints().get(0);
-				EquatorialCoordinatesAdapter eca = new EquatorialCoordinatesAdapter(
-						new EquatorialCoordinates(lastPoint.getRightAscensionAsDecimalDegrees(), lastPoint.getDeclinaisonAsDecimalDegrees()));
-				switch(cs) {
-					case ALTAZ: {
-						GeographicCoordinates observatory = new GeographicCoordinates(observer.getLatitude(), observer.getLongitude());
-						X = eca.getAzimuth(observatory, observer.getGreenwichSiderealTime());
-						Y = eca.getElevation(observatory, observer.getGreenwichSiderealTime());
-						if (Y < 0) Y = 0;
-						Projection projection = new StereographicProjection();
-						Point2D mp = projection.project(Math.toRadians(X), Math.toRadians(Y));
-						X = Math.toDegrees(mp.getX());
-						Y = Math.toDegrees(mp.getY());
-						break;
-					}
-					case ECL: {
-						X = eca.getEcliptiqueLongitude();
-						Y = eca.getEcliptiqueLatitude();
-						break;
-					}
-					case GAL: {
-						X = eca.getGalacticLongitude();
-						Y = eca.getGalacticLatitude();
-						MollweideProjection projection = new MollweideProjection();
-						Point2D mp = projection.project(Math.toRadians(X>=180?X-360:X), Math.toRadians(Y));
-						X = Math.toDegrees(mp.getX());
-						Y = Math.toDegrees(mp.getY());
-						break;
-					}
-					case EQ:
-					default: {
-						X = lastPoint.getRightAscensionAsDecimalDegrees();
-						Y = lastPoint.getDeclinaisonAsDecimalDegrees();
-						break;
-					}
-				}
-				optimizedData.setValue(i, 0, X);
-				optimizedData.setValue(i, serieIndexes.getConstellationBoundarySerieIndex(), Y);
-				i++;
 				
-				// We finally put a null value as separator in the serie to avoid two constellations to have their boundaries linked together
-				optimizedData.setValue(i, 0, X);
-				optimizedData.setValueNull(i, serieIndexes.getConstellationBoundarySerieIndex());
-				i++;
 			}
 		}
 			
@@ -485,26 +494,26 @@ public class DsoCatalogGWT implements EntryPoint {
 					double endX = 0;
 					double endY = 0;
 					switch(cs) {
-						case ALTAZ: {
-							projection = new StereographicProjection();
-							
-							GeographicCoordinates observatory = new GeographicCoordinates(observer.getLatitude(), observer.getLongitude()); 
-							startX = lineStart.getAzimuth(observatory, observer.getGreenwichSiderealTime());
-							startY = lineStart.getElevation(observatory, observer.getGreenwichSiderealTime());
-							if (startY < 0) startY = 0;
-							Point2D pStart = projection.project(Math.toRadians(startX), Math.toRadians(startY));
-							startX = Math.toDegrees(pStart.getX());
-							startY = Math.toDegrees(pStart.getY());
-							
-							endX = lineEnd.getAzimuth(observatory, observer.getGreenwichSiderealTime());
-							endY = lineEnd.getElevation(observatory, observer.getGreenwichSiderealTime());
-							if (endY < 0) endY = 0;
-							Point2D pEnd = projection.project(Math.toRadians(endX), Math.toRadians(endY));
-							endX = Math.toDegrees(pEnd.getX());
-							endY = Math.toDegrees(pEnd.getY());
-							break;
-						}
+//						case ALTAZ: {
+//							projection = new StereographicProjection();
+//							GeographicCoordinates observatory = new GeographicCoordinates(observer.getLatitude(), observer.getLongitude()); 
+//							startX = lineStart.getAzimuth(observatory, observer.getGreenwichSiderealTime());
+//							startY = lineStart.getElevation(observatory, observer.getGreenwichSiderealTime());
+//							if (startY < 0) startY = 0;
+//							Point2D pStart = projection.project(Math.toRadians(startX), Math.toRadians(startY));
+//							startX = Math.toDegrees(pStart.getX());
+//							startY = Math.toDegrees(pStart.getY());
+//							
+//							endX = lineEnd.getAzimuth(observatory, observer.getGreenwichSiderealTime());
+//							endY = lineEnd.getElevation(observatory, observer.getGreenwichSiderealTime());
+//							if (endY < 0) endY = 0;
+//							Point2D pEnd = projection.project(Math.toRadians(endX), Math.toRadians(endY));
+//							endX = Math.toDegrees(pEnd.getX());
+//							endY = Math.toDegrees(pEnd.getY());
+//							break;
+//						}
 						case ECL: {
+							projection = new NeutralProjection();
 							startX = lineStart.getEcliptiqueLongitude();
 							startY = lineStart.getEcliptiqueLatitude();
 							endX = lineEnd.getEcliptiqueLongitude();
@@ -513,7 +522,6 @@ public class DsoCatalogGWT implements EntryPoint {
 						}
 						case GAL: {
 							projection = new MollweideProjection();
-							
 							startX = GeometryUtils.normalizeAngleInDegrees(lineStart.getGalacticLongitude(), -180, 180);
 							startY = lineStart.getGalacticLatitude();
 							endX = GeometryUtils.normalizeAngleInDegrees(lineEnd.getGalacticLongitude(), -180, 180);
@@ -522,6 +530,7 @@ public class DsoCatalogGWT implements EntryPoint {
 						}
 						case EQ:
 						default: {
+							projection = new NeutralProjection();
 							startX = l.getStartRightAscension();
 							startY = l.getStartDeclinaison();
 							endX = l.getEndRightAscension();
