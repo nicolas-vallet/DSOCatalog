@@ -653,6 +653,16 @@ public class VisualizationHelper {
 			
 		} else if (ao instanceof DeepSkyObject) {
 			DeepSkyObject dso = (DeepSkyObject) ao;
+			objectDetailsTableExternalResources.setHTML(row++, 0,
+					"<a href='http://www.astrobin.com/search/?search_type=0"
+					+ "&license=0&license=1&license=2&license=3&license=4&license=5&license=6"
+					+ "&telescope_type=any&telescope_type=0&telescope_type=1&telescope_type=2&telescope_type=3"
+					+ "&telescope_type=4&telescope_type=5&telescope_type=6&telescope_type=7&telescope_type=8"
+					+ "&telescope_type=9&telescope_type=10&telescope_type=11&telescope_type=12&telescope_type=13"
+					+ "&telescope_type=14&telescope_type=15&telescope_type=16&telescope_type=17&telescope_type=18"
+					+ "&telescope_type=19&telescope_type=20&telescope_type=21&telescope_type=22"
+					+ "&camera_type=any&camera_type=0&camera_type=1&camera_type=2&camera_type=3&camera_type=4&camera_type=5&q="
+					+ dso.getName()+"' target='_blank'>Astrobin</a>");
 			objectDetailsTableExternalResources.setHTML(row++, 0, 
 					"<a href='http://fr.wikipedia.org/w/index.php?fulltext=Search&searchengineselect=mediawiki&search="+dso.getName()+"' target='_blank'>Wikipedia</a>");
 			objectDetailsTableExternalResources.setHTML(row++, 0, 
