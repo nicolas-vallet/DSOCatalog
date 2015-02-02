@@ -31,6 +31,7 @@ import com.nzv.gwt.dsocatalog.model.ConstellationShapeLine;
 import com.nzv.gwt.dsocatalog.model.CoordinatesSystem;
 import com.nzv.gwt.dsocatalog.model.DeepSkyObject;
 import com.nzv.gwt.dsocatalog.model.Planet;
+import com.nzv.gwt.dsocatalog.model.PlanetEnum;
 import com.nzv.gwt.dsocatalog.model.Star;
 import com.nzv.gwt.dsocatalog.projection.GeometryUtils;
 import com.nzv.gwt.dsocatalog.projection.MollweideProjection;
@@ -59,7 +60,7 @@ public class DsoCatalogGWT implements EntryPoint {
 		STYLE_PLANETS.put(Planet.VENUS, "point {shape-type: circle; size: 4; fill-color: #d1d1c2; }");
 		STYLE_PLANETS.put(Planet.MARS, "point {shape-type: circle; size: 3; fill-color: #fc9935; }");
 		STYLE_PLANETS.put(Planet.JUPITER, "point {shape-type: circle; size: 6; fill-color: #f7be6d; }");
-		STYLE_PLANETS.put(Planet.SATURN, "point {shape-type: circle; size: 6; fill-color: #ebdbc5; }");
+		STYLE_PLANETS.put(Planet.SATURN, "point {shape-type: circle; size: 5; fill-color: #ebdbc5; }");
 		STYLE_PLANETS.put(Planet.URANUS, "point {shape-type: circle; size: 4; fill-color: #7aebe9; }");
 		STYLE_PLANETS.put(Planet.NEPTUNE, "point {shape-type: circle; size: 4; fill-color: #107fe0; }");
 		STYLE_PLANETS.put(Planet.PLUTO, "point {shape-type: circle; size: 2; fill-color: #c4bcaf; }");
@@ -142,12 +143,12 @@ public class DsoCatalogGWT implements EntryPoint {
 										for (int i=0 ; i<selections.length() ; i++) {
 											Selection selection = selections.get(i);
 											if (displayedObjectReferences.containsKey(new ObjectReferenceAddressInTable(selection.getRow(), selection.getColumn()))) {
-												// The user clicked on a AstroObject (star or dso)
-												fetchObjectDetails(displayedObjectReferences.get(
+												// The user clicked on a AstroObject (planet, star or dso)
+												fetchObjectDetails(searchOptions, displayedObjectReferences.get(
 														new ObjectReferenceAddressInTable(selection.getRow(), selection.getColumn())));
 											} else {
 												// The user selected a constellation boundary point or a shape line limit...
-												appPanel.objectDetailsTable.removeAllRows();
+												appPanel.hideObjectDetails();
 											}
 										}
 									}
@@ -603,8 +604,24 @@ public class DsoCatalogGWT implements EntryPoint {
 		return optimizedData;
 	}
 	
-	private void fetchObjectDetails(final ObjectReference objectReference) {
-		if (objectReference.isStar()) {
+	private void fetchObjectDetails(CatalogSearchOptions searchOptions, final ObjectReference objectReference) {
+		if (objectReference.isPlanet()) {
+			final PlanetEnum planet = PlanetEnum.forId(objectReference.getId());
+			catalogService.computePlanetCurrentPosition(PlanetEnum.forId(objectReference.getId()), searchOptions, new AsyncCallback<Planet>() {
+
+				@Override
+				public void onFailure(Throwable caught) {
+					appPanel.systemMessage.setText("Unable to fetch details about planet ["+planet.getName()+"]");
+				}
+
+				@Override
+				public void onSuccess(Planet result) {
+					VisualizationHelper.displayObjectDetails(result, appPanel.objectDetailsTableIdentifiers, 
+							appPanel.objectDetailsTableCoordinates, appPanel.objectDetailsTableBrightness, 
+							appPanel.objectDetailsTableSpecificCharacteristics, appPanel.objectDetailsTableExternalResources);
+				}
+			});
+		} else if (objectReference.isStar()) {
 			catalogService.findStarByHrNumber(objectReference.getId(), new AsyncCallback<Star>() {
 				@Override
 				public void onFailure(Throwable caught) {

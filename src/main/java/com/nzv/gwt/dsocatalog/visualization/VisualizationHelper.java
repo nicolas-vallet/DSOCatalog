@@ -27,6 +27,7 @@ import com.nzv.gwt.dsocatalog.model.Constellation;
 import com.nzv.gwt.dsocatalog.model.CoordinatesSystem;
 import com.nzv.gwt.dsocatalog.model.DeepSkyObject;
 import com.nzv.gwt.dsocatalog.model.Planet;
+import com.nzv.gwt.dsocatalog.model.PlanetEnum;
 import com.nzv.gwt.dsocatalog.model.Star;
 
 public class VisualizationHelper {
@@ -400,7 +401,11 @@ public class VisualizationHelper {
 
 		// Identifiers
 		int row = 0;
-		if (ao instanceof Star) {
+		if (ao instanceof Planet) {
+			Planet p = (Planet) ao;
+			objectDetailsTableIdentifier.setHTML(row, 0, "PLANETE");
+			objectDetailsTableIdentifier.setHTML(row++, 1, p.getIdentifier());
+		} else if (ao instanceof Star) {
 			Star s = (Star) ao;
 			objectDetailsTableIdentifier.setHTML(row, 0, "NUMERO HR");
 			objectDetailsTableIdentifier.setHTML(row++, 1, "" + s.getHrNumber());
@@ -501,7 +506,13 @@ public class VisualizationHelper {
 
 		// Brightness
 		row = 0;
-		if (ao instanceof Star) {
+		if (ao instanceof Planet) {
+			Planet p = (Planet) ao;
+			objectDetailsTableBrightness.setText(row, 0, "ALBEDO");
+			objectDetailsTableBrightness.setText(row++, 1, "" + PlanetEnum.forId(p.getNumericIdentifier()).getMeanAlbedo());
+			
+			// TODO : Compute the magnitude of the planet...
+		} else if (ao instanceof Star) {
 			Star s = (Star) ao;
 			if (s.getSpectralType() != null) {
 				objectDetailsTableBrightness.setText(row, 0, "TYPE SPECTRAL");
@@ -646,7 +657,21 @@ public class VisualizationHelper {
 		
 		// External resources
 		row = 0;
-		if (ao instanceof Star) {
+		if (ao instanceof Planet) {
+			Planet p = (Planet) ao;
+			objectDetailsTableExternalResources.setHTML(row++, 0, "<a href='http://en.wikipedia.org/wiki/"+p.getIdentifier().toLowerCase()+"' target='_blank'>Wikipedia</a>");
+			objectDetailsTableExternalResources.setHTML(row++, 0,
+					"<a href='http://www.astrobin.com/search/?search_type=0"
+					+ "&license=0&license=1&license=2&license=3&license=4&license=5&license=6"
+					+ "&telescope_type=any&telescope_type=0&telescope_type=1&telescope_type=2&telescope_type=3"
+					+ "&telescope_type=4&telescope_type=5&telescope_type=6&telescope_type=7&telescope_type=8"
+					+ "&telescope_type=9&telescope_type=10&telescope_type=11&telescope_type=12&telescope_type=13"
+					+ "&telescope_type=14&telescope_type=15&telescope_type=16&telescope_type=17&telescope_type=18"
+					+ "&telescope_type=19&telescope_type=20&telescope_type=21&telescope_type=22"
+					+ "&camera_type=any&camera_type=0&camera_type=1&camera_type=2&camera_type=3&camera_type=4&camera_type=5&q="
+					+ p.getIdentifier()+"' target='_blank'>Astrobin</a>");
+			
+		} else if (ao instanceof Star) {
 			Star s = (Star) ao;
 			objectDetailsTableExternalResources.setHTML(row++, 0, 
 					"<a href='http://simbad.u-strasbg.fr/simbad/sim-id?Ident=hr"+s.getHrNumber()+"' target='_blank'>Simbad</a>");

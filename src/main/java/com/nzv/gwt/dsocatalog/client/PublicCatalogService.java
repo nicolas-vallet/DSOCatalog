@@ -8,11 +8,15 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import com.nzv.gwt.dsocatalog.model.AstroObject;
 import com.nzv.gwt.dsocatalog.model.Constellation;
 import com.nzv.gwt.dsocatalog.model.DeepSkyObject;
+import com.nzv.gwt.dsocatalog.model.Planet;
+import com.nzv.gwt.dsocatalog.model.PlanetEnum;
 import com.nzv.gwt.dsocatalog.model.Star;
 
 @RemoteServiceRelativePath("springGwtServices/catalogService")
 public interface PublicCatalogService extends RemoteService {
 
+	public Planet computePlanetCurrentPosition(PlanetEnum planet, CatalogSearchOptions options);
+	
 	public Set<AstroObject> findObjectBrighterThan(CatalogSearchOptions options);
 
 	public Constellation findConstellationByCode(String constellationCode);

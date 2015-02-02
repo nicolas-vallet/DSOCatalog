@@ -342,4 +342,12 @@ public class ApplicationBoard extends SplitLayoutPanel {
 		options.setObservatoryLongitude(observer.getLongitude());
 		return options;
 	}
+	
+	protected void hideObjectDetails() {
+		objectDetailsTableIdentifiers.removeAllRows();
+		objectDetailsTableCoordinates.removeAllRows();
+		objectDetailsTableBrightness.removeAllRows();
+		objectDetailsTableSpecificCharacteristics.removeAllRows();
+		objectDetailsTableExternalResources.removeAllRows();
+	}
 }

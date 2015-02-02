@@ -7,9 +7,13 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.nzv.gwt.dsocatalog.model.AstroObject;
 import com.nzv.gwt.dsocatalog.model.Constellation;
 import com.nzv.gwt.dsocatalog.model.DeepSkyObject;
+import com.nzv.gwt.dsocatalog.model.Planet;
+import com.nzv.gwt.dsocatalog.model.PlanetEnum;
 import com.nzv.gwt.dsocatalog.model.Star;
 
 public interface PublicCatalogServiceAsync {
+	
+	public void computePlanetCurrentPosition(PlanetEnum planet, CatalogSearchOptions options, AsyncCallback<Planet> callback);
 
 	public void findObjectBrighterThan(CatalogSearchOptions options,
 			AsyncCallback<Set<AstroObject>> callback);
