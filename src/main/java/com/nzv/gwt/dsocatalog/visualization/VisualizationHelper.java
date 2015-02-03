@@ -6,12 +6,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
-import org.hibernate.id.GUIDGenerator;
-
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.FlexTable;
-import com.google.gwt.visualization.client.ChartArea;
 import com.google.gwt.visualization.client.AbstractDataTable.ColumnType;
+import com.google.gwt.visualization.client.ChartArea;
 import com.google.gwt.visualization.client.visualizations.corechart.AxisOptions;
 import com.google.gwt.visualization.client.visualizations.corechart.Options;
 import com.google.gwt.visualization.client.visualizations.corechart.TextStyle;
@@ -32,7 +30,6 @@ import com.nzv.gwt.dsocatalog.model.Planet;
 import com.nzv.gwt.dsocatalog.model.PlanetEnum;
 import com.nzv.gwt.dsocatalog.model.Star;
 import com.nzv.gwt.dsocatalog.projection.GeometryUtils;
-import com.nzv.gwt.dsocatalog.projection.Point2D;
 
 public class VisualizationHelper {
 
@@ -333,21 +330,10 @@ public class VisualizationHelper {
 				// constellation...
 				Constellation constellation = constellationsList.get(appPanel.getLiConstellations().getValue(
 						appPanel.getLiConstellations().getSelectedIndex()));
-//				String constellation = appPanel.getLiConstellations().getValue(
-//						appPanel.getLiConstellations().getSelectedIndex());
 				EquatorialCoordinates upperWesterMapLimit = constellation.getUpperWesternMapLimit();
 				EquatorialCoordinates lowerEasterMapLimit = constellation.getLowerEasternMapLimit();
-				
-				if (constellation.isSpreadOnBothSidesOfRightAscensionOriginAxis()) {
-					double leftLimit = GeometryUtils.normalizeAngleInDegrees(upperWesterMapLimit.getRightAscension(), -180, 180);
-					double rightLimit = GeometryUtils.normalizeAngleInDegrees(lowerEasterMapLimit.getRightAscension(), -180, 180);
-					hAxisOptions.setMinValue((int) rightLimit);
-					hAxisOptions.setMaxValue((int) leftLimit);
-					hAxisOptions.setDirection(-1);
-				} else {
-					hAxisOptions.setMinValue((int) upperWesterMapLimit.getRightAscension());
-					hAxisOptions.setMaxValue((int) (lowerEasterMapLimit.getRightAscension()));
-				}
+				hAxisOptions.setMinValue((int) upperWesterMapLimit.getRightAscension());
+				hAxisOptions.setMaxValue((int) (lowerEasterMapLimit.getRightAscension()));
 				vAxisOptions.setMinValue((int) lowerEasterMapLimit.getDeclinaison());
 				vAxisOptions.setMaxValue((int) (upperWesterMapLimit.getDeclinaison()));
 			} else {
