@@ -33,4 +33,16 @@ public class GeometryUtilsTest {
 		Assert.assertEquals(20, GeometryUtils.normalizeAngleInDegrees(200, -90, 90), 0);
 		Assert.assertEquals(20, GeometryUtils.normalizeAngleInDegrees(-160, -90, 90), 0);
 	}
+	
+	@Test
+	public void testGetAngleDifference() {
+		Assert.assertEquals(90, GeometryUtils.getAngleDifference(90, 180), 0);
+		Assert.assertEquals(90, GeometryUtils.getAngleDifference(45, -45), 0);
+		Assert.assertEquals(90, GeometryUtils.getAngleDifference(0, 270), 0);
+		Assert.assertEquals(20, GeometryUtils.getAngleDifference(0, 20), 0);
+		Assert.assertEquals(20, GeometryUtils.getAngleDifference(20, 0), 0);
+		Assert.assertEquals(20, GeometryUtils.getAngleDifference(10, -10), 0);
+		Assert.assertEquals(20, GeometryUtils.getAngleDifference(10, 350), 0);
+		Assert.assertEquals(20, GeometryUtils.getAngleDifference(10, 350), 0);
+	}
 }

@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
+import org.hibernate.id.GUIDGenerator;
+
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.visualization.client.ChartArea;
@@ -29,6 +31,8 @@ import com.nzv.gwt.dsocatalog.model.DeepSkyObject;
 import com.nzv.gwt.dsocatalog.model.Planet;
 import com.nzv.gwt.dsocatalog.model.PlanetEnum;
 import com.nzv.gwt.dsocatalog.model.Star;
+import com.nzv.gwt.dsocatalog.projection.GeometryUtils;
+import com.nzv.gwt.dsocatalog.projection.Point2D;
 
 public class VisualizationHelper {
 
@@ -247,14 +251,43 @@ public class VisualizationHelper {
 		String coordinatesMode = appPanel.getLiCoordinatesMode().getValue(
 				appPanel.getLiCoordinatesMode().getSelectedIndex());
 		MyLineChartOptions options = MyLineChartOptions.create();
+		CoordinatesSystem cs = 
+				CoordinatesSystem.valueOf(appPanel.getLiCoordinatesMode().getValue(appPanel.getLiCoordinatesMode().getSelectedIndex()));
+		boolean displayOnConstellation = 
+				searchOptions.getRestrictedToConstellationCode() != null && !searchOptions.getRestrictedToConstellationCode().isEmpty();
 		int chartWidth = Window.getClientWidth() - (2 * ApplicationBoard.PANEL_SPLITTER_WIDTH)
 				- ApplicationBoard.LEFT_PANEL_WIDTH;
 		int chartHeight = Window.getClientHeight() - 25 - ApplicationBoard.SOUTH_PANEL_HEIGHT;
-		// We use a ration 2:1 on chart width:height
-		if (chartHeight > chartWidth / 2) {
-			chartHeight = chartWidth / 2;
+		if (cs == CoordinatesSystem.ALTAZ) {
+			// We use a ratio 1:1 on chart width:height
+			if (chartHeight > chartWidth) {
+				chartHeight = chartWidth;
+			} else {
+				chartWidth = chartHeight;
+			}
+		} else if (cs == CoordinatesSystem.ECL || cs == CoordinatesSystem.GAL || (cs == CoordinatesSystem.EQ && !displayOnConstellation)) {
+			// We use a ration 2:1 on chart width:height
+			if (chartHeight > chartWidth / 2) {
+				chartHeight = chartWidth / 2;
+			} else {
+				chartWidth = 2 * chartHeight;
+			}
 		} else {
-			chartWidth = 2 * chartHeight;
+			// We use the ratio of the constellation width:height 
+			Constellation displayedConstellation = constellationsList.get(searchOptions.getRestrictedToConstellationCode());
+			EquatorialCoordinates uw = displayedConstellation.getUpperWesternMapLimit();
+			EquatorialCoordinates le = displayedConstellation.getLowerEasternMapLimit();
+			double constellationWidth = 
+					GeometryUtils.getAngleDifference(uw.getRightAscension(), le.getRightAscension());
+			double constellationHeight =
+					GeometryUtils.getAngleDifference(uw.getDeclinaison(), le.getDeclinaison());
+			double chartWidthHeightRatio = constellationWidth / constellationHeight;
+			double windowWidthHeightRatio = (1.0 * chartWidth) / (1.0 * chartHeight);
+			if (chartWidthHeightRatio > windowWidthHeightRatio) {
+				chartHeight = (int) (chartWidth / chartWidthHeightRatio);
+			} else {
+				chartWidth = (int) (chartHeight * chartWidthHeightRatio);
+			}
 		}
 		options.setWidth(chartWidth);
 		options.setHeight(chartHeight);

@@ -97,6 +97,7 @@ public class GeometryUtils {
 	}
 	
 	public static boolean isCrossingChartLimitY(Point2D p1, Point2D p2, CoordinatesSystem cs) {
+		// TODO
 		return false;
 	}
 	
@@ -109,5 +110,33 @@ public class GeometryUtils {
 			angle -= interval;
 		}
 		return angle % interval;
+	}
+	
+	/**
+	 * Returns the minimum difference between two angle values.
+	 * For instance, the difference between 90 and 180 will be 90 and not 270.
+	 * @param angle1
+	 * @param angle2
+	 * @return
+	 */
+	public static double getAngleDifference(double angle1, double angle2) {
+		double a1, a2;
+		a1 = normalizeAngleInDegrees(angle1, 0, 360);
+		a2 = normalizeAngleInDegrees(angle2, 0, 360);
+		double diff1 = Math.abs(a1 - a2);
+		
+		a1 = normalizeAngleInDegrees(angle1, -180, 180);
+		a2 = normalizeAngleInDegrees(angle2, -180, 180);
+		double diff2 = Math.abs(a1 - a2);
+		
+		return Math.min(diff1, diff2);
+	}
+	
+	public static double getDistanceX(Point2D p1, Point2D p2) {
+		return 0;
+	}
+	
+	public static double getDistanceY(Point2D p1, Point2D p2) {
+		return 0;
 	}
 }

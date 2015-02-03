@@ -1,15 +1,12 @@
 package com.nzv.gwt.dsocatalog;
 
-import java.math.BigDecimal;
-import java.math.MathContext;
-
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import com.nzv.astro.ephemeris.Sexagesimal;
-import com.nzv.astro.ephemeris.Sexagesimal.SexagesimalType;
+import com.nzv.astro.ephemeris.coordinate.impl.EquatorialCoordinates;
 import com.nzv.gwt.dsocatalog.client.PublicCatalogService;
-import com.nzv.gwt.dsocatalog.model.Star;
+import com.nzv.gwt.dsocatalog.model.Constellation;
+import com.nzv.gwt.dsocatalog.projection.GeometryUtils;
 
 
 public class DsoCatalogTest {
@@ -19,14 +16,35 @@ public class DsoCatalogTest {
 		ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml", "jpaContext.xml");
 		PublicCatalogService catalogService = (PublicCatalogService) ctx.getBean(PublicCatalogService.class);
 		
-		Star s = catalogService.findStarByHrNumber(1708);
-		System.out.println("RA="+s.getRightAscension());
-		System.out.println("DEC="+s.getDeclinaison());
+		Constellation c = catalogService.findConstellationByCode("UMA");
+		EquatorialCoordinates uw = c.getUpperWesternMapLimit();
+		EquatorialCoordinates le = c.getLowerEasternMapLimit();
 		
-		MathContext round = new MathContext(5);
-		Sexagesimal ra = new Sexagesimal(BigDecimal.valueOf(s.getRightAscension() / 15).round(round).doubleValue());
-		Sexagesimal dec = new Sexagesimal(BigDecimal.valueOf(s.getDeclinaison()).round(round).doubleValue());
-		System.out.println(ra.toString(SexagesimalType.HOURS));
-		System.out.println(dec.toString(SexagesimalType.DEGREES));
+		
+		System.out.println("UW : RA="+uw.getRightAscension()+" / DEC="+uw.getDeclinaison());
+		System.out.println("LE : RA="+le.getRightAscension()+" / DEC="+le.getDeclinaison());
+		
+		int windowWidth = 500;
+		int windowHeight = 200;
+		double windowWidthHeightRatio = windowWidth / windowHeight;
+		
+		double constellationWidth = 
+				GeometryUtils.getAngleDifference(uw.getRightAscension(), le.getRightAscension());
+		double constellationHeight =
+				GeometryUtils.getAngleDifference(uw.getDeclinaison(), le.getDeclinaison());
+		double chartWidthHeightRatio = constellationWidth / constellationHeight;
+		
+		System.out.println("ratio W:H = "+chartWidthHeightRatio);
+		
+		double w, h;
+		if (chartWidthHeightRatio > windowWidthHeightRatio) {
+			w = windowWidth;
+			h = w / chartWidthHeightRatio;
+		} else {
+			h = windowHeight;
+			w = h * chartWidthHeightRatio;
+		}
+		System.out.println("W="+w);
+		System.out.println("H="+h);
 	}
 }
