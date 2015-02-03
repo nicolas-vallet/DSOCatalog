@@ -20,10 +20,7 @@ public class CatalogSearchOptions implements Serializable {
 		CatalogSearchOptions options = new CatalogSearchOptions();
 		options.setStarLimitMagnitude(DEFAULT_STAR_LIMIT_MAGNITUDE);
 		options.setDsoLimitMagnitude(DEFAULT_DSO_LIMIT_MAGNITUDE);
-		options.findPlanets = false;
-		options.displayConstellationNames = false;
-		options.displayConstellationBoundaries = false;
-		options.displayConstellationShape = false;
+		options.findPlanets = true;
 		options.findStars = true;
 		options.findAsterisms = true;
 		options.findGalaxies = true;
@@ -38,6 +35,9 @@ public class CatalogSearchOptions implements Serializable {
 
 	private boolean findPlanets = false;
 	private String restrictedToConstellationCode = null;
+	private boolean displayEquator = false;
+	private boolean displayEcliptic = false;
+	private boolean displayGalacticPlan = false;
 	private boolean displayConstellationNames = false;
 	private boolean displayConstellationBoundaries = false;
 	private boolean displayConstellationShape = false;
@@ -59,6 +59,30 @@ public class CatalogSearchOptions implements Serializable {
 	private double observatoryLatitude = 0;
 	private double observatoryLongitude = 0;
 	
+	public boolean isDisplayEquator() {
+		return displayEquator;
+	}
+
+	public void setDisplayEquator(boolean displayEquator) {
+		this.displayEquator = displayEquator;
+	}
+
+	public boolean isDisplayEcliptic() {
+		return displayEcliptic;
+	}
+
+	public void setDisplayEcliptic(boolean displayEcliptic) {
+		this.displayEcliptic = displayEcliptic;
+	}
+
+	public boolean isDisplayGalacticPlan() {
+		return displayGalacticPlan;
+	}
+
+	public void setDisplayGalacticPlan(boolean displayGalacticPlan) {
+		this.displayGalacticPlan = displayGalacticPlan;
+	}
+
 	public boolean isFindPlanets() {
 		return findPlanets;
 	}

@@ -21,8 +21,12 @@ import com.google.gwt.visualization.client.visualizations.corechart.LineChart;
 import com.google.gwt.visualization.client.visualizations.corechart.Options;
 import com.nzv.astro.ephemeris.Sexagesimal;
 import com.nzv.astro.ephemeris.coordinate.GeographicCoordinates;
+import com.nzv.astro.ephemeris.coordinate.adapter.EclipticCoordinatesAdapter;
 import com.nzv.astro.ephemeris.coordinate.adapter.EquatorialCoordinatesAdapter;
+import com.nzv.astro.ephemeris.coordinate.adapter.GalacticCoordinatesAdapter;
+import com.nzv.astro.ephemeris.coordinate.impl.EclipticCoordinates;
 import com.nzv.astro.ephemeris.coordinate.impl.EquatorialCoordinates;
+import com.nzv.astro.ephemeris.coordinate.impl.GalacticCoordinates;
 import com.nzv.gwt.dsocatalog.date.DateComputation;
 import com.nzv.gwt.dsocatalog.model.AstroObject;
 import com.nzv.gwt.dsocatalog.model.Constellation;
@@ -51,6 +55,9 @@ public class DsoCatalogGWT implements EntryPoint {
 	public static String STYLE_CHART_BACKGROUND_COLOR = "#132345";
 	public static String AXIS_TITLE_TEXT_STYLE = "color: #ffffff;";
 	public static String STYLE_CONSTELLATION_NAME = "point { size: 0; }";
+	public static String STYLE_ECLIPTIC_COLOR = "#e5e8c5";
+	public static String STYLE_EQUATOR_COLOR = "#70d1e0";
+	public static String STYLE_GALACTIC_PLAN_COLOR = "#f5c773";
 	public static String STYLE_CONSTELLATION_NAME_TEXT_COLOR = "#90AEF0";
 	public static String STYLE_CONSTELLATION_BORDER_COLOR = "#888888";
 	public static String STYLE_CONSTELLATION_SHAPE_COLOR = "#90AEF0";
@@ -218,8 +225,121 @@ public class DsoCatalogGWT implements EntryPoint {
 				!searchOptions.getRestrictedToConstellationCode().isEmpty();
 		CoordinatesSystem cs = CoordinatesSystem.valueOf(appPanel.liCoordinatesMode.getValue(appPanel.liCoordinatesMode.getSelectedIndex()));
 		Observer observer = initializeObserver();
+		GeographicCoordinates observatory = new GeographicCoordinates(observer.getLatitude(), observer.getLongitude());
 		DataSerieIndexes serieIndexes = new DataSerieIndexes(searchOptions);
+		//Window.alert(serieIndexes.toString());
 		int i = 0;
+		
+		
+		// Ecliptic, Equator and Galactic plan...
+		{
+			Projection projectionToUse = new NeutralProjection();
+			if (cs == CoordinatesSystem.ALTAZ) {
+				projectionToUse = new StereographicProjection();
+			} else if (cs == CoordinatesSystem.GAL) {
+				projectionToUse = new MollweideProjection();
+			}
+			for (int j=0 ; j<360 ; j++) {
+				EclipticCoordinatesAdapter eclipticAdapter = new EclipticCoordinatesAdapter(new EclipticCoordinates(j, 0));
+				EquatorialCoordinatesAdapter equatorAdapter = new EquatorialCoordinatesAdapter(new EquatorialCoordinates(j, 0));
+				GalacticCoordinatesAdapter galacticAdapter = new GalacticCoordinatesAdapter(new GalacticCoordinates(j, 0));
+				switch(cs) {
+				case ALTAZ:
+					// TODO
+					break;
+				case ECL:
+					if (searchOptions.isDisplayEcliptic()) {
+						Point2D mp = projectionToUse.project(
+								Math.toRadians(eclipticAdapter.getEclipticCoordinates().getEcliptiqueLongitude()),
+								Math.toRadians(eclipticAdapter.getEclipticCoordinates().getEcliptiqueLatitude()));
+						optimizedData.setValue(i, 0, GeometryUtils.normalizeAngleInDegrees(Math.toDegrees(mp.getX()), -180, 180));
+						optimizedData.setValue(i, serieIndexes.getEclipticSerieIndex(), Math.toDegrees(mp.getY()));
+						optimizedData.setValue(i, serieIndexes.getEclipticSerieIndex()+1, "ECLIPTIQUE");
+						i++;
+					}
+					if (searchOptions.isDisplayEquator()) {
+						Point2D mp = projectionToUse.project(
+								Math.toRadians(equatorAdapter.getEcliptiqueLongitude()), 
+								Math.toRadians(equatorAdapter.getEcliptiqueLatitude()));
+						optimizedData.setValue(i, 0, Math.toDegrees(mp.getX()));
+						optimizedData.setValue(i, serieIndexes.getEquatorSerieIndex(), Math.toDegrees(mp.getY()));
+						optimizedData.setValue(i, serieIndexes.getEquatorSerieIndex()+1, "EQUATEUR CELESTE");
+						i++;
+					}
+					if (searchOptions.isDisplayGalacticPlan()) {
+						EquatorialCoordinatesAdapter tmp = new EquatorialCoordinatesAdapter(new EquatorialCoordinates(galacticAdapter.getRightAscension(), galacticAdapter.getDeclinaison()));
+						Point2D mp = projectionToUse.project(
+								Math.toRadians(tmp.getEcliptiqueLongitude()), 
+								Math.toRadians(tmp.getEcliptiqueLatitude()));
+						optimizedData.setValue(i, 0, Math.toDegrees(mp.getX()));
+						optimizedData.setValue(i, serieIndexes.getGalacticPlanSerieIndex(), Math.toDegrees(mp.getY()));
+						optimizedData.setValue(i, serieIndexes.getGalacticPlanSerieIndex()+1, "PLAN GALACTIQUE");
+						i++;
+					}
+					break;
+				case GAL:
+					if (searchOptions.isDisplayEcliptic()) {
+						EquatorialCoordinatesAdapter tmp = new EquatorialCoordinatesAdapter(new EquatorialCoordinates(eclipticAdapter.getRightAscension(), eclipticAdapter.getDeclinaison()));
+						Point2D mp = projectionToUse.project(
+								Math.toRadians(tmp.getGalacticLongitude()), 
+								Math.toRadians(tmp.getGalacticLatitude()));
+						optimizedData.setValue(i, 0, GeometryUtils.normalizeAngleInDegrees(Math.toDegrees(mp.getX()), -180, 180));
+						optimizedData.setValue(i, serieIndexes.getEclipticSerieIndex(), Math.toDegrees(mp.getY()));
+						optimizedData.setValue(i, serieIndexes.getEclipticSerieIndex()+1, "ECLIPTIQUE");
+						i++;
+					}
+					if (searchOptions.isDisplayEquator()) {
+						Point2D mp = projectionToUse.project(
+								Math.toRadians(equatorAdapter.getGalacticLongitude()), 
+								Math.toRadians(equatorAdapter.getGalacticLatitude()));
+						optimizedData.setValue(i, 0, GeometryUtils.normalizeAngleInDegrees(Math.toDegrees(mp.getX()), -180, 180));
+						optimizedData.setValue(i, serieIndexes.getEquatorSerieIndex(), Math.toDegrees(mp.getY()));
+						optimizedData.setValue(i, serieIndexes.getEquatorSerieIndex()+1, "EQUATEUR CELESTE");
+						i++;
+					}
+					if (searchOptions.isDisplayGalacticPlan()) {
+						Point2D mp = projectionToUse.project(
+								Math.toRadians(galacticAdapter.getGalacticCoordinates().getGalacticLongitude()), 
+								Math.toRadians(galacticAdapter.getGalacticCoordinates().getGalacticLatitude()));
+						optimizedData.setValue(i, 0, GeometryUtils.normalizeAngleInDegrees(Math.toDegrees(mp.getX()), -180, 180));
+						optimizedData.setValue(i, serieIndexes.getGalacticPlanSerieIndex(), Math.toDegrees(mp.getY()));
+						optimizedData.setValue(i, serieIndexes.getGalacticPlanSerieIndex()+1, "PLAN GALACTIQUE");
+					}
+					break;
+				case EQ:
+				default:
+					if (searchOptions.isDisplayEcliptic()) {
+						Point2D mp = projectionToUse.project(
+								Math.toRadians(eclipticAdapter.getRightAscension()), 
+								Math.toRadians(eclipticAdapter.getDeclinaison()));
+						optimizedData.setValue(i, 0, GeometryUtils.normalizeAngleInDegrees(Math.toDegrees(mp.getX()), 0, 360));
+						optimizedData.setValue(i, serieIndexes.getEclipticSerieIndex(), Math.toDegrees(mp.getY()));
+						optimizedData.setValue(i, serieIndexes.getEclipticSerieIndex()+1, "ECLIPTIQUE");
+						i++;
+					}
+					if (searchOptions.isDisplayEquator()) {
+						Point2D mp = projectionToUse.project(
+								Math.toRadians(equatorAdapter.getEquatorialCoordinates().getRightAscension()), 
+								Math.toRadians(equatorAdapter.getEquatorialCoordinates().getDeclinaison()));
+						optimizedData.setValue(i, 0, Math.toDegrees(mp.getX()));
+						optimizedData.setValue(i, serieIndexes.getEquatorSerieIndex(), Math.toDegrees(mp.getY()));
+						optimizedData.setValue(i, serieIndexes.getEquatorSerieIndex()+1, "EQUATEUR CELESTE");
+						i++;
+					}
+					if (searchOptions.isDisplayGalacticPlan()) {
+						Point2D mp = projectionToUse.project(
+								Math.toRadians(galacticAdapter.getRightAscension()), 
+								Math.toRadians(galacticAdapter.getDeclinaison()));
+						optimizedData.setValue(i, 0, Math.toDegrees(mp.getX()));
+						optimizedData.setValue(i, serieIndexes.getGalacticPlanSerieIndex(), Math.toDegrees(mp.getY()));
+						optimizedData.setValue(i, serieIndexes.getGalacticPlanSerieIndex()+1, "PLAN GALACTIQUE");
+						i++;
+					}
+					break;
+				}
+			}
+		}
+		
 		
 		for (AstroObject o : objects) {
 			// Should we show objects under horizon ?
@@ -297,25 +417,20 @@ public class DsoCatalogGWT implements EntryPoint {
 			}
 			EquatorialCoordinatesAdapter eca = new EquatorialCoordinatesAdapter(new EquatorialCoordinates(o.getRightAscension(), o.getDeclinaison()));
 			Point2D p = new Point2D(0,0);
-			boolean useProjection = false;
 			if (cs == CoordinatesSystem.GAL) {
 				projection = new MollweideProjection();
 				p = projection.project(Math.toRadians(GeometryUtils.normalizeAngleInDegrees(eca.getGalacticLongitude(), -180, 180)), 
 						Math.toRadians(GeometryUtils.normalizeAngleInDegrees(eca.getGalacticLatitude(), -90, 90)));
-				useProjection = true;
 			} else if (cs == CoordinatesSystem.ALTAZ) {
 				if (o.getYCoordinateForReferential(cs, observer) < 0) continue;
 				projection = new StereographicProjection();
-				p = projection.project(Math.toRadians(o.getXCoordinateForReferential(cs, observer)), Math.toRadians(o.getYCoordinateForReferential(cs, observer)));
-				useProjection = true;
-			}
-			if (useProjection) {
-				optimizedData.setValue(i, 0, Math.toDegrees(p.getX()));
-				optimizedData.setValue(i, serieIndexToUse, Math.toDegrees(p.getY()));
+				p = projection.project(Math.toRadians(GeometryUtils.normalizeAngleInDegrees(o.getXCoordinateForReferential(cs, observer), 0, 360)), Math.toRadians(o.getYCoordinateForReferential(cs, observer)));
 			} else {
-				optimizedData.setValue(i, 0, o.getXCoordinateForReferential(cs));
-				optimizedData.setValue(i, serieIndexToUse, o.getYCoordinateForReferential(cs));
+				p = projection.project(Math.toRadians(o.getXCoordinateForReferential(cs, observer)), Math.toRadians(o.getYCoordinateForReferential(cs, observer)));
 			}
+			
+			optimizedData.setValue(i, 0, Math.toDegrees(p.getX()));
+			optimizedData.setValue(i, serieIndexToUse, Math.toDegrees(p.getY()));
 			optimizedData.setValue(i, serieIndexToUse+1, styleToUse);
 			optimizedData.setValue(i, serieIndexToUse+2, VisualizationHelper.generateTooltip(appPanel, o, observer));
 			displayedObjectReferences.put(new ObjectReferenceAddressInTable(i, serieIndexToUse), objectReference);
@@ -331,44 +446,44 @@ public class DsoCatalogGWT implements EntryPoint {
 		
 		// Constellation(s) names
 		if (searchOptions.isDisplayConstellationNames()) {
-			
+			Projection projection = new NeutralProjection();
+			Point2D mp = new Point2D(0, 0);
 			for (Constellation constellation : constellationsToDisplay) {
 				double X, Y;
 				EquatorialCoordinatesAdapter eca = new EquatorialCoordinatesAdapter(
 						new EquatorialCoordinates(constellation.getCenterRightAscension(), constellation.getCenterDeclinaison()));
 				switch (cs) {
 					case ALTAZ: {
-						GeographicCoordinates observatory = new GeographicCoordinates(observer.getLatitude(), observer.getLongitude());
 						X = eca.getAzimuth(observatory, observer.getGreenwichSiderealTime());
 						Y = eca.getElevation(observatory, observer.getGreenwichSiderealTime());
 						if (Y < 0) continue;
-						Projection projection = new StereographicProjection();
-						Point2D mp = projection.project(Math.toRadians(X), Math.toRadians(Y));
-						X = Math.toDegrees(mp.getX());
-						Y = Math.toDegrees(mp.getY());
+						projection = new StereographicProjection();
+						mp = projection.project(Math.toRadians(GeometryUtils.normalizeAngleInDegrees(X, 0, 360)), Math.toRadians(Y));
 						break;
 					}
 					case ECL: {
 						X = eca.getEcliptiqueLongitude();
 						Y = eca.getEcliptiqueLatitude();
+						mp = projection.project(Math.toRadians(X), Math.toRadians(Y));
 						break;
 					}
 					case GAL: {
 						X = eca.getGalacticLongitude();
 						Y = eca.getGalacticLatitude();
-						Projection projection = new MollweideProjection();
-						Point2D mp = projection.project(Math.toRadians(X>=180?X-360:X), Math.toRadians(Y));
-						X = Math.toDegrees(mp.getX());
-						Y = Math.toDegrees(mp.getY());
+						projection = new MollweideProjection();
+						mp = projection.project(Math.toRadians(X>=180?X-360:X), Math.toRadians(Y));
 						break;
 					}
 					case EQ:
 					default: {
 						X = constellation.getCenterRightAscension();
 						Y = constellation.getCenterDeclinaison();
+						mp = projection.project(Math.toRadians(X), Math.toRadians(Y));
 						break;
 					}
 				}
+				X = Math.toDegrees(mp.getX());
+				Y = Math.toDegrees(mp.getY());
 				optimizedData.setValue(i, 0, X);
 				optimizedData.setValue(i, serieIndexes.getConstellationNameSerieIndex(), Y);
 				optimizedData.setValue(i, serieIndexes.getConstellationNameSerieIndex()+1, STYLE_CONSTELLATION_NAME);
@@ -396,15 +511,14 @@ public class DsoCatalogGWT implements EntryPoint {
 					
 					switch(cs) {
 						case ALTAZ: {
-							// TODO : Implementation
-							break;
-						}
-						case ECL: {
-							projection = new NeutralProjection();
-							startX = lineStart.getEcliptiqueLongitude();
-							startY = lineStart.getEcliptiqueLatitude();
-							endX = lineEnd.getEcliptiqueLongitude();
-							endY = lineEnd.getEcliptiqueLatitude();
+							projection = new StereographicProjection();
+							startX = GeometryUtils.normalizeAngleInDegrees(lineStart.getAzimuth(observatory, observer.getGreenwichSiderealTime()), 0, 360);
+							startY = lineStart.getElevation(observatory, observer.getGreenwichSiderealTime());
+							endX = GeometryUtils.normalizeAngleInDegrees(lineEnd.getAzimuth(observatory, observer.getGreenwichSiderealTime()), 0, 360);
+							endY = lineEnd.getElevation(observatory, observer.getGreenwichSiderealTime());
+							if (appPanel.chkShowObjectsUnderHorizon.getValue() == false && (startY < 0 || endY < 0)) {
+								continue;
+							}
 							break;
 						}
 						case GAL: {
@@ -413,6 +527,14 @@ public class DsoCatalogGWT implements EntryPoint {
 							startY = lineStart.getGalacticLatitude();
 							endX = GeometryUtils.normalizeAngleInDegrees(lineEnd.getGalacticLongitude(), -180, 180);
 							endY = lineEnd.getGalacticLatitude();
+							break;
+						}
+						case ECL: {
+							projection = new NeutralProjection();
+							startX = lineStart.getEcliptiqueLongitude();
+							startY = lineStart.getEcliptiqueLatitude();
+							endX = lineEnd.getEcliptiqueLongitude();
+							endY = lineEnd.getEcliptiqueLatitude();
 							break;
 						}
 						case EQ:
@@ -435,30 +557,17 @@ public class DsoCatalogGWT implements EntryPoint {
 					boolean isCrossingChartLimitX = GeometryUtils.isCrossingChartLimitX(startX, endX, cs);
 					Point2D pStart = projection.project(Math.toRadians(startX), Math.toRadians(startY));
 					Point2D pEnd = projection.project(Math.toRadians(endX), Math.toRadians(endY));
-					if (!isCrossingChartLimitX) {
-						optimizedData.setValue(i, 0, Math.toDegrees(pStart.getX()));
-						optimizedData.setValue(i, serieIndexes.getConstellationBoundarySerieIndex(), Math.toDegrees(pStart.getY()));
-						optimizedData.setValue(i, serieIndexes.getConstellationBoundarySerieIndex()+1, constellation.getName());
-						optimizedData.setValue(i+1, 0, Math.toDegrees(pEnd.getX()));
-						optimizedData.setValue(i+1, serieIndexes.getConstellationBoundarySerieIndex(), Math.toDegrees(pEnd.getY()));
-						optimizedData.setValue(i+1, serieIndexes.getConstellationBoundarySerieIndex()+1, constellation.getName());
-						optimizedData.setValue(i+2, 0, Math.toDegrees(pStart.getX()));
-						optimizedData.setValueNull(i+2, serieIndexes.getConstellationBoundarySerieIndex());
-						i += 3;
-					} else {
+						
+					optimizedData.setValue(i, 0, Math.toDegrees(pStart.getX()));
+					optimizedData.setValue(i, serieIndexes.getConstellationBoundarySerieIndex(), Math.toDegrees(pStart.getY()));
+					optimizedData.setValue(i, serieIndexes.getConstellationBoundarySerieIndex()+1, constellation.getName());
+					if (isCrossingChartLimitX) {
 						// We have to generate intermediate points...
-						Point2D intermediatePointOnRight = 
-								GeometryUtils.giveIntermediatePointOnChartLimit(
-										new Point2D(startX, startY), 
-										new Point2D(endX, endY),
-										cs);
+						Point2D intermediatePointOnRight = GeometryUtils.giveIntermediatePointOnChartLimit(new Point2D(startX, startY), new Point2D(endX, endY), cs);
 						Point2D intermediatePointOnLeft = new Point2D(intermediatePointOnRight.getX()+360, intermediatePointOnRight.getY());
 						intermediatePointOnRight = projection.project(Math.toRadians(intermediatePointOnRight.getX()), Math.toRadians(intermediatePointOnRight.getY()));
 						intermediatePointOnLeft = projection.project(Math.toRadians(intermediatePointOnLeft.getX()), Math.toRadians(intermediatePointOnLeft.getY()));
 						
-						optimizedData.setValue(i, 0, Math.toDegrees(pStart.getX()));
-						optimizedData.setValue(i, serieIndexes.getConstellationBoundarySerieIndex(), Math.toDegrees(pStart.getY()));
-						optimizedData.setValue(i, serieIndexes.getConstellationBoundarySerieIndex()+1, constellation.getName());
 						optimizedData.setValue(i+1, 0, Math.toDegrees(intermediatePointOnLeft.getX()));
 						optimizedData.setValue(i+1, serieIndexes.getConstellationBoundarySerieIndex(), Math.toDegrees(intermediatePointOnLeft.getY()));
 						optimizedData.setValue(i+1, serieIndexes.getConstellationBoundarySerieIndex()+1, constellation.getName());
@@ -470,13 +579,13 @@ public class DsoCatalogGWT implements EntryPoint {
 						optimizedData.setValue(i, 0, Math.toDegrees(intermediatePointOnRight.getX()));
 						optimizedData.setValue(i, serieIndexes.getConstellationBoundarySerieIndex(), Math.toDegrees(intermediatePointOnRight.getY()));
 						optimizedData.setValue(i, serieIndexes.getConstellationBoundarySerieIndex()+1, constellation.getName());
-						optimizedData.setValue(i+1, 0, Math.toDegrees(pEnd.getX()));
-						optimizedData.setValue(i+1, serieIndexes.getConstellationBoundarySerieIndex(), Math.toDegrees(pEnd.getY()));
-						optimizedData.setValue(i+1, serieIndexes.getConstellationBoundarySerieIndex()+1, constellation.getName());
-						optimizedData.setValue(i+2, 0, Math.toDegrees(pEnd.getX()));
-						optimizedData.setValueNull(i+2, serieIndexes.getConstellationBoundarySerieIndex());
-						i += 3;
 					}
+					optimizedData.setValue(i+1, 0, Math.toDegrees(pEnd.getX()));
+					optimizedData.setValue(i+1, serieIndexes.getConstellationBoundarySerieIndex(), Math.toDegrees(pEnd.getY()));
+					optimizedData.setValue(i+1, serieIndexes.getConstellationBoundarySerieIndex()+1, constellation.getName());
+					optimizedData.setValue(i+2, 0, Math.toDegrees(pEnd.getX()));
+					optimizedData.setValueNull(i+2, serieIndexes.getConstellationBoundarySerieIndex());
+					i += 3;
 				}
 				
 			}
@@ -499,30 +608,15 @@ public class DsoCatalogGWT implements EntryPoint {
 					double endX = 0;
 					double endY = 0;
 					switch(cs) {
-//						case ALTAZ: {
-//							projection = new StereographicProjection();
-//							GeographicCoordinates observatory = new GeographicCoordinates(observer.getLatitude(), observer.getLongitude()); 
-//							startX = lineStart.getAzimuth(observatory, observer.getGreenwichSiderealTime());
-//							startY = lineStart.getElevation(observatory, observer.getGreenwichSiderealTime());
-//							if (startY < 0) startY = 0;
-//							Point2D pStart = projection.project(Math.toRadians(startX), Math.toRadians(startY));
-//							startX = Math.toDegrees(pStart.getX());
-//							startY = Math.toDegrees(pStart.getY());
-//							
-//							endX = lineEnd.getAzimuth(observatory, observer.getGreenwichSiderealTime());
-//							endY = lineEnd.getElevation(observatory, observer.getGreenwichSiderealTime());
-//							if (endY < 0) endY = 0;
-//							Point2D pEnd = projection.project(Math.toRadians(endX), Math.toRadians(endY));
-//							endX = Math.toDegrees(pEnd.getX());
-//							endY = Math.toDegrees(pEnd.getY());
-//							break;
-//						}
-						case ECL: {
-							projection = new NeutralProjection();
-							startX = lineStart.getEcliptiqueLongitude();
-							startY = lineStart.getEcliptiqueLatitude();
-							endX = lineEnd.getEcliptiqueLongitude();
-							endY = lineEnd.getEcliptiqueLatitude();
+						case ALTAZ: {
+							projection = new StereographicProjection();
+							startX = GeometryUtils.normalizeAngleInDegrees(lineStart.getAzimuth(observatory, observer.getGreenwichSiderealTime()), 0, 360);
+							startY = lineStart.getElevation(observatory, observer.getGreenwichSiderealTime());
+							endX = GeometryUtils.normalizeAngleInDegrees(lineEnd.getAzimuth(observatory, observer.getGreenwichSiderealTime()), 0, 360);
+							endY = lineEnd.getElevation(observatory, observer.getGreenwichSiderealTime());
+							if (appPanel.chkShowObjectsUnderHorizon.getValue() == false && (startY < 0 || endY < 0)) {
+								continue;
+							}
 							break;
 						}
 						case GAL: {
@@ -531,6 +625,14 @@ public class DsoCatalogGWT implements EntryPoint {
 							startY = lineStart.getGalacticLatitude();
 							endX = GeometryUtils.normalizeAngleInDegrees(lineEnd.getGalacticLongitude(), -180, 180);
 							endY = lineEnd.getGalacticLatitude();
+							break;
+						}
+						case ECL: {
+							projection = new NeutralProjection();
+							startX = lineStart.getEcliptiqueLongitude();
+							startY = lineStart.getEcliptiqueLatitude();
+							endX = lineEnd.getEcliptiqueLongitude();
+							endY = lineEnd.getEcliptiqueLatitude();
 							break;
 						}
 						case EQ:
@@ -553,30 +655,18 @@ public class DsoCatalogGWT implements EntryPoint {
 					boolean isCrossingChartLimitX = GeometryUtils.isCrossingChartLimitX(startX, endX, cs);
 					Point2D pStart = projection.project(Math.toRadians(startX), Math.toRadians(startY));
 					Point2D pEnd = projection.project(Math.toRadians(endX), Math.toRadians(endY));
-					if (!isCrossingChartLimitX) {
-						optimizedData.setValue(i, 0, Math.toDegrees(pStart.getX()));
-						optimizedData.setValue(i, serieIndexes.getConstellationShapeSerieIndex(), Math.toDegrees(pStart.getY()));
-						optimizedData.setValue(i, serieIndexes.getConstellationShapeSerieIndex()+1, constellation.getName());
-						optimizedData.setValue(i+1, 0, Math.toDegrees(pEnd.getX()));
-						optimizedData.setValue(i+1, serieIndexes.getConstellationShapeSerieIndex(), Math.toDegrees(pEnd.getY()));
-						optimizedData.setValue(i+1, serieIndexes.getConstellationShapeSerieIndex()+1, constellation.getName());
-						optimizedData.setValue(i+2, 0, Math.toDegrees(pStart.getX()));
-						optimizedData.setValueNull(i+2, serieIndexes.getConstellationShapeSerieIndex());
-						i += 3;
-					} else {
+					
+					optimizedData.setValue(i, 0, Math.toDegrees(pStart.getX()));
+					optimizedData.setValue(i, serieIndexes.getConstellationShapeSerieIndex(), Math.toDegrees(pStart.getY()));
+					optimizedData.setValue(i, serieIndexes.getConstellationShapeSerieIndex()+1, constellation.getName());
+					
+					if (isCrossingChartLimitX) {
 						// We have to generate intermediate points...
-						Point2D intermediatePointOnRight = 
-								GeometryUtils.giveIntermediatePointOnChartLimit(
-										new Point2D(startX, startY), 
-										new Point2D(endX, endY),
-										cs);
+						Point2D intermediatePointOnRight = GeometryUtils.giveIntermediatePointOnChartLimit(
+								new Point2D(startX, startY), new Point2D(endX, endY), cs);
 						Point2D intermediatePointOnLeft = new Point2D(intermediatePointOnRight.getX()+360, intermediatePointOnRight.getY());
 						intermediatePointOnRight = projection.project(Math.toRadians(intermediatePointOnRight.getX()), Math.toRadians(intermediatePointOnRight.getY()));
 						intermediatePointOnLeft = projection.project(Math.toRadians(intermediatePointOnLeft.getX()), Math.toRadians(intermediatePointOnLeft.getY()));
-						
-						optimizedData.setValue(i, 0, Math.toDegrees(pStart.getX()));
-						optimizedData.setValue(i, serieIndexes.getConstellationShapeSerieIndex(), Math.toDegrees(pStart.getY()));
-						optimizedData.setValue(i, serieIndexes.getConstellationShapeSerieIndex()+1, constellation.getName());
 						optimizedData.setValue(i+1, 0, Math.toDegrees(intermediatePointOnLeft.getX()));
 						optimizedData.setValue(i+1, serieIndexes.getConstellationShapeSerieIndex(), Math.toDegrees(intermediatePointOnLeft.getY()));
 						optimizedData.setValue(i+1, serieIndexes.getConstellationShapeSerieIndex()+1, constellation.getName());
@@ -588,19 +678,33 @@ public class DsoCatalogGWT implements EntryPoint {
 						optimizedData.setValue(i, 0, Math.toDegrees(intermediatePointOnRight.getX()));
 						optimizedData.setValue(i, serieIndexes.getConstellationShapeSerieIndex(), Math.toDegrees(intermediatePointOnRight.getY()));
 						optimizedData.setValue(i, serieIndexes.getConstellationShapeSerieIndex()+1, constellation.getName());
-						optimizedData.setValue(i+1, 0, Math.toDegrees(pEnd.getX()));
-						optimizedData.setValue(i+1, serieIndexes.getConstellationShapeSerieIndex(), Math.toDegrees(pEnd.getY()));
-						optimizedData.setValue(i+1, serieIndexes.getConstellationShapeSerieIndex()+1, constellation.getName());
-						optimizedData.setValue(i+2, 0, Math.toDegrees(pEnd.getX()));
-						optimizedData.setValueNull(i+2, serieIndexes.getConstellationShapeSerieIndex());
-						i += 3;
 					}
+					
+					optimizedData.setValue(i+1, 0, Math.toDegrees(pEnd.getX()));
+					optimizedData.setValue(i+1, serieIndexes.getConstellationShapeSerieIndex(), Math.toDegrees(pEnd.getY()));
+					optimizedData.setValue(i+1, serieIndexes.getConstellationShapeSerieIndex()+1, constellation.getName());
+					optimizedData.setValue(i+2, 0, Math.toDegrees(pEnd.getX()));
+					optimizedData.setValueNull(i+2, serieIndexes.getConstellationShapeSerieIndex());
+					i += 3;
 				}
 			}
 		}
 		// We remove unused rows if any.
 		// It is the case when we do not display the objects under horizon in the AltAz projection.
 		optimizedData.removeRows(i, (optimizedData.getNumberOfRows() - i));
+		
+//		if (cs == CoordinatesSystem.ALTAZ) {
+//			double yMin = 0, xMin = 0;
+//			for (int j=0 ; j<optimizedData.getNumberOfRows() ; j++) {
+//				if (optimizedData.getValueDouble(j, serieIndexes.getStarSerieIndex()) < yMin) {
+//					yMin = optimizedData.getValueDouble(j, serieIndexes.getStarSerieIndex());
+//				}
+//				if (optimizedData.getValueDouble(j, 0) < xMin) {
+//					xMin = optimizedData.getValueDouble(j, 0);
+//				}
+//			}
+//			Window.alert("xMin="+xMin+" / yMin="+yMin);
+//		}
 		return optimizedData;
 	}
 	

@@ -54,6 +54,40 @@ public class VisualizationHelper {
 			optimizedData.addColumn(ColumnType.NUMBER, "RA");
 			break;
 		}
+		if (searchOptions.isDisplayEcliptic()) {
+			optimizedData.addColumn(ColumnType.NUMBER, "Ecliptique");
+			optimizedData.addTooltipColumn(optimizedData);
+		}
+		if (searchOptions.isDisplayEquator()) {
+			optimizedData.addColumn(ColumnType.NUMBER, "Equateur");
+			optimizedData.addTooltipColumn(optimizedData);
+		}
+		if (searchOptions.isDisplayGalacticPlan()) {
+			optimizedData.addColumn(ColumnType.NUMBER, "Plan galactique");
+			optimizedData.addTooltipColumn(optimizedData);
+		}
+		if (searchOptions.isDisplayConstellationNames()) {
+			optimizedData.addColumn(ColumnType.NUMBER, "Constellation");
+			optimizedData.addStyleColumn(optimizedData);
+			optimizedData.addAnnotationColumn(optimizedData);
+			optimizedData.addAnnotationTextColumn(optimizedData);
+		}
+
+		ArrayList<String> codeOfConstellationsToDisplay = new ArrayList<String>();
+		if (showOneConstellation) {
+			codeOfConstellationsToDisplay.add(appPanel.getLiConstellations().getValue(
+					appPanel.getLiConstellations().getSelectedIndex()));
+		} else {
+			codeOfConstellationsToDisplay.addAll(constellationsList.keySet());
+		}
+		if (searchOptions.isDisplayConstellationBoundaries()) {
+			optimizedData.addColumn(ColumnType.NUMBER, "Limites constellation");
+			optimizedData.addTooltipColumn(optimizedData);
+		}
+		if (searchOptions.isDisplayConstellationShape()) {
+			optimizedData.addColumn(ColumnType.NUMBER, "Forme constellation");
+			optimizedData.addTooltipColumn(optimizedData);
+		}
 		if (searchOptions.isFindAsterisms()) {
 			optimizedData.addColumn(ColumnType.NUMBER, "Asterismes");
 			optimizedData.addStyleColumn(optimizedData);
@@ -104,30 +138,17 @@ public class VisualizationHelper {
 			optimizedData.addStyleColumn(optimizedData);
 			optimizedData.addTooltipColumn(optimizedData);
 		}
-		if (searchOptions.isDisplayConstellationNames()) {
-			optimizedData.addColumn(ColumnType.NUMBER, "Constellation");
-			optimizedData.addStyleColumn(optimizedData);
-			optimizedData.addAnnotationColumn(optimizedData);
-			optimizedData.addAnnotationTextColumn(optimizedData);
-		}
-
-		ArrayList<String> codeOfConstellationsToDisplay = new ArrayList<String>();
-		if (showOneConstellation) {
-			codeOfConstellationsToDisplay.add(appPanel.getLiConstellations().getValue(
-					appPanel.getLiConstellations().getSelectedIndex()));
-		} else {
-			codeOfConstellationsToDisplay.addAll(constellationsList.keySet());
-		}
-		if (searchOptions.isDisplayConstellationBoundaries()) {
-			optimizedData.addColumn(ColumnType.NUMBER, "Limites constellation");
-			optimizedData.addTooltipColumn(optimizedData);
-		}
-		if (searchOptions.isDisplayConstellationShape()) {
-			optimizedData.addColumn(ColumnType.NUMBER, "Forme constellation");
-			optimizedData.addTooltipColumn(optimizedData);
-		}
 
 		optimizedData.addRows(objects.size());
+		if (searchOptions.isDisplayEcliptic()) {
+			optimizedData.addRows(360);
+		}
+		if (searchOptions.isDisplayEquator()) {
+			optimizedData.addRows(360);
+		}
+		if (searchOptions.isDisplayGalacticPlan()) {
+			optimizedData.addRows(360);
+		}
 		if (searchOptions.isDisplayConstellationNames()) {
 			optimizedData.addRows(codeOfConstellationsToDisplay.size());
 		}
@@ -301,28 +322,27 @@ public class VisualizationHelper {
 		axisTitleTextStyle.setColor("#ffffff");
 		hAxisOptions.setTitleTextStyle(axisTitleTextStyle);
 		vAxisOptions.setTitleTextStyle(axisTitleTextStyle);
-		if (coordinatesMode.equals("" + CoordinatesSystem.ALTAZ)
-				&& appPanel.getChkShowObjectsUnderHorizon().getValue() == false) {
-			vAxisOptions.setMinValue(0);
-		} else {
-			vAxisOptions.setMinValue(-90);
-		}
-		vAxisOptions.setMaxValue(90);
 		if (("" + CoordinatesSystem.ECL).equals(coordinatesMode)) {
 			hAxisOptions.setMinValue(-180);
 			hAxisOptions.setMaxValue(180);
 			hAxisOptions.setTitle("LONGITUDE ECLIPTIQUE");
+			vAxisOptions.setMinValue(-90);
+			vAxisOptions.setMaxValue(90);
 			vAxisOptions.setTitle("LATITUDE ECLIPTIQUE");
 		} else if (("" + CoordinatesSystem.GAL).equals(coordinatesMode)) {
 			hAxisOptions.setMinValue(-180);
 			hAxisOptions.setMaxValue(180);
 			hAxisOptions.setTitle("LONGITUDE GALACTIQUE");
+			vAxisOptions.setMinValue(-90);
+			vAxisOptions.setMaxValue(90);
 			vAxisOptions.setTitle("LATITUDE GALACTIQUE");
 		} else if (("" + CoordinatesSystem.ALTAZ).equals(coordinatesMode)) {
-			// hAxisOptions.setMinValue(-180);
-			// hAxisOptions.setMaxValue(180);
 			hAxisOptions.setTitle("AZIMUTH");
 			vAxisOptions.setTitle("ELEVATION");
+			hAxisOptions.setMinValue(Math.toDegrees(-2));
+			hAxisOptions.setMaxValue(Math.toDegrees(2));
+			vAxisOptions.setMinValue(Math.toDegrees(-2));
+			vAxisOptions.setMaxValue(Math.toDegrees(2));
 		} else if (("" + CoordinatesSystem.EQ).equals(coordinatesMode)) {
 			if (!appPanel.getLiConstellations()
 					.getValue(appPanel.getLiConstellations().getSelectedIndex()).isEmpty()) {
@@ -339,6 +359,8 @@ public class VisualizationHelper {
 			} else {
 				hAxisOptions.setMinValue(0);
 				hAxisOptions.setMaxValue(360);
+				vAxisOptions.setMinValue(-90);
+				vAxisOptions.setMaxValue(90);
 			}
 			hAxisOptions.setTitle("ASCENSION DROITE");
 			vAxisOptions.setTitle("DECLINAISON");
@@ -376,11 +398,32 @@ public class VisualizationHelper {
 			CatalogSearchOptions searchOptions) {
 		DataSerieIndexes serieIndexes = new DataSerieIndexes(searchOptions);
 		int i = 0;
-		for (i = 0; i < serieIndexes.getObjectSeriesCount(); i++) {
+		if (searchOptions.isDisplayEcliptic()) {
 			MySeries s = MySeries.create();
-			s.setLineWidth(0);
+			s.setLineWidth(1);
+			s.setPointSize(0);
+			s.setColor(DsoCatalogGWT.STYLE_ECLIPTIC_COLOR);
 			s.setVisibleInLegend(false);
 			options.setSeries(i, s);
+			i++;
+		}
+		if (searchOptions.isDisplayEquator()) {
+			MySeries s = MySeries.create();
+			s.setLineWidth(1);
+			s.setPointSize(0);
+			s.setColor(DsoCatalogGWT.STYLE_EQUATOR_COLOR);
+			s.setVisibleInLegend(false);
+			options.setSeries(i, s);
+			i++;
+		}
+		if (searchOptions.isDisplayGalacticPlan()) {
+			MySeries s = MySeries.create();
+			s.setLineWidth(1);
+			s.setPointSize(0);
+			s.setColor(DsoCatalogGWT.STYLE_GALACTIC_PLAN_COLOR);
+			s.setVisibleInLegend(false);
+			options.setSeries(i, s);
+			i++;
 		}
 		if (searchOptions.isDisplayConstellationNames()) {
 			MySeries s = MySeries.create();
@@ -406,6 +449,12 @@ public class VisualizationHelper {
 			s.setVisibleInLegend(false);
 			options.setSeries(i, s);
 			i++;
+		}
+		for (int j = 0; j < serieIndexes.getObjectSeriesCount(); j++) {
+			MySeries s = MySeries.create();
+			s.setLineWidth(0);
+			s.setVisibleInLegend(false);
+			options.setSeries((i+j), s);
 		}
 		return options;
 	}

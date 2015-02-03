@@ -12,6 +12,9 @@ public class DataSerieIndexes {
 	private int nebulaSerieIndex = 0;
 	private int snRemnantSerieIndex = 0;
 	private int quasarSerieIndex = 0;
+	private int eclipticSerieIndex = 0;
+	private int equatorSerieIndex = 0;
+	private int galacticPlanSerieIndex = 0;
 	private int constellationNameSerieIndex = 0;
 	private int constellationBoundarySerieIndex = 0;
 	private int constellationShapeSerieIndex = 0;
@@ -20,6 +23,32 @@ public class DataSerieIndexes {
 	public DataSerieIndexes(CatalogSearchOptions searchOptions) {
 		int serieIndex = 0;
 
+		if (searchOptions.isDisplayEcliptic()) {
+			eclipticSerieIndex = ++serieIndex;
+			serieIndex++;
+		}
+		if (searchOptions.isDisplayEquator()) {
+			equatorSerieIndex = ++serieIndex;
+			serieIndex++;
+		}
+		if (searchOptions.isDisplayGalacticPlan()) {
+			galacticPlanSerieIndex = ++serieIndex;
+			serieIndex++;
+		}
+		if (searchOptions.isDisplayConstellationNames()) {
+			// Constellation name display requires columns for RA center, DEC center, Style, Annotation (will contain the code), AnnotationText (will contain the name) 
+			constellationNameSerieIndex = ++serieIndex;
+			serieIndex += 3;
+		}
+		if (searchOptions.isDisplayConstellationBoundaries()) {
+			constellationBoundarySerieIndex = ++serieIndex;
+			serieIndex++;
+		}
+		
+		if (searchOptions.isDisplayConstellationShape()) {
+			constellationShapeSerieIndex = ++serieIndex;
+			serieIndex++;
+		}
 		if (searchOptions.isFindAsterisms()) {
 			asterismSerieIndex = ++serieIndex;
 			serieIndex += 2;
@@ -69,22 +98,6 @@ public class DataSerieIndexes {
 			planetSerieIndex = ++serieIndex;
 			serieIndex += 2;
 			objectSeriesCount++;
-		}
-		
-		if (searchOptions.isDisplayConstellationNames()) {
-			// Constellation name display requires columns for RA center, DEC center, Style, Annotation (will contain the code), AnnotationText (will contain the name) 
-			constellationNameSerieIndex = ++serieIndex;
-			serieIndex += 3;
-			
-		}
-		if (searchOptions.isDisplayConstellationBoundaries()) {
-			constellationBoundarySerieIndex = ++serieIndex;
-			serieIndex++;
-		}
-		
-		if (searchOptions.isDisplayConstellationShape()) {
-			constellationShapeSerieIndex = ++serieIndex;
-			serieIndex++;
 		}
 	}
 	
@@ -140,6 +153,18 @@ public class DataSerieIndexes {
 		return constellationShapeSerieIndex;
 	}
 	
+	public int getEclipticSerieIndex() {
+		return eclipticSerieIndex;
+	}
+
+	public int getEquatorSerieIndex() {
+		return equatorSerieIndex;
+	}
+
+	public int getGalacticPlanSerieIndex() {
+		return galacticPlanSerieIndex;
+	}
+
 	public int getObjectSeriesCount() {
 		return objectSeriesCount;
 	}
@@ -147,20 +172,21 @@ public class DataSerieIndexes {
 	@Override
 	public String toString() {
 		return "DataSerieIndexes [planetSerieIndex="+planetSerieIndex
-				+ ", starSerieIndex=" + starSerieIndex
-				+ ", asterismSerieIndex=" + asterismSerieIndex
-				+ ", galaxySerieIndex=" + galaxySerieIndex
-				+ ", globularClusterSerieIndex=" + globularClusterSerieIndex
-				+ ", openClusterSerieIndex=" + openClusterSerieIndex
-				+ ", planetaryNebulaSerieIndex=" + planetaryNebulaSerieIndex
-				+ ", nebulaSerieIndex=" + nebulaSerieIndex
-				+ ", snRemnantSerieIndex=" + snRemnantSerieIndex
-				+ ", quasarSerieIndex=" + quasarSerieIndex
-				+ ", constellationNameSerieIndex="+constellationNameSerieIndex
-				+ ", constellationBoundarySerieIndex="
-				+ constellationBoundarySerieIndex 
-				+ ", constellationShapeSerieIndex="
-				+ constellationShapeSerieIndex
-				+ ", objectSeriesCount=" + objectSeriesCount + "]";
+				+ ", \n starSerieIndex=" + starSerieIndex
+				+ ", \n asterismSerieIndex=" + asterismSerieIndex
+				+ ", \n galaxySerieIndex=" + galaxySerieIndex
+				+ ", \n globularClusterSerieIndex=" + globularClusterSerieIndex
+				+ ", \n openClusterSerieIndex=" + openClusterSerieIndex
+				+ ", \n planetaryNebulaSerieIndex=" + planetaryNebulaSerieIndex
+				+ ", \n nebulaSerieIndex=" + nebulaSerieIndex
+				+ ", \n snRemnantSerieIndex=" + snRemnantSerieIndex
+				+ ", \n quasarSerieIndex=" + quasarSerieIndex
+				+ ", \n eclipticSerieIndex=" + eclipticSerieIndex
+				+ ", \n equatorSerieIndex=" + equatorSerieIndex
+				+ ", \n galacticPlanSerieIndex=" + galacticPlanSerieIndex
+				+ ", \n constellationNameSerieIndex="+constellationNameSerieIndex
+				+ ", \n constellationBoundarySerieIndex="+constellationBoundarySerieIndex 
+				+ ", \n constellationShapeSerieIndex="+constellationShapeSerieIndex
+				+ ", \n objectSeriesCount=" + objectSeriesCount + "]";
 	}
 }

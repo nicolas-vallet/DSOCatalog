@@ -76,7 +76,10 @@ public class ApplicationBoard extends SplitLayoutPanel {
 	Label lbCoordinatesMode = new Label("Système de coordonnées");
 	ListBox liCoordinatesMode = new ListBox();
 	CheckBox chkShowObjectsUnderHorizon = new CheckBox("Montrer les objets sous l'horizon");
-	VerticalPanel coordinatesPanel = new VerticalPanel();
+	CheckBox chkDisplayEcliptic = new CheckBox("Afficher l'Ecliptique");
+	CheckBox chkDisplayEquator = new CheckBox("Afficher l'équateur");
+	CheckBox chkDisplayGalacticPlan = new CheckBox("Afficher le plan galactique");
+	VerticalPanel projectionPanel = new VerticalPanel();
 
 	Label lbObserverLatitude = new Label("Latitude de l'observateur");
 	TextBox txtObserverLatitude = new TextBox();
@@ -129,19 +132,25 @@ public class ApplicationBoard extends SplitLayoutPanel {
 		appPanel.configurationPanel.setPixelSize(LEFT_PANEL_WIDTH, 500);
 		
 		// We add the coordinates panel.
-		appPanel.coordinatesPanel.setSize("270px", "30px");
-		appPanel.coordinatesPanel.add(appPanel.lbCoordinatesMode);
+		appPanel.projectionPanel.setSize("270px", "30px");
+		appPanel.projectionPanel.add(appPanel.lbCoordinatesMode);
 		appPanel.liCoordinatesMode.addItem("Equatoriaux", ""+CoordinatesSystem.EQ);
 		appPanel.liCoordinatesMode.addItem("Ecliptiques", ""+CoordinatesSystem.ECL);
 		appPanel.liCoordinatesMode.addItem("Galactiques", ""+CoordinatesSystem.GAL);
-		//appPanel.liCoordinatesMode.addItem("Alt-Az", ""+CoordinatesSystem.ALTAZ);
+//		appPanel.liCoordinatesMode.addItem("Alt-Az", ""+CoordinatesSystem.ALTAZ);
 		appPanel.liCoordinatesMode.addChangeHandler(new UpdateMapEventHandler(source));
-		appPanel.coordinatesPanel.add(appPanel.liCoordinatesMode);
+		appPanel.projectionPanel.add(appPanel.liCoordinatesMode);
 		appPanel.chkShowObjectsUnderHorizon.addClickHandler(new UpdateMapEventHandler(source));
-		//appPanel.coordinatesPanel.add(appPanel.chkShowObjectsUnderHorizon);
+//		appPanel.projectionPanel.add(appPanel.chkShowObjectsUnderHorizon);
+		appPanel.chkDisplayEcliptic.addClickHandler(new UpdateMapEventHandler(source));
+		appPanel.projectionPanel.add(appPanel.chkDisplayEcliptic);
+		appPanel.chkDisplayEquator.addClickHandler(new UpdateMapEventHandler(source));
+		appPanel.projectionPanel.add(appPanel.chkDisplayEquator);
+		appPanel.chkDisplayGalacticPlan.addClickHandler(new UpdateMapEventHandler(source));
+		appPanel.projectionPanel.add(appPanel.chkDisplayGalacticPlan);
 
 		// We add the coordinates panel to configuration panel.
-		appPanel.configurationPanel.add(appPanel.coordinatesPanel, new Label("Projection"), 28);
+		appPanel.configurationPanel.add(appPanel.projectionPanel, new Label("Projection"), 28);
 		
 		// We add the observer panel.
 		appPanel.observerPanel.setSize("270px", "250px");
@@ -294,6 +303,9 @@ public class ApplicationBoard extends SplitLayoutPanel {
 		CatalogSearchOptions options = new CatalogSearchOptions();
 		options.setRestrictedToConstellationCode(liConstellations.getValue(liConstellations.getSelectedIndex()));
 		options.setFindPlanets(chkDisplayPlanets.getValue());
+		options.setDisplayEcliptic(chkDisplayEcliptic.getValue());
+		options.setDisplayEquator(chkDisplayEquator.getValue());
+		options.setDisplayGalacticPlan(chkDisplayGalacticPlan.getValue());
 		options.setDisplayConstellationNames(chkDisplayConstellationNames.getValue());
 		options.setDisplayConstellationShape(chkDisplayConstellationShapes.getValue());
 		options.setDisplayConstellationBoundaries(chkDisplayConstellationBoundaries.getValue());
