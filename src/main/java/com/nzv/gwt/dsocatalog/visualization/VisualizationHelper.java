@@ -331,16 +331,25 @@ public class VisualizationHelper {
 					.getValue(appPanel.getLiConstellations().getSelectedIndex()).isEmpty()) {
 				// We set the limit of the map to the limit of the selected
 				// constellation...
-				String constellation = appPanel.getLiConstellations().getValue(
-						appPanel.getLiConstellations().getSelectedIndex());
-				EquatorialCoordinates upperWesterMapLimit = constellationsList.get(constellation)
-						.getUpperWesternMapLimit(1);
-				EquatorialCoordinates lowerEasterMapLimit = constellationsList.get(constellation)
-						.getLowerEasternMapLimit(1);
-				hAxisOptions.setMinValue((int) upperWesterMapLimit.getRightAscension());
-				hAxisOptions.setMaxValue((int) (lowerEasterMapLimit.getRightAscension() + 1));
+				Constellation constellation = constellationsList.get(appPanel.getLiConstellations().getValue(
+						appPanel.getLiConstellations().getSelectedIndex()));
+//				String constellation = appPanel.getLiConstellations().getValue(
+//						appPanel.getLiConstellations().getSelectedIndex());
+				EquatorialCoordinates upperWesterMapLimit = constellation.getUpperWesternMapLimit();
+				EquatorialCoordinates lowerEasterMapLimit = constellation.getLowerEasternMapLimit();
+				
+				if (constellation.isSpreadOnBothSidesOfRightAscensionOriginAxis()) {
+					double leftLimit = GeometryUtils.normalizeAngleInDegrees(upperWesterMapLimit.getRightAscension(), -180, 180);
+					double rightLimit = GeometryUtils.normalizeAngleInDegrees(lowerEasterMapLimit.getRightAscension(), -180, 180);
+					hAxisOptions.setMinValue((int) rightLimit);
+					hAxisOptions.setMaxValue((int) leftLimit);
+					hAxisOptions.setDirection(-1);
+				} else {
+					hAxisOptions.setMinValue((int) upperWesterMapLimit.getRightAscension());
+					hAxisOptions.setMaxValue((int) (lowerEasterMapLimit.getRightAscension()));
+				}
 				vAxisOptions.setMinValue((int) lowerEasterMapLimit.getDeclinaison());
-				vAxisOptions.setMaxValue((int) (upperWesterMapLimit.getDeclinaison() + 1));
+				vAxisOptions.setMaxValue((int) (upperWesterMapLimit.getDeclinaison()));
 			} else {
 				hAxisOptions.setMinValue(0);
 				hAxisOptions.setMaxValue(360);
