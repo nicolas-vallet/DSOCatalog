@@ -12,6 +12,12 @@ public class DsoCatalogTest {
 //		ApplicationContext ctx = new ClassPathXmlApplicationContext("applicationContext.xml", "jpaContext.xml");
 //		PublicCatalogService catalogService = (PublicCatalogService) ctx.getBean(PublicCatalogService.class);
 		
+		Double d1 = 2.0;
+		Double d2 = null;
+		System.out.println(Math.max(d1, d2));
+		System.exit(0);
+		
+		
 		Point2D pointHorizonEst = new Point2D(90.0, 0.0);
 		Point2D pointHorizonNord = new Point2D(0.0, 0.0);
 		Point2D pointHorizonSud = new Point2D(180.0, 0.0);

@@ -5,7 +5,6 @@ import java.util.Date;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.i18n.shared.DateTimeFormat;
 import com.google.gwt.user.client.ui.CheckBox;
-import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
@@ -102,12 +101,12 @@ public class ApplicationBoard extends SplitLayoutPanel {
 	VerticalPanel observerPanel = new VerticalPanel();
 
 	Panel visualizationPanel = new SimplePanel();
-	FlexTable objectDetailsTable = new FlexTable();
-	FlexTable objectDetailsTableIdentifiers = new FlexTable();
-	FlexTable objectDetailsTableCoordinates = new FlexTable();
-	FlexTable objectDetailsTableBrightness = new FlexTable();
-	FlexTable objectDetailsTableSpecificCharacteristics = new FlexTable();
-	FlexTable objectDetailsTableExternalResources = new FlexTable();
+//	FlexTable objectDetailsTable = new FlexTable();
+//	FlexTable objectDetailsTableIdentifiers = new FlexTable();
+//	FlexTable objectDetailsTableCoordinates = new FlexTable();
+//	FlexTable objectDetailsTableBrightness = new FlexTable();
+//	FlexTable objectDetailsTableSpecificCharacteristics = new FlexTable();
+//	FlexTable objectDetailsTableExternalResources = new FlexTable();
 
 	PushButton btUpdateMap = new PushButton("Update map");
 	Label systemMessage = new Label("");
@@ -115,8 +114,7 @@ public class ApplicationBoard extends SplitLayoutPanel {
 	StackLayoutPanel configurationPanel = new StackLayoutPanel(Unit.PX);
 	VerticalPanel leftPanel = new VerticalPanel();
 	VerticalPanel centerPanel = new VerticalPanel();
-	VerticalPanel southPanel = new VerticalPanel();
-	TabLayoutPanel southPanelNew = new TabLayoutPanel(25, Unit.PX);
+	TabLayoutPanel southPanel = new TabLayoutPanel(25, Unit.PX);
 	
 	
 	private ApplicationBoard() {
@@ -284,16 +282,15 @@ public class ApplicationBoard extends SplitLayoutPanel {
 		appPanel.centerPanel.add(appPanel.visualizationPanel);
 		
 		// We add the table that will be used to display object details
-		appPanel.southPanel.add(appPanel.objectDetailsTable);
-		appPanel.southPanelNew.add(appPanel.objectDetailsTableIdentifiers, new Label("Identification"));
-		appPanel.southPanelNew.add(appPanel.objectDetailsTableCoordinates, new Label("Coordonnées"));
-		appPanel.southPanelNew.add(appPanel.objectDetailsTableBrightness, new Label("Aspect visuel"));
-		appPanel.southPanelNew.add(appPanel.objectDetailsTableSpecificCharacteristics, new Label("Spécificités"));
-		appPanel.southPanelNew.add(appPanel.objectDetailsTableExternalResources, new Label("Resources externes"));
+//		appPanel.southPanel.add(appPanel.objectDetailsTableIdentifiers, new Label("Identification"));
+//		appPanel.southPanel.add(appPanel.objectDetailsTableCoordinates, new Label("Coordonnées"));
+//		appPanel.southPanel.add(appPanel.objectDetailsTableBrightness, new Label("Aspect visuel"));
+//		appPanel.southPanel.add(appPanel.objectDetailsTableSpecificCharacteristics, new Label("Spécificités"));
+//		appPanel.southPanel.add(appPanel.objectDetailsTableExternalResources, new Label("Resources externes"));
 		
 		// We place the left and the right panels in the main one.
 		appPanel.addWest(appPanel.leftPanel, LEFT_PANEL_WIDTH);
-		appPanel.addSouth(appPanel.southPanelNew, SOUTH_PANEL_HEIGHT);
+		appPanel.addSouth(appPanel.southPanel, SOUTH_PANEL_HEIGHT);
 		appPanel.add(appPanel.centerPanel);
 		
 		return appPanel;
@@ -355,11 +352,7 @@ public class ApplicationBoard extends SplitLayoutPanel {
 		return options;
 	}
 	
-	protected void hideObjectDetails() {
-		objectDetailsTableIdentifiers.removeAllRows();
-		objectDetailsTableCoordinates.removeAllRows();
-		objectDetailsTableBrightness.removeAllRows();
-		objectDetailsTableSpecificCharacteristics.removeAllRows();
-		objectDetailsTableExternalResources.removeAllRows();
+	protected void removeObjectDetails() {
+		southPanel.clear();
 	}
 }

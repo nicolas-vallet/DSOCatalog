@@ -123,7 +123,8 @@ public class DsoCatalogGWT implements EntryPoint {
 
 	protected void updateMap() {
 		// We remove every data in details table
-		appPanel.objectDetailsTable.removeAllRows();
+		//appPanel.objectDetailsTable.removeAllRows();
+		appPanel.removeObjectDetails();
 		final CatalogSearchOptions searchOptions = appPanel.getCatalogSearchOptions();
 		catalogService.findObjectBrighterThan(searchOptions, new AsyncCallback<Set<AstroObject>>() {
 
@@ -155,7 +156,7 @@ public class DsoCatalogGWT implements EntryPoint {
 														new ObjectReferenceAddressInTable(selection.getRow(), selection.getColumn())));
 											} else {
 												// The user selected a constellation boundary point or a shape line limit...
-												appPanel.hideObjectDetails();
+												appPanel.removeObjectDetails();
 											}
 										}
 									}
@@ -720,9 +721,7 @@ public class DsoCatalogGWT implements EntryPoint {
 
 				@Override
 				public void onSuccess(Planet result) {
-					VisualizationHelper.displayObjectDetails(result, appPanel.objectDetailsTableIdentifiers, 
-							appPanel.objectDetailsTableCoordinates, appPanel.objectDetailsTableBrightness, 
-							appPanel.objectDetailsTableSpecificCharacteristics, appPanel.objectDetailsTableExternalResources);
+					VisualizationHelper.displayObjectDetails(result, appPanel.southPanel);
 				}
 			});
 		} else if (objectReference.isStar()) {
@@ -734,9 +733,7 @@ public class DsoCatalogGWT implements EntryPoint {
 
 				@Override
 				public void onSuccess(Star result) {
-					VisualizationHelper.displayObjectDetails(result, appPanel.objectDetailsTableIdentifiers, 
-							appPanel.objectDetailsTableCoordinates, appPanel.objectDetailsTableBrightness, 
-							appPanel.objectDetailsTableSpecificCharacteristics, appPanel.objectDetailsTableExternalResources);
+					VisualizationHelper.displayObjectDetails(result, appPanel.southPanel);
 				}
 			});
 		} else if (objectReference.isDeepSkyObject()) {
@@ -748,9 +745,7 @@ public class DsoCatalogGWT implements EntryPoint {
 				
 				@Override
 				public void onSuccess(DeepSkyObject result) {
-					VisualizationHelper.displayObjectDetails(result, appPanel.objectDetailsTableIdentifiers, 
-							appPanel.objectDetailsTableCoordinates, appPanel.objectDetailsTableBrightness, 
-							appPanel.objectDetailsTableSpecificCharacteristics, appPanel.objectDetailsTableExternalResources);
+					VisualizationHelper.displayObjectDetails(result, appPanel.southPanel);
 				}
 			});
 		}
