@@ -383,6 +383,14 @@ public class VisualizationHelper {
 		}
 		// Trying to fine-tune the series representation options...
 		options = VisualizationHelper.createSeriesOptions(options, searchOptions);
+		
+		// Configure the zoom
+		Explorer explorer = Explorer.create();
+//		explorer.setKeepInBounds(true);
+		explorer.setMaxZoomIn(0.001);
+		explorer.setMaxZoomOut(1);
+		explorer.setZoomDelta(1.1);
+		options.setExplorer(explorer);
 		return options;
 	}
 

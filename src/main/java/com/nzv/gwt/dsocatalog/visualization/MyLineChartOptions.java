@@ -40,4 +40,8 @@ public class MyLineChartOptions extends
 	public final native void setSeriesType(String seriesType) /*-{
 		this.seriesType = seriesType;
 	}-*/;
+	
+	public final native void setExplorer(Explorer exp) /*-{
+		this.explorer = exp;
+	}-*/;
 }

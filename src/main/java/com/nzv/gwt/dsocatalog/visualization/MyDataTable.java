@@ -28,7 +28,7 @@ public class MyDataTable extends DataTable {
 	}-*/;
 	
 	public final native int addAnnotationTextColumn(DataTable data) /*-{
-	return data.addColumn({type:'string', role:'annotationText'});
+		return data.addColumn({type:'string', role:'annotationText'});
 	}-*/;
 
 	public final native int addStyleColumn(DataTable data) /*-{
