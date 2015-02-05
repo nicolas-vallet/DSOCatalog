@@ -499,7 +499,7 @@ public class VisualizationHelper {
 			objectDetailsPanel.add(generateAspectTable(ao), new Label("Aspect"));
 			objectDetailsPanel.add(generateSpecificitiesTable(ao), new Label("Spécificités"));
 			objectDetailsPanel.add(generateExternalResourcesTable(ao), new Label("Resource externes"));
-			objectDetailsPanel.add(generateImageTable(ao), new Label("Image DSS"));
+			objectDetailsPanel.add(generateImageTable(ao), new Label("Images"));
 			
 		} else if (ao instanceof DeepSkyObject) {
 			objectDetailsPanel.add(generateIdentifiersTable(ao), new Label("Identifiants"));
@@ -507,7 +507,7 @@ public class VisualizationHelper {
 			objectDetailsPanel.add(generateAspectTable(ao), new Label("Aspect"));
 			objectDetailsPanel.add(generateSpecificitiesTable(ao), new Label("Spécificités"));
 			objectDetailsPanel.add(generateExternalResourcesTable(ao), new Label("Resource externes"));
-			objectDetailsPanel.add(generateImageTable(ao), new Label("Image DSS"));
+			objectDetailsPanel.add(generateImageTable(ao), new Label("Images"));
 		}
 	}
 	
@@ -543,7 +543,9 @@ public class VisualizationHelper {
 		liSurveys.addItem("Quick-V", "quickv");
 		liSurveys.addItem("HST Phase 2 (GSC2)", "phase2_gsc2");
 		liSurveys.addItem("HST Phase 2 (GSC1)", "phase2_gsc1");
-		liSurveys.setSelectedIndex(liSurveys.getItemCount()-1);
+		liSurveys.addItem("Sloan DSS", "sloan");
+		liSurveys.addItem("Sloan DSS (négatif)", "sloan_inverted");
+		liSurveys.setSelectedIndex(liSurveys.getItemCount()-4);
 		liSurveys.addChangeHandler(new UpdateDssImageHandler(liSurveys, img, spinner, ao));
 		surveyPanel.add(liSurveys);
 		spinner.getElement().setAttribute("alignement", "center");

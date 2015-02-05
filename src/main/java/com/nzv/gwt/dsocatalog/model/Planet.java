@@ -27,6 +27,11 @@ public class Planet extends AstroObject implements Serializable {
 	
 	@SuppressWarnings("unused")
 	private Planet(){}
+	
+	@Override
+	public Double getBoundingBoxSizeInArcMinute() {
+		throw new UnsupportedOperationException();
+	}
 
 	public Planet(int numId, String id, Double visualMag, double ra, double dec) {
 		this.numericIdentifier = numId;

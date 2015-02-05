@@ -499,6 +499,12 @@ public class Star extends AstroObject implements Serializable {
 	public void setCompanionCount(Integer companionCount) {
 		this.companionCount = companionCount;
 	}
+	
+	@Override
+	public Double getBoundingBoxSizeInArcMinute() {
+		// By default, we returned a value of 0.5°
+		return 30.0;
+	}
 
 	@Override
 	public String toString() {

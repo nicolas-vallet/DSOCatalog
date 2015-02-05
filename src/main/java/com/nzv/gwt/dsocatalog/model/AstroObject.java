@@ -19,6 +19,8 @@ public abstract class AstroObject implements Serializable {
 	public abstract String getIdentifier();
 
 	public abstract String getObjectType();
+	
+	public abstract Double getBoundingBoxSizeInArcMinute();
 
 	public double getXCoordinateForReferential(CoordinatesSystem system, Observer... observer) {
 		if (CoordinatesSystem.EQ == system) {

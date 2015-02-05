@@ -231,6 +231,30 @@ public class DeepSkyObject extends AstroObject implements Serializable {
 	public void setMaxSize(Double maxSize) {
 		this.maxSize = maxSize;
 	}
+	
+	@Override
+	public Double getBoundingBoxSizeInArcMinute() {
+		if (this.maxSize == null) {
+			return null;
+		} else {
+			double widthInArcmin= 60;
+			if (maxSize != null) {
+				switch(maxSizeUnit) {
+				case d:
+					widthInArcmin = 60 *  maxSize;
+					break;
+				case s:
+					widthInArcmin = maxSize / 60;
+					break;
+				case m:
+				default:
+					widthInArcmin = maxSize;
+					break;
+				}
+			}
+			return widthInArcmin;
+		}
+	}
 
 	public SizeUnit getMaxSizeUnit() {
 		return maxSizeUnit;
@@ -373,10 +397,8 @@ public class DeepSkyObject extends AstroObject implements Serializable {
 		return DsoType.PLNNB == type;
 	}
 	public boolean isNebula() {
-		return DsoType.BRTNB == type || DsoType.CL_NB == type
-				|| DsoType.DRKNB == type || DsoType.GX_DN == type
-				|| DsoType.G_C_N == type || DsoType.LMCCN == type
-				|| DsoType.LMCDN == type || DsoType.SMCCN == type
+		return DsoType.BRTNB == type  || DsoType.DRKNB == type 
+				|| DsoType.GX_DN == type || DsoType.LMCDN == type 
 				|| DsoType.SMCDN == type;
 	}
 	public boolean isSupernovaRemnant() {

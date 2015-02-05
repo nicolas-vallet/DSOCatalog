@@ -117,15 +117,10 @@ public class PublicCatalogServiceImpl implements PublicCatalogService {
 		}
 		if (options.isFindNebulas()) {
 			searchedTypes.add(DsoType.BRTNB);
-			searchedTypes.add(DsoType.CL_NB);
 			searchedTypes.add(DsoType.DRKNB);
 			searchedTypes.add(DsoType.GX_DN);
-			searchedTypes.add(DsoType.G_C_N);
-			searchedTypes.add(DsoType.LMCCN);
 			searchedTypes.add(DsoType.LMCDN);
-			searchedTypes.add(DsoType.SMCCN);
 			searchedTypes.add(DsoType.SMCDN);
-			searchedTypes.add(DsoType.BRTNB);
 		}
 		if (options.isFindSupernovaRemnant()) {
 			searchedTypes.add(DsoType.SNREM);
