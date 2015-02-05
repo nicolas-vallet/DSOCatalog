@@ -6,11 +6,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
+import com.google.gwt.event.dom.client.LoadEvent;
+import com.google.gwt.event.dom.client.LoadHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.FlexTable;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TabLayoutPanel;
+import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.visualization.client.AbstractDataTable.ColumnType;
 import com.google.gwt.visualization.client.ChartArea;
 import com.google.gwt.visualization.client.visualizations.corechart.AxisOptions;
@@ -25,6 +31,7 @@ import com.nzv.gwt.dsocatalog.client.CatalogSearchOptions;
 import com.nzv.gwt.dsocatalog.client.DataSerieIndexes;
 import com.nzv.gwt.dsocatalog.client.DsoCatalogGWT;
 import com.nzv.gwt.dsocatalog.client.Observer;
+import com.nzv.gwt.dsocatalog.client.UpdateDssImageHandler;
 import com.nzv.gwt.dsocatalog.model.AstroObject;
 import com.nzv.gwt.dsocatalog.model.Constellation;
 import com.nzv.gwt.dsocatalog.model.CoordinatesSystem;
@@ -313,7 +320,7 @@ public class VisualizationHelper {
 		options.setWidth(chartWidth);
 		options.setHeight(chartHeight);
 		ChartArea area = ChartArea.create();
-		area.setLeft(25);
+		area.setLeft(45);
 		area.setTop(25);
 		area.setWidth("85%");
 		area.setHeight("85%");
@@ -492,7 +499,7 @@ public class VisualizationHelper {
 			objectDetailsPanel.add(generateAspectTable(ao), new Label("Aspect"));
 			objectDetailsPanel.add(generateSpecificitiesTable(ao), new Label("Spécificités"));
 			objectDetailsPanel.add(generateExternalResourcesTable(ao), new Label("Resource externes"));
-			objectDetailsPanel.add(generateImagesTable(ao), new Label("Image DSS"));
+			objectDetailsPanel.add(generateImageTable(ao), new Label("Image DSS"));
 			
 		} else if (ao instanceof DeepSkyObject) {
 			objectDetailsPanel.add(generateIdentifiersTable(ao), new Label("Identifiants"));
@@ -500,46 +507,49 @@ public class VisualizationHelper {
 			objectDetailsPanel.add(generateAspectTable(ao), new Label("Aspect"));
 			objectDetailsPanel.add(generateSpecificitiesTable(ao), new Label("Spécificités"));
 			objectDetailsPanel.add(generateExternalResourcesTable(ao), new Label("Resource externes"));
-			objectDetailsPanel.add(generateImagesTable(ao), new Label("Image DSS"));
+			objectDetailsPanel.add(generateImageTable(ao), new Label("Image DSS"));
 		}
 	}
 	
-	private static Image generateImagesTable(AstroObject ao) {
-		Sexagesimal ra = new Sexagesimal(ao.getRightAscension());
-		Sexagesimal dec = new Sexagesimal(ao.getDeclinaison());
-		StringBuilder url = new StringBuilder("http://stdatu.stsci.edu/cgi-bin/dss_search?v=phase2_gsc1&e=J2000&f=gif&c=none");
-		// Coordinates
-		url.append("&r="+ra.getUnit()+"d"+ra.getMinute()+"m"+Math.round(ra.getSecond())+"s");
-		url.append("&d="+dec.getUnit()+"d"+dec.getMinute()+"m"+Math.round(dec.getSecond())+"s");
-		// FOV
-		if (ao instanceof Star) {
-			// We always use a field of 30'
-			url.append("&w=30&h=30");
-		} else if (ao instanceof DeepSkyObject) {
-			// We adapt the FOV to the object'size if it is known, 60' otherwise.
-			DeepSkyObject dso = (DeepSkyObject) ao;
-			int widthInArcmin= 60;
-			if (dso.getMaxSize() != null) {
-				switch(dso.getMaxSizeUnit()) {
-				// 60 arcmin is the maximum authorized
-				case d:
-					widthInArcmin = 60;
-					break;
-				case s:
-					widthInArcmin = (int) Math.round(1.2 * ((1.0 / 60) * dso.getMaxSize()));
-					break;
-				case m:
-				default:
-					widthInArcmin = (int) Math.min(60, Math.round(1.20 * dso.getMaxSize()));
-					break;
-				}
-			}
-			url.append("&w="+widthInArcmin+"&h="+widthInArcmin);
-		}
-		Image img = new Image(url.toString());
-		img.setSize(""+(ApplicationBoard.SOUTH_PANEL_HEIGHT - 25), ""+(ApplicationBoard.SOUTH_PANEL_HEIGHT - 25));
+	private static HorizontalPanel generateImageTable(AstroObject ao) {
+		HorizontalPanel imagePanel = new HorizontalPanel(); 
+		SimplePanel leftPart = new SimplePanel();
+		leftPart.setPixelSize(ApplicationBoard.SOUTH_PANEL_HEIGHT - 30, ApplicationBoard.SOUTH_PANEL_HEIGHT - 30);
+		final Image spinner = new Image("images/spinner.gif");
+		final Image img = new Image(UpdateDssImageHandler.getDssImageUrl("phase2_gsc1", ao));
+		img.setSize(""+(ApplicationBoard.SOUTH_PANEL_HEIGHT - 30), ""+(ApplicationBoard.SOUTH_PANEL_HEIGHT - 30));
 		img.setAltText("From Digital Sky Survey");
-		return img;
+		img.setVisible(false);
+		spinner.setVisible(true);
+		img.addLoadHandler(new LoadHandler() {
+			@Override
+			public void onLoad(LoadEvent event) {
+				spinner.setVisible(false);
+				img.setVisible(true);
+			}
+		});
+		leftPart.add(img);
+		imagePanel.add(leftPart);
+		
+		// We create a list of available surveys...
+		VerticalPanel surveyPanel = new VerticalPanel();
+		surveyPanel.add(new Label("Survey à consulter :"));
+		ListBox liSurveys = new ListBox();
+		liSurveys.addItem("POSS2/UKSTU Rouge", "poss2ukstu_red");
+		liSurveys.addItem("POSS2/UKSTU Bleu", "poss2ukstu_blue");
+		liSurveys.addItem("POSS2/UKSTU IR", "poss2ukstu_ir");
+		liSurveys.addItem("POSS1 Rouge", "poss1_red");
+		liSurveys.addItem("POSS1 Bleu", "poss1_blue");
+		liSurveys.addItem("Quick-V", "quickv");
+		liSurveys.addItem("HST Phase 2 (GSC2)", "phase2_gsc2");
+		liSurveys.addItem("HST Phase 2 (GSC1)", "phase2_gsc1");
+		liSurveys.setSelectedIndex(liSurveys.getItemCount()-1);
+		liSurveys.addChangeHandler(new UpdateDssImageHandler(liSurveys, img, spinner, ao));
+		surveyPanel.add(liSurveys);
+		spinner.getElement().setAttribute("alignement", "center");
+		surveyPanel.add(spinner);
+		imagePanel.add(surveyPanel);
+		return imagePanel;
 	}
 	
 	private static FlexTable generateIdentifiersTable(AstroObject ao) {
