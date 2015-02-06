@@ -24,6 +24,7 @@
 		<planetary-ephemeris-engine.version>1.0-SNAPSHOT</planetary-ephemeris-engine.version>
 		<junit.version>4.12</junit.version>
 		<joda-time.version>2.7</joda-time.version>
+		<gwt-ga.version>0.5</gwt-ga.version>
 	</properties>
 
 	<dependencies>
@@ -132,6 +133,11 @@
 			<groupId>joda-time</groupId>
 			<artifactId>joda-time</artifactId>
 			<version>${joda-time.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.realityforge.gwt.ga</groupId>
+			<artifactId>gwt-ga</artifactId>
+			<version>${gwt-ga.version}</version>
 		</dependency>
 	</dependencies>
 	

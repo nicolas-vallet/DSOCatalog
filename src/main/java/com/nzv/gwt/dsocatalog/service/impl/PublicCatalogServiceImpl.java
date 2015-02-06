@@ -208,8 +208,6 @@ public class PublicCatalogServiceImpl implements PublicCatalogService {
 		return dsoRepository.findOne(id);
 	}
 	
-	
-	
 	@Override
 	public Planet computePlanetCurrentPosition(PlanetEnum planet, CatalogSearchOptions options) {
 		PlanetData planetaryEngine = new PlanetData();
@@ -237,79 +235,4 @@ public class PublicCatalogServiceImpl implements PublicCatalogService {
 		}
 		throw new RuntimeException("An error occured, please consult the application log file.");
 	}
-
-//	private Set<Planet> computePlanetCurrentPositions(CatalogSearchOptions options) {
-//		Set<Planet> planets = new HashSet<Planet>();
-//		PlanetData planetaryEngine = new PlanetData();
-//		ObsInfo observatory = new ObsInfo(new Latitude(options.getObservatoryLatitude()), new Longitude(options.getObservatoryLongitude()));
-//		
-//		// TODO : compute the Julian day based on the observer configuration...
-//		String[] date = options.getObserverCurrentDateAsString().split("/");
-//		int j = Integer.valueOf(date[0]);
-//		int m = Integer.valueOf(date[1]);
-//		int a = Integer.valueOf(date[2]);
-//		String[] time = options.getObserverCurrentTimeAsString().split(":");
-//		int H = Integer.valueOf(time[0]);
-//		int M = Integer.valueOf(time[1]);
-//		int S = Integer.valueOf(time[2]);
-//		
-//		DateTime dt = new DateTime(a, m, j, H, M, S, DateTimeZone.forOffsetHours(options.getObserverGreenwhichHourOffset()));
-//		double jd = DateTimeUtils.toJulianDay(dt.getMillis());
-//		
-//		try {
-//			// Sun
-//			planetaryEngine.calc(Planets.SUN, jd, observatory);
-//			planets.add(new Planet(Planet.SUN, "SUN", null, 
-//					Math.toDegrees(planetaryEngine.getRightAscension()), Math.toDegrees(planetaryEngine.getDeclination())));
-//			
-//			// Moon
-//			planetaryEngine.calc(Planets.LUNA, jd, observatory);
-//			planets.add(new Planet(Planet.MOON, "MOON", null,
-//					Math.toDegrees(planetaryEngine.getRightAscension()), Math.toDegrees(planetaryEngine.getDeclination())));
-//			
-//			// Mercury
-//			planetaryEngine.calc(Planets.MERCURY, jd, observatory);
-//			planets.add(new Planet(Planet.MERCURY, "MERCURE", null, 
-//					Math.toDegrees(planetaryEngine.getRightAscension()), Math.toDegrees(planetaryEngine.getDeclination())));
-//			
-//			// Venus
-//			planetaryEngine.calc(Planets.VENUS, jd, observatory);
-//			planets.add(new Planet(Planet.VENUS, "VENUS", null,
-//					Math.toDegrees(planetaryEngine.getRightAscension()), Math.toDegrees(planetaryEngine.getDeclination())));
-//			
-//			// Mars
-//			planetaryEngine.calc(Planets.MARS, jd, observatory);
-//			planets.add(new Planet(Planet.MARS, "MARS", null, 
-//					Math.toDegrees(planetaryEngine.getRightAscension()), Math.toDegrees(planetaryEngine.getDeclination())));
-//			
-//			// Saturn
-//			planetaryEngine.calc(Planets.SATURN, jd, observatory);
-//			planets.add(new Planet(Planets.SATURN, "SATURN", null, 
-//					Math.toDegrees(planetaryEngine.getRightAscension()), Math.toDegrees(planetaryEngine.getDeclination())));
-//			
-//			// Jupiter
-//			planetaryEngine.calc(Planets.JUPITER, jd, observatory);
-//			planets.add(new Planet(Planet.JUPITER, "JUPITER", null, 
-//					Math.toDegrees(planetaryEngine.getRightAscension()), Math.toDegrees(planetaryEngine.getDeclination())));
-//			
-//			// Uranus
-//			planetaryEngine.calc(Planets.URANUS, jd, observatory);
-//			planets.add(new Planet(Planet.URANUS, "URANUS", null,
-//					Math.toDegrees(planetaryEngine.getRightAscension()), Math.toDegrees(planetaryEngine.getDeclination())));
-//			
-//			// Neptune
-//			planetaryEngine.calc(Planets.NEPTUNE, jd, observatory);
-//			planets.add(new Planet(Planet.NEPTUNE, "NEPTUNE", null, 
-//					Math.toDegrees(planetaryEngine.getRightAscension()), Math.toDegrees(planetaryEngine.getDeclination())));
-//			
-//			// Pluto
-//			planetaryEngine.calc(Planets.PLUTO, jd, observatory);
-//			planets.add(new Planet(Planet.PLUTO, "PLUTO", null,
-//					Math.toDegrees(planetaryEngine.getRightAscension()), Math.toDegrees(planetaryEngine.getDeclination())));
-//			
-//		} catch (NoInitException e) {
-//			logger.error(e);
-//		}
-//		return planets;
-//	}
 }

@@ -19,7 +19,7 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.nzv.gwt.dsocatalog.model.CoordinatesSystem;
 
 public class ApplicationBoard extends SplitLayoutPanel {
-
+	
 	public static int LEFT_PANEL_WIDTH = 280;
 	public static int SOUTH_PANEL_HEIGHT = 300;
 	public static int PANEL_SPLITTER_WIDTH = 2;
@@ -101,12 +101,6 @@ public class ApplicationBoard extends SplitLayoutPanel {
 	VerticalPanel observerPanel = new VerticalPanel();
 
 	Panel visualizationPanel = new SimplePanel();
-//	FlexTable objectDetailsTable = new FlexTable();
-//	FlexTable objectDetailsTableIdentifiers = new FlexTable();
-//	FlexTable objectDetailsTableCoordinates = new FlexTable();
-//	FlexTable objectDetailsTableBrightness = new FlexTable();
-//	FlexTable objectDetailsTableSpecificCharacteristics = new FlexTable();
-//	FlexTable objectDetailsTableExternalResources = new FlexTable();
 
 	PushButton btUpdateMap = new PushButton("Update map");
 	Label systemMessage = new Label("");
@@ -141,10 +135,13 @@ public class ApplicationBoard extends SplitLayoutPanel {
 		appPanel.chkShowObjectsUnderHorizon.addClickHandler(new UpdateMapEventHandler(source));
 //		appPanel.projectionPanel.add(appPanel.chkShowObjectsUnderHorizon);
 		appPanel.chkDisplayEcliptic.addClickHandler(new UpdateMapEventHandler(source));
+		appPanel.chkDisplayEcliptic.addValueChangeHandler(new GoogleAnalyticsEventFilterAware("Ecliptic"));
 		appPanel.projectionPanel.add(appPanel.chkDisplayEcliptic);
 		appPanel.chkDisplayEquator.addClickHandler(new UpdateMapEventHandler(source));
+		appPanel.chkDisplayEquator.addValueChangeHandler(new GoogleAnalyticsEventFilterAware("Equator"));
 		appPanel.projectionPanel.add(appPanel.chkDisplayEquator);
 		appPanel.chkDisplayGalacticPlan.addClickHandler(new UpdateMapEventHandler(source));
+		appPanel.chkDisplayGalacticPlan.addValueChangeHandler(new GoogleAnalyticsEventFilterAware("Galactic plan"));
 		appPanel.projectionPanel.add(appPanel.chkDisplayGalacticPlan);
 
 		// We add the coordinates panel to configuration panel.
@@ -193,6 +190,7 @@ public class ApplicationBoard extends SplitLayoutPanel {
 		
 		// We put the planet display checkbox in the filter panel.
 		appPanel.chkDisplayPlanets.addValueChangeHandler(new UpdateMapEventHandler(source));
+		appPanel.chkDisplayPlanets.addValueChangeHandler(new GoogleAnalyticsEventFilterAware("Display planets"));
 		appPanel.filterPanel.add(appPanel.chkDisplayPlanets);
 		
 		// We put the constellation select list in the filter panel.
@@ -200,19 +198,24 @@ public class ApplicationBoard extends SplitLayoutPanel {
 		appPanel.filterPanel.add(appPanel.lbConstellation);
 		appPanel.filterPanel.add(appPanel.liConstellations);
 		appPanel.chkDisplayConstellationNames.addValueChangeHandler(new UpdateMapEventHandler(source));
+		appPanel.chkDisplayConstellationNames.addValueChangeHandler(new GoogleAnalyticsEventFilterAware("Display constellations names"));
 		appPanel.filterPanel.add(appPanel.chkDisplayConstellationNames);
 		appPanel.chkDisplayConstellationShapes.addValueChangeHandler(new UpdateMapEventHandler(source));
+		appPanel.chkDisplayConstellationShapes.addValueChangeHandler(new GoogleAnalyticsEventFilterAware("Display constellations shapes"));
 		appPanel.filterPanel.add(appPanel.chkDisplayConstellationShapes);
 		appPanel.chkDisplayConstellationBoundaries.addValueChangeHandler(new UpdateMapEventHandler(source));
+		appPanel.chkDisplayConstellationBoundaries.addValueChangeHandler(new GoogleAnalyticsEventFilterAware("Display constellations boundaries"));
 		appPanel.filterPanel.add(appPanel.chkDisplayConstellationBoundaries);
 
 		// We put the star magnitude filter field
 		appPanel.chkDisplayStars.setValue(true);
 		appPanel.chkDisplayStars.addValueChangeHandler(new UpdateMapEventHandler(source));
+		appPanel.chkDisplayStars.addValueChangeHandler(new GoogleAnalyticsEventFilterAware("Display stars"));
 		appPanel.filterPanel.add(appPanel.chkDisplayStars);
 		
 		appPanel.filterPanel.add(appPanel.lbStarLimitMagnitude);
 		appPanel.txtBoxStarLimitMagnitude.setText("" + CatalogSearchOptions.DEFAULT_STAR_LIMIT_MAGNITUDE);
+		appPanel.txtBoxStarLimitMagnitude.setTitle("Magnitude limite pour les étoiles");
 		appPanel.txtBoxStarLimitMagnitude.setWidth("100px");
 		appPanel.starLimitMagnitudePanel.add(appPanel.txtBoxStarLimitMagnitude);
 		appPanel.btIncreaseStarLimitMagnitude.addClickHandler(new ChangeLimitMagnitudeClickEventHandler(source, appPanel.txtBoxStarLimitMagnitude, +1));
@@ -224,39 +227,48 @@ public class ApplicationBoard extends SplitLayoutPanel {
 		// We set the DSO filter fields
 		appPanel.chkDisplayAsterisms.setValue(false);
 		appPanel.chkDisplayAsterisms.addValueChangeHandler(new UpdateMapEventHandler(source));
+		appPanel.chkDisplayAsterisms.addValueChangeHandler(new GoogleAnalyticsEventFilterAware("Display asterisms"));
 		appPanel.filterPanel.add(appPanel.chkDisplayAsterisms);
 		
 		appPanel.chkDisplayGalaxies.setValue(false);
 		appPanel.chkDisplayGalaxies.addValueChangeHandler(new UpdateMapEventHandler(source));
+		appPanel.chkDisplayGalaxies.addValueChangeHandler(new GoogleAnalyticsEventFilterAware("Display galaxies"));
 		appPanel.filterPanel.add(appPanel.chkDisplayGalaxies);
 		
 		appPanel.chkDisplayGlobularClusters.setValue(false);
 		appPanel.chkDisplayGlobularClusters.addValueChangeHandler(new UpdateMapEventHandler(source));
+		appPanel.chkDisplayGlobularClusters.addValueChangeHandler(new GoogleAnalyticsEventFilterAware("Display globular clusters"));
 		appPanel.filterPanel.add(appPanel.chkDisplayGlobularClusters);
 		
 		appPanel.chkDisplayOpenClusters.setValue(false);
 		appPanel.chkDisplayOpenClusters.addValueChangeHandler(new UpdateMapEventHandler(source));
+		appPanel.chkDisplayOpenClusters.addValueChangeHandler(new GoogleAnalyticsEventFilterAware("Display open clusters"));
 		appPanel.filterPanel.add(appPanel.chkDisplayOpenClusters);
 		
 		appPanel.chkDisplayPlanetaryNebulas.setValue(false);
 		appPanel.chkDisplayPlanetaryNebulas.addValueChangeHandler(new UpdateMapEventHandler(source));
+		appPanel.chkDisplayPlanetaryNebulas.addValueChangeHandler(new GoogleAnalyticsEventFilterAware("Display planetary nebulas"));
 		appPanel.filterPanel.add(appPanel.chkDisplayPlanetaryNebulas);
 		
 		appPanel.chkDisplayNebulas.setValue(false);
 		appPanel.chkDisplayNebulas.addValueChangeHandler(new UpdateMapEventHandler(source));
+		appPanel.chkDisplayNebulas.addValueChangeHandler(new GoogleAnalyticsEventFilterAware("Display nebulas"));
 		appPanel.filterPanel.add(appPanel.chkDisplayNebulas);
 		
 		appPanel.chkDisplaySupernovaRemnants.setValue(false);
 		appPanel.chkDisplaySupernovaRemnants.addValueChangeHandler(new UpdateMapEventHandler(source));
+		appPanel.chkDisplaySupernovaRemnants.addValueChangeHandler(new GoogleAnalyticsEventFilterAware("Display SN Remnants"));
 		appPanel.filterPanel.add(appPanel.chkDisplaySupernovaRemnants);
 		
 		appPanel.chkDisplayQuasars.setValue(false);
 		appPanel.chkDisplayQuasars.addValueChangeHandler(new UpdateMapEventHandler(source));
+		appPanel.chkDisplayQuasars.addValueChangeHandler(new GoogleAnalyticsEventFilterAware("Display quasars"));
 		appPanel.filterPanel.add(appPanel.chkDisplayQuasars);
 		
 		appPanel.filterPanel.add(appPanel.lbDsoLimitMagnitude);
 		
 		appPanel.txtBoxDsoLimitMagnitude.setText("" + CatalogSearchOptions.DEFAULT_DSO_LIMIT_MAGNITUDE);
+		appPanel.txtBoxDsoLimitMagnitude.setTitle("Magnitude limite pour les DSO");
 		appPanel.txtBoxDsoLimitMagnitude.setWidth("100px");
 		appPanel.dsoLimitMagnitudePanel.add(appPanel.txtBoxDsoLimitMagnitude);
 		appPanel.btIncreaseDsoLimitMagnitude.addClickHandler(new ChangeLimitMagnitudeClickEventHandler(source, appPanel.txtBoxDsoLimitMagnitude, +1));
@@ -280,13 +292,6 @@ public class ApplicationBoard extends SplitLayoutPanel {
 		
 		// We add the panel that will be used to display the chart.
 		appPanel.centerPanel.add(appPanel.visualizationPanel);
-		
-		// We add the table that will be used to display object details
-//		appPanel.southPanel.add(appPanel.objectDetailsTableIdentifiers, new Label("Identification"));
-//		appPanel.southPanel.add(appPanel.objectDetailsTableCoordinates, new Label("Coordonnées"));
-//		appPanel.southPanel.add(appPanel.objectDetailsTableBrightness, new Label("Aspect visuel"));
-//		appPanel.southPanel.add(appPanel.objectDetailsTableSpecificCharacteristics, new Label("Spécificités"));
-//		appPanel.southPanel.add(appPanel.objectDetailsTableExternalResources, new Label("Resources externes"));
 		
 		// We place the left and the right panels in the main one.
 		appPanel.addWest(appPanel.leftPanel, LEFT_PANEL_WIDTH);

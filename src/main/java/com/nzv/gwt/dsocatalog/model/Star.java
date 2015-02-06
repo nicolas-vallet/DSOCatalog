@@ -506,15 +506,11 @@ public class Star extends AstroObject implements Serializable {
 		return 30.0;
 	}
 
+	
+
 	@Override
 	public String toString() {
-		return "BrightStar [HR=" + hrNumber + ", Name=" + name + ", HD="
-				+ hdNumber + ", SAO=" + saoNumber + ", RA="
-				+ rightAscensionHour + "h " + rightAscensionMinute + "m "
-				+ rightAscensionSecond + "s " + ", DEC=" + declinaisonSignus
-				+ declinaisonDegree + "° " + declinaisonMinute + "m "
-				+ declinaisonSecond + "s " + ", Vmag=" + visualMagnitude
-				+ ", BVmag=" + bvMag + ", UBmag=" + ubMag + "]";
+		return "Star [hrNumber=" + hrNumber + (name != null && !name.isEmpty() ? ", name=" + name : "") + "]";
 	}
 
 	/*
@@ -535,11 +531,7 @@ public class Star extends AstroObject implements Serializable {
 
 	@Override
 	public String getIdentifier() {
-		String result = "HR" + getHrNumber();
-		if (getName() != null && !getName().isEmpty()) {
-			result += " ("+getName()+")";
-		}
-		return result;
+		return "HR" + getHrNumber();
 	}
 
 	@Override

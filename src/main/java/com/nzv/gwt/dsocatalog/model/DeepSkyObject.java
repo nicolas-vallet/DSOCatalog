@@ -410,9 +410,7 @@ public class DeepSkyObject extends AstroObject implements Serializable {
 
 	@Override
 	public String toString() {
-		return "DeepSkyObject [name=" + name + ", type=" + type
-				+ ", classtype=" + classtype + " in constellation=" + constellation 
-				+ ", magnitude=" + magnitude + "]";
+		return "DeepSkyObject [name=" + name + "]";
 	}
 
 	@Override
@@ -422,11 +420,7 @@ public class DeepSkyObject extends AstroObject implements Serializable {
 
 	@Override
 	public String getIdentifier() {
-		String result = getName();
-		if (getOtherName() != null) {
-			result += " ("+getOtherName()+")";
-		}
-		return result;
+		return getName();
 	}
 
 	@Override

@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.realityforge.gwt.ga.UniversalGoogleAnalytics;
+import org.realityforge.gwt.ga.impl.UniversalGoogleAnalyticsImpl;
+
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.shared.GWT;
@@ -87,8 +90,9 @@ public class DsoCatalogGWT implements EntryPoint {
 	public static String STYLE_QUASARS = "point { shape-type: circle; size: 3; fill-color: #f42929;}";
 	
 
-	private static PublicCatalogServiceAsync catalogService = GWT
-			.create(PublicCatalogService.class);
+	private static PublicCatalogServiceAsync catalogService = GWT.create(PublicCatalogService.class);
+	private static InfrastructureServiceAsync infrastructureService = GWT.create(InfrastructureService.class);
+	private static UniversalGoogleAnalytics ga = new UniversalGoogleAnalyticsImpl();
 	
 	private static HashMap<String, Constellation> constellationsList = new HashMap<String, Constellation>();
 	
@@ -96,7 +100,6 @@ public class DsoCatalogGWT implements EntryPoint {
 	
 	@Override
 	public void onModuleLoad() {
-		
 		
 		// We load the list of constellation.
 		catalogService.findAllConstellations(new AsyncCallback<List<Constellation>>() {
@@ -117,6 +120,17 @@ public class DsoCatalogGWT implements EntryPoint {
 				// to the body of the page and we update the map. 
 				RootLayoutPanel.get().add(appPanel);
 				updateMap();
+				
+				infrastructureService.getGoogleAnalyticsWebPropertyId(new AsyncCallback<String>() {
+					@Override
+					public void onFailure(Throwable caught) {
+					}
+
+					@Override
+					public void onSuccess(String result) {
+						ga.init(result);
+					}
+				});
 			}
 		});
 	}
@@ -377,7 +391,7 @@ public class DsoCatalogGWT implements EntryPoint {
 				}
 				serieIndexToUse = serieIndexes.getPlanetSerieIndex();
 				styleToUse = STYLE_PLANETS.get(((Planet)o).getNumericIdentifier());
-				objectReference = new ObjectReference(true, false, false, ((Planet)o).getNumericIdentifier());
+				objectReference = new ObjectReference(true, false, false, ((Planet)o).getNumericIdentifier(), o.getIdentifier());
 			} else if (o instanceof Star) {
 				serieIndexToUse = serieIndexes.getStarSerieIndex();
 				
@@ -386,7 +400,7 @@ public class DsoCatalogGWT implements EntryPoint {
 				double tmp = 10 / Math.exp(0.15 * mag);
 				int sizePoint = ((int)(Math.ceil(tmp))) * STYLE_STARS_POINT_SIZE_MAX / 12;
 				styleToUse = STYLE_STARS.replaceAll("SIZE_STAR", ""+sizePoint);
-				objectReference = new ObjectReference(false, true, false, ((Star) o).getHrNumber());
+				objectReference = new ObjectReference(false, true, false, ((Star) o).getHrNumber(), o.getIdentifier());
 			} else if (o instanceof DeepSkyObject) {
 				DeepSkyObject dso = (DeepSkyObject) o;
 				if (dso.isAsterism()) {
@@ -414,7 +428,7 @@ public class DsoCatalogGWT implements EntryPoint {
 					serieIndexToUse = serieIndexes.getQuasarSerieIndex();
 					styleToUse = STYLE_QUASARS;
 				}
-				objectReference = new ObjectReference(false, false, true, dso.getId());
+				objectReference = new ObjectReference(false, false, true, dso.getId(), o.getIdentifier());
 			}
 			EquatorialCoordinatesAdapter eca = new EquatorialCoordinatesAdapter(new EquatorialCoordinates(o.getRightAscension(), o.getDeclinaison()));
 			Point2D p = new Point2D(0,0);
@@ -693,23 +707,11 @@ public class DsoCatalogGWT implements EntryPoint {
 		// We remove unused rows if any.
 		// It is the case when we do not display the objects under horizon in the AltAz projection.
 		optimizedData.removeRows(i, (optimizedData.getNumberOfRows() - i));
-		
-//		if (cs == CoordinatesSystem.ALTAZ) {
-//			double yMin = 0, xMin = 0;
-//			for (int j=0 ; j<optimizedData.getNumberOfRows() ; j++) {
-//				if (optimizedData.getValueDouble(j, serieIndexes.getStarSerieIndex()) < yMin) {
-//					yMin = optimizedData.getValueDouble(j, serieIndexes.getStarSerieIndex());
-//				}
-//				if (optimizedData.getValueDouble(j, 0) < xMin) {
-//					xMin = optimizedData.getValueDouble(j, 0);
-//				}
-//			}
-//			Window.alert("xMin="+xMin+" / yMin="+yMin);
-//		}
 		return optimizedData;
 	}
 	
 	private void fetchObjectDetails(CatalogSearchOptions searchOptions, final ObjectReference objectReference) {
+		ga.trackEvent("Selection", "Object", objectReference.getName());
 		if (objectReference.isPlanet()) {
 			final PlanetEnum planet = PlanetEnum.forId(objectReference.getId());
 			catalogService.computePlanetCurrentPosition(PlanetEnum.forId(objectReference.getId()), searchOptions, new AsyncCallback<Planet>() {

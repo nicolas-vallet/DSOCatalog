@@ -29,6 +29,7 @@ import com.nzv.astro.ephemeris.coordinate.impl.EquatorialCoordinates;
 import com.nzv.gwt.dsocatalog.client.ApplicationBoard;
 import com.nzv.gwt.dsocatalog.client.CatalogSearchOptions;
 import com.nzv.gwt.dsocatalog.client.DataSerieIndexes;
+import com.nzv.gwt.dsocatalog.client.DetailsPanelSelectionHandler;
 import com.nzv.gwt.dsocatalog.client.DsoCatalogGWT;
 import com.nzv.gwt.dsocatalog.client.Observer;
 import com.nzv.gwt.dsocatalog.client.UpdateDssImageHandler;
@@ -487,19 +488,23 @@ public class VisualizationHelper {
 	public static void displayObjectDetails(AstroObject ao, TabLayoutPanel objectDetailsPanel) {
 		objectDetailsPanel.clear();
 		MathContext precision = new MathContext(5);
+		String[] availableTabs = null;
 		if (ao instanceof Planet) {
 			objectDetailsPanel.add(generateIdentifiersTable(ao), new Label("Identifiant"));
 			objectDetailsPanel.add(generateCoordinatesTable(ao, precision), new Label("Coordonnées"));
 			objectDetailsPanel.add(generateAspectTable(ao), new Label("Aspect"));
 			objectDetailsPanel.add(generateExternalResourcesTable(ao), new Label("Resource externes"));
+			availableTabs = new String[]{"Identifiant", "Coordonnées", "Aspect", "Resources externes"};
 			
 		} else if (ao instanceof Star) {
-			objectDetailsPanel.add(generateIdentifiersTable(ao), new Label("Identifiant"));
+			objectDetailsPanel.add(generateIdentifiersTable(ao), new Label("Identifiants"));
 			objectDetailsPanel.add(generateCoordinatesTable(ao, precision), new Label("Coordonnées"));
 			objectDetailsPanel.add(generateAspectTable(ao), new Label("Aspect"));
 			objectDetailsPanel.add(generateSpecificitiesTable(ao), new Label("Spécificités"));
 			objectDetailsPanel.add(generateExternalResourcesTable(ao), new Label("Resource externes"));
 			objectDetailsPanel.add(generateImageTable(ao), new Label("Images"));
+			availableTabs = new String[]{"Identifiants", "Coordonnées",
+					"Aspect", "Spécificités", "Resource externes", "Images"};
 			
 		} else if (ao instanceof DeepSkyObject) {
 			objectDetailsPanel.add(generateIdentifiersTable(ao), new Label("Identifiants"));
@@ -508,7 +513,13 @@ public class VisualizationHelper {
 			objectDetailsPanel.add(generateSpecificitiesTable(ao), new Label("Spécificités"));
 			objectDetailsPanel.add(generateExternalResourcesTable(ao), new Label("Resource externes"));
 			objectDetailsPanel.add(generateImageTable(ao), new Label("Images"));
+			availableTabs = new String[]{"Identifiants", "Coordonnées",
+					"Aspect", "Spécificités", "Resource externes", "Images"};
 		}
+//		objectDetailsPanel.insert(new Label(),  new Label(), 0);
+//		objectDetailsPanel.selectTab(1);
+//		objectDetailsPanel.addBeforeSelectionHandler(new DetailsPanelFirstTabDisabler());
+		objectDetailsPanel.addSelectionHandler(new DetailsPanelSelectionHandler(availableTabs));
 	}
 	
 	private static HorizontalPanel generateImageTable(AstroObject ao) {

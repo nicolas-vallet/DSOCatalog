@@ -75,4 +75,9 @@ public class Planet extends AstroObject implements Serializable {
 	public String getObjectType() {
 		return "PLANET";
 	}
+
+	@Override
+	public String toString() {
+		return "Planet [identifier=" + identifier + "]";
+	}
 }
