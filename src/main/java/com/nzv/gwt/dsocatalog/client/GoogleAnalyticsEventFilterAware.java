@@ -1,10 +1,9 @@
 package com.nzv.gwt.dsocatalog.client;
 
-import org.realityforge.gwt.ga.UniversalGoogleAnalytics;
-import org.realityforge.gwt.ga.impl.UniversalGoogleAnalyticsImpl;
-
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.nzv.gwt.ga.UniversalGoogleAnalytics;
+import com.nzv.gwt.ga.impl.UniversalGoogleAnalyticsImpl;
 
 public class GoogleAnalyticsEventFilterAware implements ValueChangeHandler<Boolean> {
 	

@@ -1,11 +1,11 @@
 package com.nzv.gwt.dsocatalog.client;
 
-import org.realityforge.gwt.ga.UniversalGoogleAnalytics;
-import org.realityforge.gwt.ga.impl.UniversalGoogleAnalyticsImpl;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.ValueBoxBase;
+import com.nzv.gwt.ga.UniversalGoogleAnalytics;
+import com.nzv.gwt.ga.impl.UniversalGoogleAnalyticsImpl;
 
 public class ChangeLimitMagnitudeClickEventHandler implements ClickHandler {
 	

@@ -1,10 +1,10 @@
 package com.nzv.gwt.dsocatalog.client;
 
-import org.realityforge.gwt.ga.UniversalGoogleAnalytics;
-import org.realityforge.gwt.ga.impl.UniversalGoogleAnalyticsImpl;
 
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
+import com.nzv.gwt.ga.UniversalGoogleAnalytics;
+import com.nzv.gwt.ga.impl.UniversalGoogleAnalyticsImpl;
 
 public class DetailsPanelSelectionHandler implements SelectionHandler<Integer>{
 	

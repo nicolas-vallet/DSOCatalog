@@ -17,5 +17,5 @@
     <!-- External resources -->
     <inherits name='com.nzv.astro.meusEngine' />
     <inherits name='com.nzv.astro.ephemeris.planetary.planetaryEphemeris' />
-    <inherits name='org.realityforge.gwt.ga.GA' />
+    <inherits name='com.nzv.gwt.ga.GA' />
 </module>

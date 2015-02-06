@@ -135,7 +135,7 @@
 			<version>${joda-time.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.realityforge.gwt.ga</groupId>
+			<groupId>com.nzv</groupId>
 			<artifactId>gwt-ga</artifactId>
 			<version>${gwt-ga.version}</version>
 		</dependency>

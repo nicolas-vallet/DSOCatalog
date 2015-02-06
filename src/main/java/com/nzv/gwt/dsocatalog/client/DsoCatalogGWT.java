@@ -7,9 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.realityforge.gwt.ga.UniversalGoogleAnalytics;
-import org.realityforge.gwt.ga.impl.UniversalGoogleAnalyticsImpl;
-
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.shared.GWT;
@@ -48,6 +45,8 @@ import com.nzv.gwt.dsocatalog.projection.Projection;
 import com.nzv.gwt.dsocatalog.projection.StereographicProjection;
 import com.nzv.gwt.dsocatalog.visualization.MyDataTable;
 import com.nzv.gwt.dsocatalog.visualization.VisualizationHelper;
+import com.nzv.gwt.ga.UniversalGoogleAnalytics;
+import com.nzv.gwt.ga.impl.UniversalGoogleAnalyticsImpl;
 
 public class DsoCatalogGWT implements EntryPoint {
 
