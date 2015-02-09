@@ -15,7 +15,6 @@ public class GoogleAnalyticsEventFilterAware implements ValueChangeHandler<Boole
 		this.guiComponent = guiComponent;
 	}
 
-
 	@Override
 	public void onValueChange(ValueChangeEvent<Boolean> event) {
 		if (event.getValue()) {

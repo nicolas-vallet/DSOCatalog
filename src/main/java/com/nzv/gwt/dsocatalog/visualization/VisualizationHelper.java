@@ -516,9 +516,6 @@ public class VisualizationHelper {
 			availableTabs = new String[]{"Identifiants", "Coordonnées",
 					"Aspect", "Spécificités", "Resource externes", "Images"};
 		}
-//		objectDetailsPanel.insert(new Label(),  new Label(), 0);
-//		objectDetailsPanel.selectTab(1);
-//		objectDetailsPanel.addBeforeSelectionHandler(new DetailsPanelFirstTabDisabler());
 		objectDetailsPanel.addSelectionHandler(new DetailsPanelSelectionHandler(availableTabs));
 	}
 	

@@ -131,6 +131,8 @@ public class ApplicationBoard extends SplitLayoutPanel {
 		appPanel.liCoordinatesMode.addItem("Galactiques", ""+CoordinatesSystem.GAL);
 //		appPanel.liCoordinatesMode.addItem("Alt-Az", ""+CoordinatesSystem.ALTAZ);
 		appPanel.liCoordinatesMode.addChangeHandler(new UpdateMapEventHandler(source));
+		appPanel.liCoordinatesMode.addChangeHandler(new GoogleAnalyticsEventProjectionAware(appPanel.liCoordinatesMode));
+		
 		appPanel.projectionPanel.add(appPanel.liCoordinatesMode);
 		appPanel.chkShowObjectsUnderHorizon.addClickHandler(new UpdateMapEventHandler(source));
 //		appPanel.projectionPanel.add(appPanel.chkShowObjectsUnderHorizon);
