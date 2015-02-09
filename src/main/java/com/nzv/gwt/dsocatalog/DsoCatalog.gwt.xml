@@ -5,6 +5,7 @@
     <inherits name='com.google.gwt.user.User'/>
     <inherits name='com.google.gwt.user.theme.dark.Dark'/>
     <inherits name='com.google.gwt.visualization.Visualization'/>
+    <inherits name='com.google.gwt.i18n.I18N'/>
     <entry-point class='com.nzv.gwt.dsocatalog.client.DsoCatalogGWT'/>
     
     <!-- Specify the paths for translatable code                    -->
@@ -13,9 +14,14 @@
     <source path='date'  />
     <source path='visualization'  />
     <source path='projection' />
+    <source path='i18n' />
     
     <!-- External resources -->
     <inherits name='com.nzv.astro.meusEngine' />
     <inherits name='com.nzv.astro.ephemeris.planetary.planetaryEphemeris' />
     <inherits name='com.nzv.gwt.ga.GA' />
+    
+    <extend-property name="locale" values="fr"/>
+    <extend-property name="locale" values="en"/>
+    <extend-property name="locale" values="es"/>
 </module>

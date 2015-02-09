@@ -28,6 +28,7 @@ import com.nzv.astro.ephemeris.coordinate.impl.EclipticCoordinates;
 import com.nzv.astro.ephemeris.coordinate.impl.EquatorialCoordinates;
 import com.nzv.astro.ephemeris.coordinate.impl.GalacticCoordinates;
 import com.nzv.gwt.dsocatalog.date.DateComputation;
+import com.nzv.gwt.dsocatalog.i18n.DsoCatalogMessages;
 import com.nzv.gwt.dsocatalog.model.AstroObject;
 import com.nzv.gwt.dsocatalog.model.Constellation;
 import com.nzv.gwt.dsocatalog.model.ConstellationBoundaryLine;
@@ -49,7 +50,7 @@ import com.nzv.gwt.ga.UniversalGoogleAnalytics;
 import com.nzv.gwt.ga.impl.UniversalGoogleAnalyticsImpl;
 
 public class DsoCatalogGWT implements EntryPoint {
-
+	
 	public static String DATE_FORMAT = "dd/MM/yyyy";
 	public static String TIME_FORMAT = "HH:mm:ss";
 
@@ -91,6 +92,7 @@ public class DsoCatalogGWT implements EntryPoint {
 
 	private static PublicCatalogServiceAsync catalogService = GWT.create(PublicCatalogService.class);
 	private static InfrastructureServiceAsync infrastructureService = GWT.create(InfrastructureService.class);
+	private static DsoCatalogMessages msg = GWT.create(DsoCatalogMessages.class);
 	private static UniversalGoogleAnalytics ga = new UniversalGoogleAnalyticsImpl();
 	
 	private static HashMap<String, Constellation> constellationsList = new HashMap<String, Constellation>();
@@ -104,12 +106,12 @@ public class DsoCatalogGWT implements EntryPoint {
 		catalogService.findAllConstellations(new AsyncCallback<List<Constellation>>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				appPanel.systemMessage.setText("Unable to load the list of constellations");
+				appPanel.systemMessage.setText(msg.messageUnableToLoadConstellationList());
 			}
 
 			@Override
 			public void onSuccess(final List<Constellation> result) {
-				appPanel.liConstellations.addItem("Non spécifiée", "");
+				appPanel.liConstellations.addItem(msg.tabFiltersConstellationUnset(), "");
 				for (Constellation c : result) {
 					appPanel.liConstellations.addItem(c.getName(), c.getCode());
 					constellationsList.put(c.getCode(), c);
@@ -143,7 +145,7 @@ public class DsoCatalogGWT implements EntryPoint {
 
 					@Override
 					public void onSuccess(final Set<AstroObject> objects) {
-						appPanel.systemMessage.setText("Rendering map...");
+						appPanel.systemMessage.setText(msg.messageRenderingMap());
 						appPanel.visualizationPanel.clear();
 
 						// Initialize the visualization...
@@ -174,7 +176,7 @@ public class DsoCatalogGWT implements EntryPoint {
 										}
 									}
 								});
-								appPanel.systemMessage.setText(displayedObjectReferences.keySet().size() + " object(s) displayed.");
+								appPanel.systemMessage.setText(displayedObjectReferences.keySet().size()+" "+ msg.messageObjectsDisplayed());
 								appPanel.visualizationPanel.add(chart);
 							}
 
@@ -268,7 +270,7 @@ public class DsoCatalogGWT implements EntryPoint {
 								Math.toRadians(eclipticAdapter.getEclipticCoordinates().getEcliptiqueLatitude()));
 						optimizedData.setValue(i, 0, GeometryUtils.normalizeAngleInDegrees(Math.toDegrees(mp.getX()), -180, 180));
 						optimizedData.setValue(i, serieIndexes.getEclipticSerieIndex(), Math.toDegrees(mp.getY()));
-						optimizedData.setValue(i, serieIndexes.getEclipticSerieIndex()+1, "ECLIPTIQUE");
+						optimizedData.setValue(i, serieIndexes.getEclipticSerieIndex()+1, msg.commonEcliptic());
 						i++;
 					}
 					if (searchOptions.isDisplayEquator()) {
@@ -277,7 +279,7 @@ public class DsoCatalogGWT implements EntryPoint {
 								Math.toRadians(equatorAdapter.getEcliptiqueLatitude()));
 						optimizedData.setValue(i, 0, Math.toDegrees(mp.getX()));
 						optimizedData.setValue(i, serieIndexes.getEquatorSerieIndex(), Math.toDegrees(mp.getY()));
-						optimizedData.setValue(i, serieIndexes.getEquatorSerieIndex()+1, "EQUATEUR CELESTE");
+						optimizedData.setValue(i, serieIndexes.getEquatorSerieIndex()+1, msg.commonEquator());
 						i++;
 					}
 					if (searchOptions.isDisplayGalacticPlan()) {
@@ -287,7 +289,7 @@ public class DsoCatalogGWT implements EntryPoint {
 								Math.toRadians(tmp.getEcliptiqueLatitude()));
 						optimizedData.setValue(i, 0, Math.toDegrees(mp.getX()));
 						optimizedData.setValue(i, serieIndexes.getGalacticPlanSerieIndex(), Math.toDegrees(mp.getY()));
-						optimizedData.setValue(i, serieIndexes.getGalacticPlanSerieIndex()+1, "PLAN GALACTIQUE");
+						optimizedData.setValue(i, serieIndexes.getGalacticPlanSerieIndex()+1, msg.commonGalacticPlan());
 						i++;
 					}
 					break;
@@ -299,7 +301,7 @@ public class DsoCatalogGWT implements EntryPoint {
 								Math.toRadians(tmp.getGalacticLatitude()));
 						optimizedData.setValue(i, 0, GeometryUtils.normalizeAngleInDegrees(Math.toDegrees(mp.getX()), -180, 180));
 						optimizedData.setValue(i, serieIndexes.getEclipticSerieIndex(), Math.toDegrees(mp.getY()));
-						optimizedData.setValue(i, serieIndexes.getEclipticSerieIndex()+1, "ECLIPTIQUE");
+						optimizedData.setValue(i, serieIndexes.getEclipticSerieIndex()+1, msg.commonEcliptic());
 						i++;
 					}
 					if (searchOptions.isDisplayEquator()) {
@@ -308,7 +310,7 @@ public class DsoCatalogGWT implements EntryPoint {
 								Math.toRadians(equatorAdapter.getGalacticLatitude()));
 						optimizedData.setValue(i, 0, GeometryUtils.normalizeAngleInDegrees(Math.toDegrees(mp.getX()), -180, 180));
 						optimizedData.setValue(i, serieIndexes.getEquatorSerieIndex(), Math.toDegrees(mp.getY()));
-						optimizedData.setValue(i, serieIndexes.getEquatorSerieIndex()+1, "EQUATEUR CELESTE");
+						optimizedData.setValue(i, serieIndexes.getEquatorSerieIndex()+1, msg.commonEquator());
 						i++;
 					}
 					if (searchOptions.isDisplayGalacticPlan()) {
@@ -317,7 +319,7 @@ public class DsoCatalogGWT implements EntryPoint {
 								Math.toRadians(galacticAdapter.getGalacticCoordinates().getGalacticLatitude()));
 						optimizedData.setValue(i, 0, GeometryUtils.normalizeAngleInDegrees(Math.toDegrees(mp.getX()), -180, 180));
 						optimizedData.setValue(i, serieIndexes.getGalacticPlanSerieIndex(), Math.toDegrees(mp.getY()));
-						optimizedData.setValue(i, serieIndexes.getGalacticPlanSerieIndex()+1, "PLAN GALACTIQUE");
+						optimizedData.setValue(i, serieIndexes.getGalacticPlanSerieIndex()+1, msg.commonGalacticPlan());
 					}
 					break;
 				case EQ:
@@ -328,7 +330,7 @@ public class DsoCatalogGWT implements EntryPoint {
 								Math.toRadians(eclipticAdapter.getDeclinaison()));
 						optimizedData.setValue(i, 0, GeometryUtils.normalizeAngleInDegrees(Math.toDegrees(mp.getX()), 0, 360));
 						optimizedData.setValue(i, serieIndexes.getEclipticSerieIndex(), Math.toDegrees(mp.getY()));
-						optimizedData.setValue(i, serieIndexes.getEclipticSerieIndex()+1, "ECLIPTIQUE");
+						optimizedData.setValue(i, serieIndexes.getEclipticSerieIndex()+1, msg.commonEcliptic());
 						i++;
 					}
 					if (searchOptions.isDisplayEquator()) {
@@ -337,7 +339,7 @@ public class DsoCatalogGWT implements EntryPoint {
 								Math.toRadians(equatorAdapter.getEquatorialCoordinates().getDeclinaison()));
 						optimizedData.setValue(i, 0, Math.toDegrees(mp.getX()));
 						optimizedData.setValue(i, serieIndexes.getEquatorSerieIndex(), Math.toDegrees(mp.getY()));
-						optimizedData.setValue(i, serieIndexes.getEquatorSerieIndex()+1, "EQUATEUR CELESTE");
+						optimizedData.setValue(i, serieIndexes.getEquatorSerieIndex()+1, msg.commonEquator());
 						i++;
 					}
 					if (searchOptions.isDisplayGalacticPlan()) {
@@ -346,7 +348,7 @@ public class DsoCatalogGWT implements EntryPoint {
 								Math.toRadians(galacticAdapter.getDeclinaison()));
 						optimizedData.setValue(i, 0, Math.toDegrees(mp.getX()));
 						optimizedData.setValue(i, serieIndexes.getGalacticPlanSerieIndex(), Math.toDegrees(mp.getY()));
-						optimizedData.setValue(i, serieIndexes.getGalacticPlanSerieIndex()+1, "PLAN GALACTIQUE");
+						optimizedData.setValue(i, serieIndexes.getGalacticPlanSerieIndex()+1, msg.commonGalacticPlan());
 						i++;
 					}
 					break;
@@ -712,14 +714,11 @@ public class DsoCatalogGWT implements EntryPoint {
 	private void fetchObjectDetails(CatalogSearchOptions searchOptions, final ObjectReference objectReference) {
 		ga.trackEvent("Selection", "Object", objectReference.getName());
 		if (objectReference.isPlanet()) {
-			final PlanetEnum planet = PlanetEnum.forId(objectReference.getId());
 			catalogService.computePlanetCurrentPosition(PlanetEnum.forId(objectReference.getId()), searchOptions, new AsyncCallback<Planet>() {
-
 				@Override
 				public void onFailure(Throwable caught) {
-					appPanel.systemMessage.setText("Unable to fetch details about planet ["+planet.getName()+"]");
+					appPanel.systemMessage.setText(msg.messageUnableToFetchDetailsAbout()+" ["+objectReference.getName()+"]");
 				}
-
 				@Override
 				public void onSuccess(Planet result) {
 					VisualizationHelper.displayObjectDetails(result, appPanel.southPanel);
@@ -729,9 +728,8 @@ public class DsoCatalogGWT implements EntryPoint {
 			catalogService.findStarByHrNumber(objectReference.getId(), new AsyncCallback<Star>() {
 				@Override
 				public void onFailure(Throwable caught) {
-					appPanel.systemMessage.setText("Unable to fetch details about star ["+objectReference.getId()+"]");
+					appPanel.systemMessage.setText(msg.messageUnableToFetchDetailsAbout()+" ["+objectReference.getName()+"]");
 				}
-
 				@Override
 				public void onSuccess(Star result) {
 					VisualizationHelper.displayObjectDetails(result, appPanel.southPanel);
@@ -741,9 +739,8 @@ public class DsoCatalogGWT implements EntryPoint {
 			catalogService.findObjectById(objectReference.getId(), new AsyncCallback<DeepSkyObject>() {
 				@Override
 				public void onFailure(Throwable caught) {
-					appPanel.systemMessage.setText("Unable to fetch details about object ["+objectReference.getId()+"]");
+					appPanel.systemMessage.setText(msg.messageUnableToFetchDetailsAbout()+" ["+objectReference.getName()+"]");
 				}
-				
 				@Override
 				public void onSuccess(DeepSkyObject result) {
 					VisualizationHelper.displayObjectDetails(result, appPanel.southPanel);

@@ -2,9 +2,12 @@ package com.nzv.gwt.dsocatalog.client;
 
 import java.util.Date;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.i18n.shared.DateTimeFormat;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.CheckBox;
+import com.google.gwt.user.client.ui.Hidden;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
@@ -16,6 +19,7 @@ import com.google.gwt.user.client.ui.StackLayoutPanel;
 import com.google.gwt.user.client.ui.TabLayoutPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
+import com.nzv.gwt.dsocatalog.i18n.DsoCatalogMessages;
 import com.nzv.gwt.dsocatalog.model.CoordinatesSystem;
 
 public class ApplicationBoard extends SplitLayoutPanel {
@@ -23,6 +27,8 @@ public class ApplicationBoard extends SplitLayoutPanel {
 	public static int LEFT_PANEL_WIDTH = 280;
 	public static int SOUTH_PANEL_HEIGHT = 300;
 	public static int PANEL_SPLITTER_WIDTH = 2;
+	
+	private static DsoCatalogMessages msg = GWT.create(DsoCatalogMessages.class);
 	
 	public ListBox getLiConstellations() {
 		return liConstellations;
@@ -43,66 +49,68 @@ public class ApplicationBoard extends SplitLayoutPanel {
 
 	DsoCatalogGWT application;
 	VerticalPanel filterPanel = new VerticalPanel();
-	CheckBox chkDisplayPlanets = new CheckBox("Afficher les planètes");
-	Label lbConstellation = new Label("Constellation : ");
+	CheckBox chkDisplayPlanets = new CheckBox(msg.tabFiltersDisplayPlanets());
+	Label lbConstellation = new Label(msg.tabFiltersConstellation()+ ":");
 	ListBox liConstellations = new ListBox();
-	CheckBox chkDisplayConstellationNames = new CheckBox("Afficher les noms des constellations");
-	CheckBox chkDisplayConstellationShapes = new CheckBox("Afficher les formes des constellations");
-	CheckBox chkDisplayConstellationBoundaries = new CheckBox(
-			"Afficher les limites des constellations");
-	CheckBox chkDisplayStars = new CheckBox("Afficher les étoiles");
-	Label lbStarLimitMagnitude = new Label("Vmag. max étoiles :");
+	CheckBox chkDisplayConstellationNames = new CheckBox(msg.tabFiltersDisplayConstellationsNames());
+	CheckBox chkDisplayConstellationShapes = new CheckBox(msg.tabFiltersDisplayConstellationsShapes());
+	CheckBox chkDisplayConstellationBoundaries = new CheckBox(msg.tabFiltersDisplayConstellationsBoundaries());
+	CheckBox chkDisplayStars = new CheckBox(msg.tabFiltersDisplayStars());
+	Label lbStarLimitMagnitude = new Label(msg.tabFiltersLimitMagnitudeStars()+" :");
 	HorizontalPanel starLimitMagnitudePanel = new HorizontalPanel();
 	TextBox txtBoxStarLimitMagnitude = new TextBox();
 	PushButton btIncreaseStarLimitMagnitude = new PushButton("+");
 	PushButton btDecreaseStarLimitMagnitude = new PushButton("-");
 
-	CheckBox chkDisplayAsterisms = new CheckBox("Astérismes");
-	CheckBox chkDisplayGalaxies = new CheckBox("Galaxies");
-	CheckBox chkDisplayGlobularClusters = new CheckBox("Amas globulaires");
-	CheckBox chkDisplayOpenClusters = new CheckBox("Amas ouverts");
-	CheckBox chkDisplayPlanetaryNebulas = new CheckBox("Nébuleuses planétaires");
-	CheckBox chkDisplayNebulas = new CheckBox("Nébuleuses");
-	CheckBox chkDisplaySupernovaRemnants = new CheckBox("Rémanants du supernova");
-	CheckBox chkDisplayQuasars = new CheckBox("Quasars");
+	CheckBox chkDisplayAsterisms = new CheckBox(msg.tabFiltersDisplayAsterisms());
+	CheckBox chkDisplayGalaxies = new CheckBox(msg.tabFiltersDisplayGalaxies());
+	CheckBox chkDisplayGlobularClusters = new CheckBox(msg.tabFiltersDisplayGlobularCluster());
+	CheckBox chkDisplayOpenClusters = new CheckBox(msg.tabFiltersDisplayOpenCluster());
+	CheckBox chkDisplayPlanetaryNebulas = new CheckBox(msg.tabFiltersDisplayPlanetaryNebulas());
+	CheckBox chkDisplayNebulas = new CheckBox(msg.tabFiltersDisplayNebulas());
+	CheckBox chkDisplaySupernovaRemnants = new CheckBox(msg.tabFiltersDisplaySnRemnants());
+	CheckBox chkDisplayQuasars = new CheckBox(msg.tabFiltersDisplayQuasars());
 
-	Label lbDsoLimitMagnitude = new Label("Vmag. max ciel profond :");
+	Label lbDsoLimitMagnitude = new Label(msg.tabFiltersLimitMagnitudeDso()+" :");
 	HorizontalPanel dsoLimitMagnitudePanel = new HorizontalPanel();
 	TextBox txtBoxDsoLimitMagnitude = new TextBox();
 	PushButton btIncreaseDsoLimitMagnitude = new PushButton("+");
 	PushButton btDecreaseDsoLimitMagnitude = new PushButton("-");
 
-	Label lbCoordinatesMode = new Label("Système de coordonnées");
+	Label lbCoordinatesMode = new Label(msg.tabProjectionCoordinatesSystem());
 	ListBox liCoordinatesMode = new ListBox();
-	CheckBox chkShowObjectsUnderHorizon = new CheckBox("Montrer les objets sous l'horizon");
-	CheckBox chkDisplayEcliptic = new CheckBox("Afficher l'Ecliptique");
-	CheckBox chkDisplayEquator = new CheckBox("Afficher l'équateur");
-	CheckBox chkDisplayGalacticPlan = new CheckBox("Afficher le plan galactique");
+	CheckBox chkShowObjectsUnderHorizon = new CheckBox(msg.tabProjectionDisplayObjectUnderHorizon());
+	CheckBox chkDisplayEcliptic = new CheckBox(msg.tabProjectionDisplayEcliptic());
+	CheckBox chkDisplayEquator = new CheckBox(msg.tabProjectionDisplayEquator());
+	CheckBox chkDisplayGalacticPlan = new CheckBox(msg.tabProjectionDisplayGalacticPlan());
 	VerticalPanel projectionPanel = new VerticalPanel();
 
-	Label lbObserverLatitude = new Label("Latitude de l'observateur");
+	Label lbObserverLanguage = new Label(msg.tabObserverLanguage());
+	ListBox liObserverLanguage = new ListBox();
+	Hidden hiddenObserverCurrentLanguage = new Hidden();
+	Label lbObserverLatitude = new Label(msg.tabObserverLatitude());
 	TextBox txtObserverLatitude = new TextBox();
-	Label lbObserverLongitude = new Label("Longitude de l'observateur");
+	Label lbObserverLongitude = new Label(msg.tabObserverLongitude());
 	TextBox txtObserverLongitude = new TextBox();
-	Label lbObserverDate = new Label("Date pour l'observateur (jj/mm/yyyy)");
+	Label lbObserverDate = new Label(msg.tabObserverDate()+" ("+msg.tabObserverDateFormat()+")");
 	TextBox txtObserverDate = new TextBox();
-	CheckBox chkObserverUseComputerDateAndTime = new CheckBox("Utiliser l'heure système");
-	Label lbObserverLocalTime = new Label("Heure locale de l'observateur (hh:mm:ss)");
+	CheckBox chkObserverUseComputerDateAndTime = new CheckBox(msg.tabObserverUseSystemCurrentTime());
+	Label lbObserverLocalTime = new Label(msg.tabObserverLocalTime()+" ("+msg.tabObserverTimeFormat()+")");
 	TextBox txtObserverLocalTime = new TextBox();
-	PushButton btObserverSubstractOneWeek = new PushButton("-1w");
-	PushButton btObserverSubstractOneDay = new PushButton("-1d");
-	PushButton btObserverSubstractOneHour = new PushButton("-1h");
-	PushButton btObserverAddOneHour = new PushButton("+1h");
-	PushButton btObserverAddOneDay = new PushButton("+1d");
-	PushButton btObserverAddOneWeek = new PushButton("+1w");
+	PushButton btObserverSubstractOneWeek = new PushButton(msg.tabObserverTimeButtonCaptionRemoveOneWeek());
+	PushButton btObserverSubstractOneDay = new PushButton(msg.tabObserverTimeButtonCaptionRemoveOneDay());
+	PushButton btObserverSubstractOneHour = new PushButton(msg.tabObserverTimeButtonCaptionRemoveOneHour());
+	PushButton btObserverAddOneHour = new PushButton(msg.tabObserverTimeButtonCaptionAddOneHour());
+	PushButton btObserverAddOneDay = new PushButton(msg.tabObserverTimeButtonCaptionAddOneDay());
+	PushButton btObserverAddOneWeek = new PushButton(msg.tabObserverTimeButtonCaptionAddOneWeek());
 	HorizontalPanel timeExplorerPanel = new HorizontalPanel();
-	Label lbGreenwichHourOffset = new Label("Décalage par rapport à l'heure de Greenwich");
+	Label lbGreenwichHourOffset = new Label(msg.tabObserverGreenwhichOffsetInHours());
 	TextBox txtGreenwichHourOffset = new TextBox();
 	VerticalPanel observerPanel = new VerticalPanel();
 
 	Panel visualizationPanel = new SimplePanel();
 
-	PushButton btUpdateMap = new PushButton("Update map");
+	PushButton btUpdateMap = new PushButton(msg.buttonCaptionUpdateMap());
 	Label systemMessage = new Label("");
 
 	StackLayoutPanel configurationPanel = new StackLayoutPanel(Unit.PX);
@@ -126,10 +134,10 @@ public class ApplicationBoard extends SplitLayoutPanel {
 		// We add the coordinates panel.
 		appPanel.projectionPanel.setSize("270px", "30px");
 		appPanel.projectionPanel.add(appPanel.lbCoordinatesMode);
-		appPanel.liCoordinatesMode.addItem("Equatoriaux", ""+CoordinatesSystem.EQ);
-		appPanel.liCoordinatesMode.addItem("Ecliptiques", ""+CoordinatesSystem.ECL);
-		appPanel.liCoordinatesMode.addItem("Galactiques", ""+CoordinatesSystem.GAL);
-//		appPanel.liCoordinatesMode.addItem("Alt-Az", ""+CoordinatesSystem.ALTAZ);
+		appPanel.liCoordinatesMode.addItem(msg.tabProjectionCoordinatesSystemEQ(), ""+CoordinatesSystem.EQ);
+		appPanel.liCoordinatesMode.addItem(msg.tabProjectionCoordinatesSystemECL(), ""+CoordinatesSystem.ECL);
+		appPanel.liCoordinatesMode.addItem(msg.tabProjectionCoordinatesSystemGAL(), ""+CoordinatesSystem.GAL);
+		//appPanel.liCoordinatesMode.addItem(msg.tabProjectionCoordinatesSystemALTAZ(), ""+CoordinatesSystem.ALTAZ);
 		appPanel.liCoordinatesMode.addChangeHandler(new UpdateMapEventHandler(source));
 		appPanel.liCoordinatesMode.addChangeHandler(new GoogleAnalyticsEventProjectionAware(appPanel.liCoordinatesMode));
 		
@@ -147,10 +155,29 @@ public class ApplicationBoard extends SplitLayoutPanel {
 		appPanel.projectionPanel.add(appPanel.chkDisplayGalacticPlan);
 
 		// We add the coordinates panel to configuration panel.
-		appPanel.configurationPanel.add(appPanel.projectionPanel, new Label("Projection"), 28);
+		appPanel.configurationPanel.add(appPanel.projectionPanel, new Label(msg.tabProjectionTitle()), 28);
 		
 		// We add the observer panel.
 		appPanel.observerPanel.setSize("270px", "250px");
+		appPanel.observerPanel.add(appPanel.lbObserverLanguage);
+		String currentLocale = "fr";
+		if (Window.Location.getParameter("locale") != null) {
+			currentLocale = Window.Location.getParameter("locale");
+		}
+		appPanel.hiddenObserverCurrentLanguage.setValue(currentLocale);
+		appPanel.liObserverLanguage.addItem(msg.commonLanguageEnglish(), "en");
+		appPanel.liObserverLanguage.addItem(msg.commonLanguageSpanish(), "es");
+		appPanel.liObserverLanguage.addItem(msg.commonLanguageFrench(), "fr");
+		if ("en".equals(currentLocale)) {
+			appPanel.liObserverLanguage.setSelectedIndex(0);
+		} else if ("es".equals(currentLocale)) {
+			appPanel.liObserverLanguage.setSelectedIndex(1);
+		} else if ("fr".equals(currentLocale)) {
+			appPanel.liObserverLanguage.setSelectedIndex(2);
+		}
+		appPanel.liObserverLanguage.addChangeHandler(
+				new UserLanguageUpdater(appPanel.liObserverLanguage, appPanel.hiddenObserverCurrentLanguage));
+		appPanel.observerPanel.add(appPanel.liObserverLanguage);
 		appPanel.observerPanel.add(appPanel.lbObserverLatitude);
 		appPanel.txtObserverLatitude.setText("48.833");
 		appPanel.observerPanel.add(appPanel.txtObserverLatitude);
@@ -188,7 +215,7 @@ public class ApplicationBoard extends SplitLayoutPanel {
 		appPanel.observerPanel.add(appPanel.timeExplorerPanel);
 		
 		// We add the observer panel to configuration panel.
-		appPanel.configurationPanel.add(appPanel.observerPanel, new Label("Observateur"), 28);
+		appPanel.configurationPanel.add(appPanel.observerPanel, new Label(msg.tabObserverTitle()), 28);
 		
 		// We put the planet display checkbox in the filter panel.
 		appPanel.chkDisplayPlanets.addValueChangeHandler(new UpdateMapEventHandler(source));
@@ -217,7 +244,7 @@ public class ApplicationBoard extends SplitLayoutPanel {
 		
 		appPanel.filterPanel.add(appPanel.lbStarLimitMagnitude);
 		appPanel.txtBoxStarLimitMagnitude.setText("" + CatalogSearchOptions.DEFAULT_STAR_LIMIT_MAGNITUDE);
-		appPanel.txtBoxStarLimitMagnitude.setTitle("Magnitude limite pour les étoiles");
+		appPanel.txtBoxStarLimitMagnitude.setTitle(msg.tabFiltersLimitMagnitudeStars());
 		appPanel.txtBoxStarLimitMagnitude.setWidth("100px");
 		appPanel.starLimitMagnitudePanel.add(appPanel.txtBoxStarLimitMagnitude);
 		appPanel.btIncreaseStarLimitMagnitude.addClickHandler(new ChangeLimitMagnitudeClickEventHandler(source, appPanel.txtBoxStarLimitMagnitude, +1));
@@ -270,7 +297,7 @@ public class ApplicationBoard extends SplitLayoutPanel {
 		appPanel.filterPanel.add(appPanel.lbDsoLimitMagnitude);
 		
 		appPanel.txtBoxDsoLimitMagnitude.setText("" + CatalogSearchOptions.DEFAULT_DSO_LIMIT_MAGNITUDE);
-		appPanel.txtBoxDsoLimitMagnitude.setTitle("Magnitude limite pour les DSO");
+		appPanel.txtBoxDsoLimitMagnitude.setTitle(msg.tabFiltersLimitMagnitudeDso());
 		appPanel.txtBoxDsoLimitMagnitude.setWidth("100px");
 		appPanel.dsoLimitMagnitudePanel.add(appPanel.txtBoxDsoLimitMagnitude);
 		appPanel.btIncreaseDsoLimitMagnitude.addClickHandler(new ChangeLimitMagnitudeClickEventHandler(source, appPanel.txtBoxDsoLimitMagnitude, +1));
@@ -280,7 +307,7 @@ public class ApplicationBoard extends SplitLayoutPanel {
 		appPanel.filterPanel.add(appPanel.dsoLimitMagnitudePanel);
 
 		// We add the filter panel to configuration panel.
-		appPanel.configurationPanel.add(appPanel.filterPanel, new Label("Filtres"), 28);
+		appPanel.configurationPanel.add(appPanel.filterPanel, new Label(msg.tabFiltersTitle()), 28);
 		appPanel.configurationPanel.showWidget(appPanel.filterPanel);
 		
 		appPanel.leftPanel.add(appPanel.configurationPanel);
@@ -318,11 +345,11 @@ public class ApplicationBoard extends SplitLayoutPanel {
 			starLimitMagnitude = Double.parseDouble(txtBoxStarLimitMagnitude
 					.getText());
 		} catch (NullPointerException ex) {
-			systemMessage.setText("Vous devez indiquer une magnitude limite");
+			systemMessage.setText(msg.messageYouMustIndicateLimitMagnitudeValue());
 			txtBoxStarLimitMagnitude.setText("" + CatalogSearchOptions.DEFAULT_STAR_LIMIT_MAGNITUDE);
 		} catch (NumberFormatException ex) {
 			systemMessage
-					.setText("Veuillez vérifier la valeur de magnitude limite. Format : \"xx.yy\"");
+					.setText(msg.messagePleaseCheckFormatLimitMagnitudeValue());
 			txtBoxStarLimitMagnitude.setText("" + CatalogSearchOptions.DEFAULT_STAR_LIMIT_MAGNITUDE);
 		}
 		options.setStarLimitMagnitude(starLimitMagnitude);
@@ -332,11 +359,11 @@ public class ApplicationBoard extends SplitLayoutPanel {
 			dsoLimitMagnitude = Double.parseDouble(txtBoxDsoLimitMagnitude
 					.getText());
 		} catch (NullPointerException ex) {
-			systemMessage.setText("Vous devez indiquer une magnitude limite");
+			systemMessage.setText(msg.messageYouMustIndicateLimitMagnitudeValue());
 			txtBoxDsoLimitMagnitude.setText("" + CatalogSearchOptions.DEFAULT_DSO_LIMIT_MAGNITUDE);
 		} catch (NumberFormatException ex) {
 			systemMessage
-					.setText("Veuillez vérifier la valeur de magnitude limite. Format : \"xx.yy\"");
+					.setText(msg.messagePleaseCheckFormatLimitMagnitudeValue());
 			txtBoxDsoLimitMagnitude.setText("" + CatalogSearchOptions.DEFAULT_STAR_LIMIT_MAGNITUDE);
 		}
 		options.setDsoLimitMagnitude(dsoLimitMagnitude);

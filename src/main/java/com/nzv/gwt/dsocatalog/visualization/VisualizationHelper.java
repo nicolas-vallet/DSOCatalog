@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.LoadEvent;
 import com.google.gwt.event.dom.client.LoadHandler;
 import com.google.gwt.user.client.Window;
@@ -33,6 +34,7 @@ import com.nzv.gwt.dsocatalog.client.DetailsPanelSelectionHandler;
 import com.nzv.gwt.dsocatalog.client.DsoCatalogGWT;
 import com.nzv.gwt.dsocatalog.client.Observer;
 import com.nzv.gwt.dsocatalog.client.UpdateDssImageHandler;
+import com.nzv.gwt.dsocatalog.i18n.DsoCatalogMessages;
 import com.nzv.gwt.dsocatalog.model.AstroObject;
 import com.nzv.gwt.dsocatalog.model.Constellation;
 import com.nzv.gwt.dsocatalog.model.CoordinatesSystem;
@@ -43,6 +45,8 @@ import com.nzv.gwt.dsocatalog.model.Star;
 import com.nzv.gwt.dsocatalog.projection.GeometryUtils;
 
 public class VisualizationHelper {
+	
+	private static DsoCatalogMessages msg = GWT.create(DsoCatalogMessages.class);
 
 	public static MyDataTable initializeDataTable(ApplicationBoard appPanel,
 			MyDataTable optimizedData, Set<AstroObject> objects,
@@ -55,30 +59,30 @@ public class VisualizationHelper {
 		switch (cs) {
 		case ECL:
 		case GAL:
-			optimizedData.addColumn(ColumnType.NUMBER, "LONGITUDE");
+			optimizedData.addColumn(ColumnType.NUMBER, msg.mapGalHaxisTitle());
 			break;
 		case ALTAZ:
-			optimizedData.addColumn(ColumnType.NUMBER, "AZIMUTH");
+			optimizedData.addColumn(ColumnType.NUMBER, msg.mapAltazHaxisTitle());
 			break;
 		case EQ:
 		default:
-			optimizedData.addColumn(ColumnType.NUMBER, "RA");
+			optimizedData.addColumn(ColumnType.NUMBER, msg.mapEqHaxisTitle());
 			break;
 		}
 		if (searchOptions.isDisplayEcliptic()) {
-			optimizedData.addColumn(ColumnType.NUMBER, "Ecliptique");
+			optimizedData.addColumn(ColumnType.NUMBER, msg.commonEcliptic());
 			optimizedData.addTooltipColumn(optimizedData);
 		}
 		if (searchOptions.isDisplayEquator()) {
-			optimizedData.addColumn(ColumnType.NUMBER, "Equateur");
+			optimizedData.addColumn(ColumnType.NUMBER, msg.commonEquator());
 			optimizedData.addTooltipColumn(optimizedData);
 		}
 		if (searchOptions.isDisplayGalacticPlan()) {
-			optimizedData.addColumn(ColumnType.NUMBER, "Plan galactique");
+			optimizedData.addColumn(ColumnType.NUMBER, msg.commonGalacticPlan());
 			optimizedData.addTooltipColumn(optimizedData);
 		}
 		if (searchOptions.isDisplayConstellationNames()) {
-			optimizedData.addColumn(ColumnType.NUMBER, "Constellation");
+			optimizedData.addColumn(ColumnType.NUMBER, msg.commonConstellation());
 			optimizedData.addStyleColumn(optimizedData);
 			optimizedData.addAnnotationColumn(optimizedData);
 			optimizedData.addAnnotationTextColumn(optimizedData);
@@ -92,60 +96,60 @@ public class VisualizationHelper {
 			codeOfConstellationsToDisplay.addAll(constellationsList.keySet());
 		}
 		if (searchOptions.isDisplayConstellationBoundaries()) {
-			optimizedData.addColumn(ColumnType.NUMBER, "Limites constellation");
+			optimizedData.addColumn(ColumnType.NUMBER, msg.mapConstellationBoundaries());
 			optimizedData.addTooltipColumn(optimizedData);
 		}
 		if (searchOptions.isDisplayConstellationShape()) {
-			optimizedData.addColumn(ColumnType.NUMBER, "Forme constellation");
+			optimizedData.addColumn(ColumnType.NUMBER, msg.mapConstellationShapes());
 			optimizedData.addTooltipColumn(optimizedData);
 		}
 		if (searchOptions.isFindAsterisms()) {
-			optimizedData.addColumn(ColumnType.NUMBER, "Asterismes");
+			optimizedData.addColumn(ColumnType.NUMBER, msg.tabFiltersDisplayAsterisms());
 			optimizedData.addStyleColumn(optimizedData);
 			optimizedData.addTooltipColumn(optimizedData);
 		}
 		if (searchOptions.isFindGalaxies()) {
-			optimizedData.addColumn(ColumnType.NUMBER, "Galaxies");
+			optimizedData.addColumn(ColumnType.NUMBER, msg.tabFiltersDisplayGalaxies());
 			optimizedData.addStyleColumn(optimizedData);
 			optimizedData.addTooltipColumn(optimizedData);
 		}
 		if (searchOptions.isFindGlobularClusters()) {
-			optimizedData.addColumn(ColumnType.NUMBER, "Amas globulaires");
+			optimizedData.addColumn(ColumnType.NUMBER, msg.tabFiltersDisplayGlobularCluster());
 			optimizedData.addStyleColumn(optimizedData);
 			optimizedData.addTooltipColumn(optimizedData);
 		}
 		if (searchOptions.isFindOpenClusters()) {
-			optimizedData.addColumn(ColumnType.NUMBER, "Amas ouverts");
+			optimizedData.addColumn(ColumnType.NUMBER, msg.tabFiltersDisplayOpenCluster());
 			optimizedData.addStyleColumn(optimizedData);
 			optimizedData.addTooltipColumn(optimizedData);
 		}
 		if (searchOptions.isFindPlanetaryNebulas()) {
-			optimizedData.addColumn(ColumnType.NUMBER, "Nébuleuses planétaires");
+			optimizedData.addColumn(ColumnType.NUMBER, msg.tabFiltersDisplayPlanetaryNebulas());
 			optimizedData.addStyleColumn(optimizedData);
 			optimizedData.addTooltipColumn(optimizedData);
 		}
 		if (searchOptions.isFindNebulas()) {
-			optimizedData.addColumn(ColumnType.NUMBER, "Nébuleuses");
+			optimizedData.addColumn(ColumnType.NUMBER, msg.tabFiltersDisplayNebulas());
 			optimizedData.addStyleColumn(optimizedData);
 			optimizedData.addTooltipColumn(optimizedData);
 		}
 		if (searchOptions.isFindSupernovaRemnant()) {
-			optimizedData.addColumn(ColumnType.NUMBER, "Rémanants de supernova");
+			optimizedData.addColumn(ColumnType.NUMBER, msg.tabFiltersDisplaySnRemnants());
 			optimizedData.addStyleColumn(optimizedData);
 			optimizedData.addTooltipColumn(optimizedData);
 		}
 		if (searchOptions.isFindQuasars()) {
-			optimizedData.addColumn(ColumnType.NUMBER, "Quasars");
+			optimizedData.addColumn(ColumnType.NUMBER, msg.tabFiltersDisplayQuasars());
 			optimizedData.addStyleColumn(optimizedData);
 			optimizedData.addTooltipColumn(optimizedData);
 		}
 		if (searchOptions.isFindStars()) {
-			optimizedData.addColumn(ColumnType.NUMBER, "Etoiles");
+			optimizedData.addColumn(ColumnType.NUMBER, msg.commonStars());
 			optimizedData.addStyleColumn(optimizedData);
 			optimizedData.addTooltipColumn(optimizedData);
 		}
 		if (searchOptions.isFindPlanets()) {
-			optimizedData.addColumn(ColumnType.NUMBER, "Planetes");
+			optimizedData.addColumn(ColumnType.NUMBER, msg.commonPlanets());
 			optimizedData.addStyleColumn(optimizedData);
 			optimizedData.addTooltipColumn(optimizedData);
 		}
@@ -239,8 +243,8 @@ public class VisualizationHelper {
 					.round(mc).doubleValue());
 			Sexagesimal dec = new Sexagesimal(BigDecimal.valueOf(p.getDeclinaison()).round(mc)
 					.doubleValue());
-			sb.append("RA=" + ra.toString(SexagesimalType.HOURS) + "\n");
-			sb.append("DEC=" + dec.toString(SexagesimalType.DEGREES) + "\n");
+			sb.append(msg.mapTooltipRightAscension()+"=" + ra.toString(SexagesimalType.HOURS) + "\n");
+			sb.append(msg.mapTooltipDeclinaison()+"=" + dec.toString(SexagesimalType.DEGREES) + "\n");
 		}
 
 		CoordinatesSystem cs = CoordinatesSystem.instanceOf(appPanel.getLiCoordinatesMode()
@@ -251,18 +255,18 @@ public class VisualizationHelper {
 				.valueOf(o.getYCoordinateForReferential(cs, observer)).round(mc).doubleValue());
 		switch (cs) {
 		case ECL:
-			sb.append("Longitude ecl.=" + x.toString(SexagesimalType.DEGREES) + " \n");
-			sb.append("Latitude ecl.=" + y.toString(SexagesimalType.DEGREES) + " \n");
+			sb.append(msg.mapTooltipEclipticLongitude()+"=" + x.toString(SexagesimalType.DEGREES) + " \n");
+			sb.append(msg.mapTooltipEclipticLatitude()+"=" + y.toString(SexagesimalType.DEGREES) + " \n");
 			break;
 		case GAL:
-			sb.append("Longitude gal.=" + x.toString(SexagesimalType.DEGREES) + " \n");
-			sb.append("Latitude gal.=" + y.toString(SexagesimalType.DEGREES) + " \n");
+			sb.append(msg.mapTooltipGalacticLongitude()+"=" + x.toString(SexagesimalType.DEGREES) + " \n");
+			sb.append(msg.mapTooltipGalacticLatitude()+"=" + y.toString(SexagesimalType.DEGREES) + " \n");
 			break;
 		case EQ:
 			break;
 		case ALTAZ:
-			sb.append("Azimuth=" + x.toString(SexagesimalType.DEGREES) + " \n");
-			sb.append("Elevation=" + y.toString(SexagesimalType.DEGREES) + " \n");
+			sb.append(msg.mapTooltipAzimuth()+"=" + x.toString(SexagesimalType.DEGREES) + " \n");
+			sb.append(msg.mapTooltipElevation()+"=" + y.toString(SexagesimalType.DEGREES) + " \n");
 			break;
 		}
 		return sb.toString();
@@ -336,20 +340,20 @@ public class VisualizationHelper {
 		if (("" + CoordinatesSystem.ECL).equals(coordinatesMode)) {
 			hAxisOptions.setMinValue(-180);
 			hAxisOptions.setMaxValue(180);
-			hAxisOptions.setTitle("LONGITUDE ECLIPTIQUE");
+			hAxisOptions.setTitle(msg.mapEclHaxisTitle());
 			vAxisOptions.setMinValue(-90);
 			vAxisOptions.setMaxValue(90);
-			vAxisOptions.setTitle("LATITUDE ECLIPTIQUE");
+			vAxisOptions.setTitle(msg.mapEclVaxisTitle());
 		} else if (("" + CoordinatesSystem.GAL).equals(coordinatesMode)) {
 			hAxisOptions.setMinValue(-180);
 			hAxisOptions.setMaxValue(180);
-			hAxisOptions.setTitle("LONGITUDE GALACTIQUE");
+			hAxisOptions.setTitle(msg.mapGalHaxisTitle());
 			vAxisOptions.setMinValue(-90);
 			vAxisOptions.setMaxValue(90);
-			vAxisOptions.setTitle("LATITUDE GALACTIQUE");
+			vAxisOptions.setTitle(msg.mapGalVaxisTitle());
 		} else if (("" + CoordinatesSystem.ALTAZ).equals(coordinatesMode)) {
-			hAxisOptions.setTitle("AZIMUTH");
-			vAxisOptions.setTitle("ELEVATION");
+			hAxisOptions.setTitle(msg.mapAltazHaxisTitle());
+			vAxisOptions.setTitle(msg.mapAltazVaxisTitle());
 			hAxisOptions.setMinValue(Math.toDegrees(-2));
 			hAxisOptions.setMaxValue(Math.toDegrees(2));
 			vAxisOptions.setMinValue(Math.toDegrees(-2));
@@ -373,8 +377,8 @@ public class VisualizationHelper {
 				vAxisOptions.setMinValue(-90);
 				vAxisOptions.setMaxValue(90);
 			}
-			hAxisOptions.setTitle("ASCENSION DROITE");
-			vAxisOptions.setTitle("DECLINAISON");
+			hAxisOptions.setTitle(msg.mapEqHaxisTitle());
+			vAxisOptions.setTitle(msg.mapEqVaxisTitle());
 		}
 		options.set("pointShape", "star");
 		options.setPointSize(5);
@@ -490,31 +494,34 @@ public class VisualizationHelper {
 		MathContext precision = new MathContext(5);
 		String[] availableTabs = null;
 		if (ao instanceof Planet) {
-			objectDetailsPanel.add(generateIdentifiersTable(ao), new Label("Identifiant"));
-			objectDetailsPanel.add(generateCoordinatesTable(ao, precision), new Label("Coordonnées"));
-			objectDetailsPanel.add(generateAspectTable(ao), new Label("Aspect"));
-			objectDetailsPanel.add(generateExternalResourcesTable(ao), new Label("Resource externes"));
-			availableTabs = new String[]{"Identifiant", "Coordonnées", "Aspect", "Resources externes"};
+			objectDetailsPanel.add(generateIdentifiersTable(ao), new Label(msg.detailsTabIdentifiersTitle()));
+			objectDetailsPanel.add(generateCoordinatesTable(ao, precision), new Label(msg.detailsTabCoordinatesTitle()));
+			objectDetailsPanel.add(generateAspectTable(ao), new Label(msg.detailsTabAspectTitle()));
+			objectDetailsPanel.add(generateExternalResourcesTable(ao), new Label(msg.detailsTabExternalResourcesTitle()));
+			availableTabs = new String[]{msg.detailsTabIdentifiersTitle(), msg.detailsTabCoordinatesTitle(),
+					msg.detailsTabAspectTitle(), msg.detailsTabExternalResourcesTitle()};
 			
 		} else if (ao instanceof Star) {
-			objectDetailsPanel.add(generateIdentifiersTable(ao), new Label("Identifiants"));
-			objectDetailsPanel.add(generateCoordinatesTable(ao, precision), new Label("Coordonnées"));
-			objectDetailsPanel.add(generateAspectTable(ao), new Label("Aspect"));
-			objectDetailsPanel.add(generateSpecificitiesTable(ao), new Label("Spécificités"));
-			objectDetailsPanel.add(generateExternalResourcesTable(ao), new Label("Resource externes"));
-			objectDetailsPanel.add(generateImageTable(ao), new Label("Images"));
-			availableTabs = new String[]{"Identifiants", "Coordonnées",
-					"Aspect", "Spécificités", "Resource externes", "Images"};
+			objectDetailsPanel.add(generateIdentifiersTable(ao), new Label(msg.detailsTabIdentifiersTitle()));
+			objectDetailsPanel.add(generateCoordinatesTable(ao, precision), new Label(msg.detailsTabCoordinatesTitle()));
+			objectDetailsPanel.add(generateAspectTable(ao), new Label(msg.detailsTabAspectTitle()));
+			objectDetailsPanel.add(generateSpecificitiesTable(ao), new Label(msg.detailsTabSpecificitiesTitle()));
+			objectDetailsPanel.add(generateExternalResourcesTable(ao), new Label(msg.detailsTabExternalResourcesTitle()));
+			objectDetailsPanel.add(generateImageTable(ao), new Label(msg.detailsTabImagesTitle()));
+			availableTabs = new String[]{msg.detailsTabIdentifiersTitle(), msg.detailsTabCoordinatesTitle(),
+					msg.detailsTabAspectTitle(), msg.detailsTabSpecificitiesTitle(),
+					msg.detailsTabExternalResourcesTitle(), msg.detailsTabImagesTitle()};
 			
 		} else if (ao instanceof DeepSkyObject) {
-			objectDetailsPanel.add(generateIdentifiersTable(ao), new Label("Identifiants"));
-			objectDetailsPanel.add(generateCoordinatesTable(ao, precision), new Label("Coordonnées"));
-			objectDetailsPanel.add(generateAspectTable(ao), new Label("Aspect"));
-			objectDetailsPanel.add(generateSpecificitiesTable(ao), new Label("Spécificités"));
-			objectDetailsPanel.add(generateExternalResourcesTable(ao), new Label("Resource externes"));
-			objectDetailsPanel.add(generateImageTable(ao), new Label("Images"));
-			availableTabs = new String[]{"Identifiants", "Coordonnées",
-					"Aspect", "Spécificités", "Resource externes", "Images"};
+			objectDetailsPanel.add(generateIdentifiersTable(ao), new Label(msg.detailsTabIdentifiersTitle()));
+			objectDetailsPanel.add(generateCoordinatesTable(ao, precision), new Label(msg.detailsTabCoordinatesTitle()));
+			objectDetailsPanel.add(generateAspectTable(ao), new Label(msg.detailsTabAspectTitle()));
+			objectDetailsPanel.add(generateSpecificitiesTable(ao), new Label(msg.detailsTabSpecificitiesTitle()));
+			objectDetailsPanel.add(generateExternalResourcesTable(ao), new Label(msg.detailsTabExternalResourcesTitle()));
+			objectDetailsPanel.add(generateImageTable(ao), new Label(msg.detailsTabImagesTitle()));
+			availableTabs = new String[]{msg.detailsTabIdentifiersTitle(), msg.detailsTabCoordinatesTitle(),
+					msg.detailsTabAspectTitle(), msg.detailsTabSpecificitiesTitle(),
+					msg.detailsTabExternalResourcesTitle(), msg.detailsTabImagesTitle()};
 		}
 		objectDetailsPanel.addSelectionHandler(new DetailsPanelSelectionHandler(availableTabs));
 	}
@@ -541,18 +548,18 @@ public class VisualizationHelper {
 		
 		// We create a list of available surveys...
 		VerticalPanel surveyPanel = new VerticalPanel();
-		surveyPanel.add(new Label("Survey à consulter :"));
+		surveyPanel.add(new Label(msg.detailsTabImagesSurveys()+" :"));
 		ListBox liSurveys = new ListBox();
-		liSurveys.addItem("POSS2/UKSTU Rouge", "poss2ukstu_red");
-		liSurveys.addItem("POSS2/UKSTU Bleu", "poss2ukstu_blue");
-		liSurveys.addItem("POSS2/UKSTU IR", "poss2ukstu_ir");
-		liSurveys.addItem("POSS1 Rouge", "poss1_red");
-		liSurveys.addItem("POSS1 Bleu", "poss1_blue");
-		liSurveys.addItem("Quick-V", "quickv");
-		liSurveys.addItem("HST Phase 2 (GSC2)", "phase2_gsc2");
-		liSurveys.addItem("HST Phase 2 (GSC1)", "phase2_gsc1");
-		liSurveys.addItem("Sloan DSS", "sloan");
-		liSurveys.addItem("Sloan DSS (négatif)", "sloan_inverted");
+		liSurveys.addItem(msg.detailsTabImagesSurveysPoss2ukstuRed(), "poss2ukstu_red");
+		liSurveys.addItem(msg.detailsTabImagesSurveysPoss2ukstuBlue(), "poss2ukstu_blue");
+		liSurveys.addItem(msg.detailsTabImagesSurveysPoss2ukstuIr(), "poss2ukstu_ir");
+		liSurveys.addItem(msg.detailsTabImagesSurveysPoss1Red(), "poss1_red");
+		liSurveys.addItem(msg.detailsTabImagesSurveysPoss1Blue(), "poss1_blue");
+		liSurveys.addItem(msg.detailsTabImagesSurveysQuickv(), "quickv");
+		liSurveys.addItem(msg.detailsTabImagesSurveysPhase2Gsc2(), "phase2_gsc2");
+		liSurveys.addItem(msg.detailsTabImagesSurveysPhase2Gsc1(), "phase2_gsc1");
+		liSurveys.addItem(msg.detailsTabImagesSurveysSloan(), "sloan");
+		liSurveys.addItem(msg.detailsTabImagesSurveysSloanInverted(), "sloan_inverted");
 		liSurveys.setSelectedIndex(liSurveys.getItemCount()-4);
 		liSurveys.addChangeHandler(new UpdateDssImageHandler(liSurveys, img, spinner, ao));
 		surveyPanel.add(liSurveys);
@@ -567,38 +574,38 @@ public class VisualizationHelper {
 		int row=0;
 		if (ao instanceof Planet) {
 			Planet p = (Planet) ao;
-			ftIdentifier.setHTML(row, 0, "PLANETE");
+			ftIdentifier.setHTML(row, 0, msg.detailsTabIdentifiersPlanet());
 			ftIdentifier.setHTML(row++, 1, p.getIdentifier());
 		} else if (ao instanceof Star) {
 			Star s = (Star) ao;
-			ftIdentifier.setHTML(row, 0, "NUMERO HR");
+			ftIdentifier.setHTML(row, 0, msg.detailsTabIdentifiersHrNumber());
 			ftIdentifier.setHTML(row++, 1, "" + s.getHrNumber());
-			ftIdentifier.setHTML(row, 0, "NUMERO HD");
+			ftIdentifier.setHTML(row, 0, msg.detailsTabIdentifiersHdNumber());
 			ftIdentifier.setHTML(row++, 1, "" + s.getHdNumber());
-			ftIdentifier.setHTML(row, 0, "NUMERO SAO");
+			ftIdentifier.setHTML(row, 0, msg.detailsTabIdentifiersSaoNumber());
 			ftIdentifier.setHTML(row++, 1, "" + s.getSaoNumber());
-			ftIdentifier.setHTML(row, 0, "NOM");
+			ftIdentifier.setHTML(row, 0, msg.detailsTabIdentifiersName());
 			ftIdentifier.setHTML(row++, 1, "" + s.getName());
-			ftIdentifier.setHTML(row, 0, "NUMERO FK5");
+			ftIdentifier.setHTML(row, 0, msg.detailsTabIdentifiersFk5Number());
 			ftIdentifier.setHTML(row++, 1, "" + s.getFk5Number());
-			ftIdentifier.setHTML(row, 0, "ID DURCHMUSTERUNG");
+			ftIdentifier.setHTML(row, 0, msg.detailsTabIdentifiersDurchmusterungId());
 			ftIdentifier.setHTML(row++, 1, "" + s.getDurchmusterungIdentification());
 			if (s.getAdsNumber() != null) {
-				ftIdentifier.setHTML(row, 0, "NUMERO ADS");
+				ftIdentifier.setHTML(row, 0, msg.detailsTabIdentifiersAdsNumber());
 				ftIdentifier.setHTML(row++, 1, "" + s.getAdsNumber());
 			}
 			if (s.getVariableStarIdentification() != null) {
-				ftIdentifier.setHTML(row, 0, "IDENTIFICATION VARIABLE");
+				ftIdentifier.setHTML(row, 0, msg.detailsTabIdentifiersVariableId());
 				ftIdentifier.setHTML(row++, 1,
 						"" + s.getVariableStarIdentification());
 			}
 			
 		} else if (ao instanceof DeepSkyObject) {
 			DeepSkyObject dso = (DeepSkyObject) ao;
-			ftIdentifier.setHTML(row, 0, "NOM");
+			ftIdentifier.setHTML(row, 0, msg.detailsTabIdentifiersName());
 			ftIdentifier.setHTML(row++, 1, dso.getName());
 
-			ftIdentifier.setHTML(row, 0, "AUTRE NOM");
+			ftIdentifier.setHTML(row, 0, msg.detailsTabIdentifiersOtherName());
 			ftIdentifier.setHTML(row++, 1, dso.getOtherName());
 		}
 		
@@ -610,36 +617,36 @@ public class VisualizationHelper {
 		int row=0;
 		if (ao instanceof Planet) {
 			Planet p = (Planet) ao;
-			ftAspect.setText(row, 0, "ALBEDO");
+			ftAspect.setText(row, 0, msg.detailsTabAspectAlbedo());
 			ftAspect.setText(row++, 1, "" + PlanetEnum.forId(p.getNumericIdentifier()).getMeanAlbedo());
 			
 		} else if (ao instanceof Star) {
 			Star s = (Star) ao;
 			if (s.getSpectralType() != null) {
-				ftAspect.setText(row, 0, "TYPE SPECTRAL");
+				ftAspect.setText(row, 0, msg.detailsTabAspectAlbedo());
 				ftAspect.setText(row++, 1, "" + s.getSpectralType());
 			}
-			ftAspect.setText(row, 0, "MAGNITUDE");
+			ftAspect.setText(row, 0, msg.detailsTabAspectMagnitude());
 			ftAspect.setText(row++, 1, "" + s.getVisualMagnitude());
-			ftAspect.setText(row, 0, "MAGNITUDE B-V");
-			ftAspect.setText(row++, 1, "" + s.getBvMag() + (s.isUncertainBvMag() ? " (uncertain) " : ""));
-			ftAspect.setText(row, 0, "MAGNITUDE U-B");
-			ftAspect.setText(row++, 1, "" + s.getUbMag() + (s.isUncertainUbMag() ? " (uncertain) " : ""));
-			ftAspect.setText(row, 0, "MAGNITUDE R-I");
+			ftAspect.setText(row, 0, msg.detailsTabAspectMagnitudeBV());
+			ftAspect.setText(row++, 1, "" + s.getBvMag() + (s.isUncertainBvMag() ? " ("+msg.detailsTabAspectMagnitudeUncertain()+") " : ""));
+			ftAspect.setText(row, 0, msg.detailsTabAspectMagnitudeUB());
+			ftAspect.setText(row++, 1, "" + s.getUbMag() + (s.isUncertainUbMag() ? " ("+msg.detailsTabAspectMagnitudeUncertain()+") " : ""));
+			ftAspect.setText(row, 0, msg.detailsTabAspectMagnitudeRI());
 			ftAspect.setText(row++, 1, "" + s.getRiMag());
-			ftAspect.setText(row, 0, "SOURCE IR ?");
+			ftAspect.setText(row, 0, msg.detailsTabAspectIrSource());
 			ftAspect.setText(row++, 1, "" + s.isIrSource());
 			
 		} else if (ao instanceof DeepSkyObject) {
 			DeepSkyObject dso = (DeepSkyObject) ao;
-			ftAspect.setText(row, 0, "MAGNITUDE");
+			ftAspect.setText(row, 0, msg.detailsTabAspectMagnitude());
 			ftAspect.setText(row++, 1, "" + dso.getMagnitude());
-			ftAspect.setText(row, 0, "MAGNITUDE SURFACIQUE");
+			ftAspect.setText(row, 0, msg.detailsTabAspectSurfaceBrightness());
 			ftAspect.setText(row++, 1, "" + dso.getSurfaceBrightness());
-			ftAspect.setText(row, 0, "DIMENSION");
+			ftAspect.setText(row, 0, msg.detailsTabAspectDimension());
 			ftAspect.setText(row++, 1, "" + dso.getSizeHumanReadable());
 			if (dso.getPositionAngle() != null) {
-				ftAspect.setText(row, 0, "ORIENTATION");
+				ftAspect.setText(row, 0, msg.detailsTabAspectOrientation());
 				ftAspect.setText(row++, 1, "" + dso.getPositionAngle() + "°");
 			}
 		}
@@ -653,77 +660,77 @@ public class VisualizationHelper {
 		if (ao instanceof Star) {
 			Star s = (Star) ao;
 			if (s.getProperMotionRa() != null) {
-				ftSpec.setText(row, 0, "MOUVEMENT PROPRE EN RA");
+				ftSpec.setText(row, 0, msg.detailsTabSpecificitiesProperMotionRa());
 				ftSpec.setText(row++, 1, "" + s.getProperMotionRa());
 			}
 			if (s.getProperMotionDec() != null) {
-				ftSpec.setText(row, 0, "MOUVEMENT PROPRE EN DEC");
+				ftSpec.setText(row, 0, msg.detailsTabSpecificitiesProperMotionDec());
 				ftSpec.setText(row++, 1, "" + s.getProperMotionDec());
 			}
 			if (s.getRadialVelocity() != null) {
-				ftSpec.setText(row, 0, "VITESSE RADIALE");
+				ftSpec.setText(row, 0, msg.detailsTabSpecificitiesRadialSpeed());
 				ftSpec.setText(row++, 1, "" + s.getRadialVelocity());
 			}
 			if (s.getParallax() != null) {
-				ftSpec.setText(row, 0, "PARALLAXE");
+				ftSpec.setText(row, 0, msg.detailsTabSpecificitiesParallaxe());
 				ftSpec.setText(row++, 1, "" + s.getParallax());
 			}
 			if (s.getParallaxCode() != null) {
-				ftSpec.setText(row, 0, "CODE PARALLAXE");
+				ftSpec.setText(row, 0, msg.detailsTabSpecificitiesParallaxeCode());
 				ftSpec.setText(row++, 1, "" + s.getParallaxCode().getComment());
 			}
 			if (s.getCompanionCount() != null) {
-				ftSpec.setText(row, 0, "NOMBRE DE COMPAGNIONS");
+				ftSpec.setText(row, 0, msg.detailsTabSpecificitiesCompanionCount());
 				ftSpec.setText(row++, 1, "" + s.getCompanionCount());
 			}
 			if (s.getMultipleStarCode() != null) {
-				ftSpec.setText(row, 0, "CODE ETOILE MULTIPLE");
+				ftSpec.setText(row, 0, msg.detailsTabSpecificitiesMultipleStarCode());
 				ftSpec.setText(row++, 1, s.getMultipleStarCode()
 						.getComment());
 			}
 			if (s.getCompanionIdentification() != null) {
-				ftSpec.setText(row, 0, "ID ETOILE COMPAGNION");
+				ftSpec.setText(row, 0, msg.detailsTabSpecificitiesIdCompanionStar());
 				ftSpec.setText(row++, 1, s.getCompanionIdentification());
 			}
 			if (s.getCompanionSeparation() != null) {
-				ftSpec.setText(row, 0, "SEPARATION");
+				ftSpec.setText(row, 0, msg.detailsTabSpecificitiesSeparation());
 				ftSpec.setText(row++, 1, "" + s.getCompanionSeparation());
 			}
 			if (s.getCompanionMagnitudeDifference() != null) {
-				ftSpec.setText(row, 0, "DIFFERENCE DE MAGNITUDE AVEC LE COMPAGNION");
+				ftSpec.setText(row, 0, msg.detailsTabSpecificitiesMagnitudeDifferenceWithCompanion());
 				ftSpec.setText(row++, 1, "" + s.getCompanionMagnitudeDifference());
 			}
 			
 		} else if (ao instanceof DeepSkyObject) {
 			DeepSkyObject dso = (DeepSkyObject) ao;
-			ftSpec.setText(row, 0, "TYPE");
+			ftSpec.setText(row, 0, msg.detailsTabSpecificitiesType());
 			ftSpec.setText(row++, 1, dso.getType().getComment());
 			if (dso.getClasstype() != null) {
-				ftSpec.setText(row, 0, "SOUS-TYPE");
+				ftSpec.setText(row, 0, msg.detailsTabSpecificitiesSubtype());
 				ftSpec.setText(row++, 1, dso.getClasstype());
 			}
 			if (dso.getStarsCount() != null) {
-				ftSpec.setText(row, 0, "NOMBRE D'ETOILES");
+				ftSpec.setText(row, 0, msg.detailsTabSpecificitiesStarCount());
 				ftSpec.setText(row++, 1, "" + dso.getStarsCount());
 			}
 			if (dso.getBrightestStarMagnitude() != null) {
-				ftSpec.setText(row, 0, "MAGNITUDE DE L'ETOILE LA PLUS LUMINEUSE");
+				ftSpec.setText(row, 0, msg.detailsTabSpecificitiesBrightestStarMagnitude());
 				ftSpec.setText(row++, 1, "" + dso.getBrightestStarMagnitude());
 			}
-			ftSpec.setText(row, 0, "PRESENT DANS LE CATALOGUE \"BEST NGC\"");
-			ftSpec.setText(row++, 1, dso.isInBestNgcCatalog() ? "OUI" : "NON");
-			ftSpec.setText(row, 0, "PRESENT DANS LE CATALOGUE \"CALDWELL\"");
-			ftSpec.setText(row++, 1, dso.isInCaldwellCalatalog() ? "OUI" : "NON");
-			ftSpec.setText(row, 0, "PRESENT DANS LE CATALOGUE \"HERSCHEL\"");
-			ftSpec.setText(row++, 1, dso.isInHerschelCatalog() ? "OUI" : "NON");
-			ftSpec.setText(row, 0, "PRESENT DANS LE CATALOGUE \"MESSIER\"");
-			ftSpec.setText(row++, 1, dso.isInMessierCatalog() ? "OUI" : "NON");
+			ftSpec.setText(row, 0, msg.detailsTabSpecificitiesInBestofNgcCatalog());
+			ftSpec.setText(row++, 1, dso.isInBestNgcCatalog() ? msg.commonYes() : msg.commonNo());
+			ftSpec.setText(row, 0, msg.detailsTabSpecificitiesInCaldwellCatalog());
+			ftSpec.setText(row++, 1, dso.isInCaldwellCalatalog() ? msg.commonYes() : msg.commonNo());
+			ftSpec.setText(row, 0, msg.detailsTabSpecificitiesInHerschelCatalog());
+			ftSpec.setText(row++, 1, dso.isInHerschelCatalog() ? msg.commonYes() : msg.commonNo());
+			ftSpec.setText(row, 0, msg.detailsTabSpecificitiesInMessierCatalog());
+			ftSpec.setText(row++, 1, dso.isInMessierCatalog() ? msg.commonYes() : msg.commonNo());
 			if (dso.getNgcDescription() != null) {
-				ftSpec.setText(row, 0, "DESCRIPTION NGC");
+				ftSpec.setText(row, 0, msg.detailsTabSpecificitiesNgcDescription());
 				ftSpec.setText(row++, 1, dso.getNgcDescription());
 			}
 			if (dso.getNotes() != null) {
-				ftSpec.setText(row, 0, "NOTES");
+				ftSpec.setText(row, 0, msg.detailsTabSpecificitiesNotes());
 				ftSpec.setText(row++, 1, dso.getNotes());
 			}
 		}
@@ -779,32 +786,32 @@ public class VisualizationHelper {
 		int row=0;
 		EquatorialCoordinatesAdapter eca = new EquatorialCoordinatesAdapter(new EquatorialCoordinates(ao.getRightAscension(), ao.getDeclinaison()));
 		
-		table.setHTML(row, 0, "ASCENSION DROITE");
+		table.setHTML(row, 0, msg.detailsTabCoordinatesRightAscension());
 		table.setHTML(row++, 1,Sexagesimal.decimalToSexagesimal(
 						BigDecimal.valueOf(eca.getEquatorialCoordinates().getRightAscension() / 15)
 								.round(precision).doubleValue()).toString(SexagesimalType.HOURS));
-		table.setHTML(row, 0, "DECLINAISON");
+		table.setHTML(row, 0, msg.detailsTabCoordinatesDeclinaison());
 		table.setHTML(row++, 1, Sexagesimal.decimalToSexagesimal(
 						BigDecimal.valueOf(eca.getEquatorialCoordinates().getDeclinaison())
 								.round(precision).doubleValue()).toString(SexagesimalType.DEGREES));
-		table.setHTML(row, 0, "LONGITUDE ECLIPTIQUE");
+		table.setHTML(row, 0, msg.detailsTabCoordinatesEclipticLongitude());
 		table.setHTML(row++, 1, Sexagesimal.decimalToSexagesimal(
 						BigDecimal.valueOf(eca.getEcliptiqueLongitude()).round(precision).doubleValue())
 						.toString(SexagesimalType.DEGREES));
-		table.setHTML(row, 0, "LATITUDE ECLIPTIQUE");
+		table.setHTML(row, 0, msg.detailsTabCoordinatesEclipticLatitude());
 		table.setHTML(row++, 1, Sexagesimal.decimalToSexagesimal(
 						BigDecimal.valueOf(eca.getEcliptiqueLatitude()).round(precision).doubleValue())
 						.toString(SexagesimalType.DEGREES));
-		table.setHTML(row, 0, "LONGITUDE GALACTIQUE");
+		table.setHTML(row, 0, msg.detailsTabCoordinatesGalacticLongitude());
 		table.setHTML(row++, 1, Sexagesimal.decimalToSexagesimal(
 						BigDecimal.valueOf(eca.getGalacticLongitude()).round(precision).doubleValue())
 						.toString(SexagesimalType.DEGREES));
-		table.setHTML(row, 0, "LATITUDE GALACTIQUE");
+		table.setHTML(row, 0, msg.detailsTabCoordinatesGalacticLatitude());
 		table.setHTML(row++, 1, Sexagesimal.decimalToSexagesimal(
 						BigDecimal.valueOf(eca.getGalacticLatitude()).round(precision).doubleValue())
 						.toString(SexagesimalType.DEGREES));
 		if (ao instanceof DeepSkyObject) {
-			table.setHTML(row, 0, "CONSTELLATION");
+			table.setHTML(row, 0, msg.detailsTabCoordinatesConstellation());
 			table.setHTML(row++, 1, ((DeepSkyObject) ao).getConstellation().getName());
 		}
 		return table;
