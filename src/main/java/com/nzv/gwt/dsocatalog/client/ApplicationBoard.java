@@ -4,6 +4,7 @@ import java.util.Date;
 
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.i18n.shared.DateTimeFormat;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.CheckBox;
@@ -159,10 +160,14 @@ public class ApplicationBoard extends SplitLayoutPanel {
 		
 		// We add the observer panel.
 		appPanel.observerPanel.setSize("270px", "250px");
+		// Language selection
 		appPanel.observerPanel.add(appPanel.lbObserverLanguage);
 		String currentLocale = "fr";
-		if (Window.Location.getParameter("locale") != null) {
-			currentLocale = Window.Location.getParameter("locale");
+		{
+			String pLocale = Window.Location.getParameter("locale");
+			if (pLocale != null) {
+				currentLocale = Window.Location.getParameter("locale");
+			}
 		}
 		appPanel.hiddenObserverCurrentLanguage.setValue(currentLocale);
 		appPanel.liObserverLanguage.addItem(msg.commonLanguageEnglish(), "en");
