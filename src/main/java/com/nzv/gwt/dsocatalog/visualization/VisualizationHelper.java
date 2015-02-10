@@ -623,7 +623,7 @@ public class VisualizationHelper {
 		} else if (ao instanceof Star) {
 			Star s = (Star) ao;
 			if (s.getSpectralType() != null) {
-				ftAspect.setText(row, 0, msg.detailsTabAspectAlbedo());
+				ftAspect.setText(row, 0, msg.detailsTabAspectSpectralType());
 				ftAspect.setText(row++, 1, "" + s.getSpectralType());
 			}
 			ftAspect.setText(row, 0, msg.detailsTabAspectMagnitude());
@@ -659,6 +659,10 @@ public class VisualizationHelper {
 		int row = 0;
 		if (ao instanceof Star) {
 			Star s = (Star) ao;
+			if (s.getSpectralType() != null) {
+				ftSpec.setText(row, 0, msg.detailsTabAspectSpectralType());
+				ftSpec.setText(row++, 1, "" + s.getSpectralType());
+			}
 			if (s.getProperMotionRa() != null) {
 				ftSpec.setText(row, 0, msg.detailsTabSpecificitiesProperMotionRa());
 				ftSpec.setText(row++, 1, "" + s.getProperMotionRa());

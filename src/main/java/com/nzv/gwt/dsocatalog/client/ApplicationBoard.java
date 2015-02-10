@@ -4,7 +4,6 @@ import java.util.Date;
 
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.dom.client.Style.Unit;
-import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.i18n.shared.DateTimeFormat;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.CheckBox;
@@ -26,6 +25,7 @@ import com.nzv.gwt.dsocatalog.model.CoordinatesSystem;
 public class ApplicationBoard extends SplitLayoutPanel {
 	
 	public static int LEFT_PANEL_WIDTH = 280;
+	public static int LEFT_PANEL_HEIGHT = 580;
 	public static int SOUTH_PANEL_HEIGHT = 300;
 	public static int PANEL_SPLITTER_WIDTH = 2;
 	
@@ -57,6 +57,10 @@ public class ApplicationBoard extends SplitLayoutPanel {
 	CheckBox chkDisplayConstellationShapes = new CheckBox(msg.tabFiltersDisplayConstellationsShapes());
 	CheckBox chkDisplayConstellationBoundaries = new CheckBox(msg.tabFiltersDisplayConstellationsBoundaries());
 	CheckBox chkDisplayStars = new CheckBox(msg.tabFiltersDisplayStars());
+	
+	Label lbStarSpectralTypeRestriction = new Label(msg.tabFiltersStarSpectralTypeRestriction()+" :");
+	TextBox txtStarSpectralTypeRestriction = new TextBox();
+	
 	Label lbStarLimitMagnitude = new Label(msg.tabFiltersLimitMagnitudeStars()+" :");
 	HorizontalPanel starLimitMagnitudePanel = new HorizontalPanel();
 	TextBox txtBoxStarLimitMagnitude = new TextBox();
@@ -71,6 +75,9 @@ public class ApplicationBoard extends SplitLayoutPanel {
 	CheckBox chkDisplayNebulas = new CheckBox(msg.tabFiltersDisplayNebulas());
 	CheckBox chkDisplaySupernovaRemnants = new CheckBox(msg.tabFiltersDisplaySnRemnants());
 	CheckBox chkDisplayQuasars = new CheckBox(msg.tabFiltersDisplayQuasars());
+	
+	Label lbDsoSubtypeRestriction = new Label(msg.tabFiltersDsoSubtypeRestriction()+" :");
+	TextBox txtDsoSubtypeRestriction = new TextBox();
 
 	Label lbDsoLimitMagnitude = new Label(msg.tabFiltersLimitMagnitudeDso()+" :");
 	HorizontalPanel dsoLimitMagnitudePanel = new HorizontalPanel();
@@ -130,7 +137,7 @@ public class ApplicationBoard extends SplitLayoutPanel {
 		appPanel.application = source;
 		
 		// We set the size of the stack panel.
-		appPanel.configurationPanel.setPixelSize(LEFT_PANEL_WIDTH, 500);
+		appPanel.configurationPanel.setPixelSize(LEFT_PANEL_WIDTH, LEFT_PANEL_HEIGHT);
 		
 		// We add the coordinates panel.
 		appPanel.projectionPanel.setSize("270px", "30px");
@@ -247,6 +254,10 @@ public class ApplicationBoard extends SplitLayoutPanel {
 		appPanel.chkDisplayStars.addValueChangeHandler(new GoogleAnalyticsEventFilterAware("Display stars"));
 		appPanel.filterPanel.add(appPanel.chkDisplayStars);
 		
+		appPanel.filterPanel.add(appPanel.lbStarSpectralTypeRestriction);
+		appPanel.txtStarSpectralTypeRestriction.addKeyUpHandler(new UpdateMapEventHandler(source));
+		appPanel.filterPanel.add(appPanel.txtStarSpectralTypeRestriction);
+		
 		appPanel.filterPanel.add(appPanel.lbStarLimitMagnitude);
 		appPanel.txtBoxStarLimitMagnitude.setText("" + CatalogSearchOptions.DEFAULT_STAR_LIMIT_MAGNITUDE);
 		appPanel.txtBoxStarLimitMagnitude.setTitle(msg.tabFiltersLimitMagnitudeStars());
@@ -298,6 +309,10 @@ public class ApplicationBoard extends SplitLayoutPanel {
 		appPanel.chkDisplayQuasars.addValueChangeHandler(new UpdateMapEventHandler(source));
 		appPanel.chkDisplayQuasars.addValueChangeHandler(new GoogleAnalyticsEventFilterAware("Display quasars"));
 		appPanel.filterPanel.add(appPanel.chkDisplayQuasars);
+		
+		appPanel.filterPanel.add(appPanel.lbDsoSubtypeRestriction);
+		appPanel.txtDsoSubtypeRestriction.addKeyUpHandler(new UpdateMapEventHandler(source));
+		appPanel.filterPanel.add(appPanel.txtDsoSubtypeRestriction);
 		
 		appPanel.filterPanel.add(appPanel.lbDsoLimitMagnitude);
 		
@@ -374,6 +389,7 @@ public class ApplicationBoard extends SplitLayoutPanel {
 		options.setDsoLimitMagnitude(dsoLimitMagnitude);
 		
 		options.setFindStars(chkDisplayStars.getValue());
+		options.setSpectralTypeRestriction(txtStarSpectralTypeRestriction.getValue());
 		options.setFindAsterisms(chkDisplayAsterisms.getValue());
 		options.setFindGalaxies(chkDisplayGalaxies.getValue());
 		options.setFindGlobularClusters(chkDisplayGlobularClusters.getValue());
@@ -382,6 +398,7 @@ public class ApplicationBoard extends SplitLayoutPanel {
 		options.setFindNebulas(chkDisplayNebulas.getValue());
 		options.setFindSupernovaRemnant(chkDisplaySupernovaRemnants.getValue());
 		options.setFindQuasars(chkDisplayQuasars.getValue());
+		options.setDsoSubtypeRestriction(txtDsoSubtypeRestriction.getValue());
 		Observer observer = application.initializeObserver();
 		options.setObserverCurrentDateAsString(txtObserverDate.getText());
 		options.setObserverCurrentTimeAsString(txtObserverLocalTime.getText());

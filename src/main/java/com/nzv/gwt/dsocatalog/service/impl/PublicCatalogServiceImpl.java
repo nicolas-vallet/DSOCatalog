@@ -73,18 +73,53 @@ public class PublicCatalogServiceImpl implements PublicCatalogService {
 						.getUpperWesternMapLimit();
 				EquatorialCoordinates lowerEasterSearchLimit = constellation
 						.getLowerEasternMapLimit();
-				result.addAll(starRepository
-						.findByEQCoordinatesAreaAndVisualMagnitudeLessThan(
-								upperWesterSearchLimit.getRightAscension(),
-								upperWesterSearchLimit.getDeclinaison(),
-								lowerEasterSearchLimit.getRightAscension(),
-								lowerEasterSearchLimit.getDeclinaison(),
-								options.getStarLimitMagnitude()));
-				// ...
+				if (options.getSpectralTypeRestriction().isEmpty()) {
+					result.addAll(starRepository
+							.findByEQCoordinatesAreaAndVisualMagnitudeLessThan(
+									upperWesterSearchLimit.getRightAscension(),
+									upperWesterSearchLimit.getDeclinaison(),
+									lowerEasterSearchLimit.getRightAscension(),
+									lowerEasterSearchLimit.getDeclinaison(),
+									options.getStarLimitMagnitude()));
+				} else {
+					if (options.getSpectralTypeRestriction().indexOf("*") != -1) {
+						result.addAll(starRepository
+								.findByEQCoordinatesAreaAndVisualMagnitudeLessThanAndSpectralTypeLike(
+										upperWesterSearchLimit.getRightAscension(),
+										upperWesterSearchLimit.getDeclinaison(),
+										lowerEasterSearchLimit.getRightAscension(),
+										lowerEasterSearchLimit.getDeclinaison(),
+										options.getStarLimitMagnitude(), 
+										options.getSpectralTypeRestriction().replace("*", "%")));
+					} else {
+						result.addAll(starRepository
+								.findByEQCoordinatesAreaAndVisualMagnitudeLessThanAndSpectralTypeEquals(
+										upperWesterSearchLimit.getRightAscension(),
+										upperWesterSearchLimit.getDeclinaison(),
+										lowerEasterSearchLimit.getRightAscension(),
+										lowerEasterSearchLimit.getDeclinaison(),
+										options.getStarLimitMagnitude(), 
+										options.getSpectralTypeRestriction()));
+					}
+				}
 			} else {
-				result.addAll(starRepository
-						.findByVisualMagnitudeLessThanEqualOrderByVisualMagnitudeAsc(options
-								.getStarLimitMagnitude()));
+				if (options.getSpectralTypeRestriction().isEmpty()) {
+					result.addAll(starRepository
+							.findByVisualMagnitudeLessThanEqualOrderByVisualMagnitudeAsc(options
+									.getStarLimitMagnitude()));
+				} else {
+					if (options.getSpectralTypeRestriction().indexOf("*") != -1) {
+						result.addAll(starRepository
+								.findByVisualMagnitudeLessThanEqualAndSpectralTypeContainingOrderByVisualMagnitudeAsc(
+										options.getStarLimitMagnitude(),
+										options.getSpectralTypeRestriction().replace("*", "")));
+					} else {
+						result.addAll(starRepository
+								.findByVisualMagnitudeLessThanEqualAndSpectralTypeEqualsOrderByVisualMagnitudeAsc(
+										options.getStarLimitMagnitude(),
+										options.getSpectralTypeRestriction()));
+					}
+				}
 			}
 
 		}
@@ -130,14 +165,41 @@ public class PublicCatalogServiceImpl implements PublicCatalogService {
 		}
 		if (!searchedTypes.isEmpty()) {
 			if (constellation != null) {
-				result.addAll(dsoRepository
-						.findDistinctByConstellationAndMagnitudeLessThanEqualAndTypeInOrderByMagnitudeAsc(
-								constellation, options.getDsoLimitMagnitude(),
-								searchedTypes));
+				if (options.getDsoSubtypeRestriction().isEmpty()) {
+					result.addAll(dsoRepository
+							.findDistinctByConstellationAndMagnitudeLessThanEqualAndTypeInOrderByMagnitudeAsc(
+									constellation, options.getDsoLimitMagnitude(),
+									searchedTypes));
+				} else {
+					if (options.getDsoSubtypeRestriction().indexOf("*") != -1) {
+						result.addAll(dsoRepository
+								.findDistinctByConstellationAndMagnitudeLessThanEqualAndTypeInAndClasstypeContainingOrderByMagnitudeAsc(
+										constellation, options.getDsoLimitMagnitude(),searchedTypes,
+										options.getDsoSubtypeRestriction().replace("*", "")));
+					} else {
+						result.addAll(dsoRepository
+								.findDistinctByConstellationAndMagnitudeLessThanEqualAndTypeInAndClasstypeEqualsOrderByMagnitudeAsc(
+										constellation, options.getDsoLimitMagnitude(),searchedTypes,
+										options.getDsoSubtypeRestriction()));
+					}
+					
+				}
 			} else {
-				result.addAll(dsoRepository
-						.findDistinctByMagnitudeLessThanEqualAndTypeInOrderByMagnitudeAsc(
-								options.getDsoLimitMagnitude(), searchedTypes));
+				if (options.getDsoSubtypeRestriction().isEmpty()) {
+					result.addAll(dsoRepository
+							.findDistinctByMagnitudeLessThanEqualAndTypeInOrderByMagnitudeAsc(
+									options.getDsoLimitMagnitude(), searchedTypes));
+				} else {
+					if (options.getDsoSubtypeRestriction().indexOf("*") != -1) {
+						result.addAll(dsoRepository
+								.findDistinctByMagnitudeLessThanEqualAndTypeInAndClasstypeContainingOrderByMagnitudeAsc(
+										options.getDsoLimitMagnitude(), searchedTypes, options.getDsoSubtypeRestriction().replace("*", "")));
+					} else {
+						result.addAll(dsoRepository
+								.findDistinctByMagnitudeLessThanEqualAndTypeInAndClasstypeEqualsOrderByMagnitudeAsc(
+										options.getDsoLimitMagnitude(), searchedTypes, options.getDsoSubtypeRestriction()));
+					}
+				}
 			}
 		}
 		long tEnd = System.currentTimeMillis();

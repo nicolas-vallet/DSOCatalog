@@ -45,6 +45,7 @@ public class CatalogSearchOptions implements Serializable {
 	private double dsoLimitMagnitude = 0d;
 
 	private boolean findStars = true;
+	private String spectralTypeRestriction;
 	private boolean findAsterisms = false;
 	private boolean findGalaxies = false;
 	private boolean findGlobularClusters = false;
@@ -53,6 +54,7 @@ public class CatalogSearchOptions implements Serializable {
 	private boolean findNebulas = false;
 	private boolean findSupernovaRemnant = false;
 	private boolean findQuasars = false;
+	private String dsoSubtypeRestriction;
 	private String observerCurrentDateAsString;
 	private String observerCurrentTimeAsString;
 	private int observerGreenwhichHourOffset;
@@ -148,6 +150,14 @@ public class CatalogSearchOptions implements Serializable {
 	public void setFindStars(boolean findStars) {
 		this.findStars = findStars;
 	}
+	
+	public String getSpectralTypeRestriction() {
+		return spectralTypeRestriction;
+	}
+
+	public void setSpectralTypeRestriction(String spectralTypeRestriction) {
+		this.spectralTypeRestriction = spectralTypeRestriction;
+	}
 
 	public boolean isFindGalaxies() {
 		return findGalaxies;
@@ -213,6 +223,14 @@ public class CatalogSearchOptions implements Serializable {
 		this.findQuasars = findQuasars;
 	}
 	
+	public String getDsoSubtypeRestriction() {
+		return dsoSubtypeRestriction;
+	}
+
+	public void setDsoSubtypeRestriction(String dsoSubtypeRestriction) {
+		this.dsoSubtypeRestriction = dsoSubtypeRestriction;
+	}
+
 	public double getObservatoryLatitude() {
 		return observatoryLatitude;
 	}
@@ -257,12 +275,14 @@ public class CatalogSearchOptions implements Serializable {
 	public String toString() {
 		return "CatalogSearchOptions [star mag max=" + starLimitMagnitude
 				+ ", dso mag max=" + dsoLimitMagnitude + " | planets=" + findPlanets
-				+ ", stars=" + findStars + ", asterisms=" + findAsterisms + ", galaxies="
+				+ ", stars=" + findStars + ", spectral type=" + spectralTypeRestriction 
+				+ ", asterisms=" + findAsterisms + ", galaxies="
 				+ findGalaxies + ", globular clusters=" + findGlobularClusters
 				+ ", open clusters=" + findOpenClusters
 				+ ", planetary nebulas=" + findPlanetaryNebulas + ", nebulas="
 				+ findNebulas + ", SN remnant=" + findSupernovaRemnant
-				+ ", quasars=" + findQuasars + ", limiting constellation="
+				+ ", quasars=" + findQuasars + ", DSO subtype="+dsoSubtypeRestriction
+				+ ", limiting constellation="
 				+ restrictedToConstellationCode + "]";
 	}
 

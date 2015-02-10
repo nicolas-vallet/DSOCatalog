@@ -4,7 +4,6 @@ import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
@@ -39,8 +38,6 @@ public class UpdateMapEventHandler implements ClickHandler, ValueChangeHandler<B
 
 	@Override
 	public void onKeyUp(KeyUpEvent event) {
-		if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-			application.updateMap();
-		}
+		application.updateMap();
 	}
 }

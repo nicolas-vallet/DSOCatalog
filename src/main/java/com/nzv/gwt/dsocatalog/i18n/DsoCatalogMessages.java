@@ -53,6 +53,7 @@ public interface DsoCatalogMessages extends Constants {
 	String tabFiltersDisplayConstellationsShapes();
 	String tabFiltersDisplayConstellationsBoundaries();
 	String tabFiltersDisplayStars();
+	String tabFiltersStarSpectralTypeRestriction();
 	String tabFiltersLimitMagnitudeStars();
 	String tabFiltersDisplayAsterisms();
 	String tabFiltersDisplayGalaxies();
@@ -62,6 +63,7 @@ public interface DsoCatalogMessages extends Constants {
 	String tabFiltersDisplayNebulas();
 	String tabFiltersDisplaySnRemnants();
 	String tabFiltersDisplayQuasars();
+	String tabFiltersDsoSubtypeRestriction();
 	String tabFiltersLimitMagnitudeDso();
 	
 	String messageRenderingMap();
