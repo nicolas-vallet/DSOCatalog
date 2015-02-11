@@ -266,8 +266,8 @@ public class DsoCatalogGWT implements EntryPoint {
 				case ECL:
 					if (searchOptions.isDisplayEcliptic()) {
 						Point2D mp = projectionToUse.project(
-								Math.toRadians(eclipticAdapter.getEclipticCoordinates().getEcliptiqueLongitude()),
-								Math.toRadians(eclipticAdapter.getEclipticCoordinates().getEcliptiqueLatitude()));
+							Math.toRadians(eclipticAdapter.getEclipticCoordinates().getEcliptiqueLongitude()),
+							Math.toRadians(eclipticAdapter.getEclipticCoordinates().getEcliptiqueLatitude()));
 						optimizedData.setValue(i, 0, GeometryUtils.normalizeAngleInDegrees(Math.toDegrees(mp.getX()), -180, 180));
 						optimizedData.setValue(i, serieIndexes.getEclipticSerieIndex(), Math.toDegrees(mp.getY()));
 						optimizedData.setValue(i, serieIndexes.getEclipticSerieIndex()+1, msg.commonEcliptic());
@@ -275,8 +275,8 @@ public class DsoCatalogGWT implements EntryPoint {
 					}
 					if (searchOptions.isDisplayEquator()) {
 						Point2D mp = projectionToUse.project(
-								Math.toRadians(equatorAdapter.getEcliptiqueLongitude()), 
-								Math.toRadians(equatorAdapter.getEcliptiqueLatitude()));
+							Math.toRadians(equatorAdapter.getEcliptiqueLongitude()), 
+							Math.toRadians(equatorAdapter.getEcliptiqueLatitude()));
 						optimizedData.setValue(i, 0, Math.toDegrees(mp.getX()));
 						optimizedData.setValue(i, serieIndexes.getEquatorSerieIndex(), Math.toDegrees(mp.getY()));
 						optimizedData.setValue(i, serieIndexes.getEquatorSerieIndex()+1, msg.commonEquator());
@@ -285,8 +285,8 @@ public class DsoCatalogGWT implements EntryPoint {
 					if (searchOptions.isDisplayGalacticPlan()) {
 						EquatorialCoordinatesAdapter tmp = new EquatorialCoordinatesAdapter(new EquatorialCoordinates(galacticAdapter.getRightAscension(), galacticAdapter.getDeclinaison()));
 						Point2D mp = projectionToUse.project(
-								Math.toRadians(tmp.getEcliptiqueLongitude()), 
-								Math.toRadians(tmp.getEcliptiqueLatitude()));
+							Math.toRadians(tmp.getEcliptiqueLongitude()), 
+							Math.toRadians(tmp.getEcliptiqueLatitude()));
 						optimizedData.setValue(i, 0, Math.toDegrees(mp.getX()));
 						optimizedData.setValue(i, serieIndexes.getGalacticPlanSerieIndex(), Math.toDegrees(mp.getY()));
 						optimizedData.setValue(i, serieIndexes.getGalacticPlanSerieIndex()+1, msg.commonGalacticPlan());
@@ -295,29 +295,30 @@ public class DsoCatalogGWT implements EntryPoint {
 					break;
 				case GAL:
 					if (searchOptions.isDisplayEcliptic()) {
-						EquatorialCoordinatesAdapter tmp = new EquatorialCoordinatesAdapter(new EquatorialCoordinates(eclipticAdapter.getRightAscension(), eclipticAdapter.getDeclinaison()));
+						EquatorialCoordinatesAdapter tmp = new EquatorialCoordinatesAdapter(
+							new EquatorialCoordinates(eclipticAdapter.getRightAscension(), eclipticAdapter.getDeclinaison()));
 						Point2D mp = projectionToUse.project(
-								Math.toRadians(tmp.getGalacticLongitude()), 
-								Math.toRadians(tmp.getGalacticLatitude()));
-						optimizedData.setValue(i, 0, GeometryUtils.normalizeAngleInDegrees(Math.toDegrees(mp.getX()), -180, 180));
+							Math.toRadians(GeometryUtils.normalizeAngleInDegrees(tmp.getGalacticLongitude(), -180, 180)), 
+							Math.toRadians(GeometryUtils.normalizeAngleInDegrees(tmp.getGalacticLatitude(), -180, 180)));
+						optimizedData.setValue(i, 0, Math.toDegrees(mp.getX()));
 						optimizedData.setValue(i, serieIndexes.getEclipticSerieIndex(), Math.toDegrees(mp.getY()));
 						optimizedData.setValue(i, serieIndexes.getEclipticSerieIndex()+1, msg.commonEcliptic());
 						i++;
 					}
 					if (searchOptions.isDisplayEquator()) {
 						Point2D mp = projectionToUse.project(
-								Math.toRadians(equatorAdapter.getGalacticLongitude()), 
-								Math.toRadians(equatorAdapter.getGalacticLatitude()));
-						optimizedData.setValue(i, 0, GeometryUtils.normalizeAngleInDegrees(Math.toDegrees(mp.getX()), -180, 180));
+							Math.toRadians(GeometryUtils.normalizeAngleInDegrees(equatorAdapter.getGalacticLongitude(), -180, 180)), 
+							Math.toRadians(GeometryUtils.normalizeAngleInDegrees(equatorAdapter.getGalacticLatitude(), -180, 180)));
+						optimizedData.setValue(i, 0, Math.toDegrees(mp.getX()));
 						optimizedData.setValue(i, serieIndexes.getEquatorSerieIndex(), Math.toDegrees(mp.getY()));
 						optimizedData.setValue(i, serieIndexes.getEquatorSerieIndex()+1, msg.commonEquator());
 						i++;
 					}
 					if (searchOptions.isDisplayGalacticPlan()) {
 						Point2D mp = projectionToUse.project(
-								Math.toRadians(galacticAdapter.getGalacticCoordinates().getGalacticLongitude()), 
-								Math.toRadians(galacticAdapter.getGalacticCoordinates().getGalacticLatitude()));
-						optimizedData.setValue(i, 0, GeometryUtils.normalizeAngleInDegrees(Math.toDegrees(mp.getX()), -180, 180));
+							Math.toRadians(galacticAdapter.getGalacticCoordinates().getGalacticLongitude()), 
+							Math.toRadians(galacticAdapter.getGalacticCoordinates().getGalacticLatitude()));
+						optimizedData.setValue(i, 0, Math.toDegrees(mp.getX()));
 						optimizedData.setValue(i, serieIndexes.getGalacticPlanSerieIndex(), Math.toDegrees(mp.getY()));
 						optimizedData.setValue(i, serieIndexes.getGalacticPlanSerieIndex()+1, msg.commonGalacticPlan());
 					}
@@ -326,8 +327,8 @@ public class DsoCatalogGWT implements EntryPoint {
 				default:
 					if (searchOptions.isDisplayEcliptic()) {
 						Point2D mp = projectionToUse.project(
-								Math.toRadians(eclipticAdapter.getRightAscension()), 
-								Math.toRadians(eclipticAdapter.getDeclinaison()));
+							Math.toRadians(eclipticAdapter.getRightAscension()), 
+							Math.toRadians(eclipticAdapter.getDeclinaison()));
 						optimizedData.setValue(i, 0, GeometryUtils.normalizeAngleInDegrees(Math.toDegrees(mp.getX()), 0, 360));
 						optimizedData.setValue(i, serieIndexes.getEclipticSerieIndex(), Math.toDegrees(mp.getY()));
 						optimizedData.setValue(i, serieIndexes.getEclipticSerieIndex()+1, msg.commonEcliptic());
@@ -335,8 +336,8 @@ public class DsoCatalogGWT implements EntryPoint {
 					}
 					if (searchOptions.isDisplayEquator()) {
 						Point2D mp = projectionToUse.project(
-								Math.toRadians(equatorAdapter.getEquatorialCoordinates().getRightAscension()), 
-								Math.toRadians(equatorAdapter.getEquatorialCoordinates().getDeclinaison()));
+							Math.toRadians(equatorAdapter.getEquatorialCoordinates().getRightAscension()), 
+							Math.toRadians(equatorAdapter.getEquatorialCoordinates().getDeclinaison()));
 						optimizedData.setValue(i, 0, Math.toDegrees(mp.getX()));
 						optimizedData.setValue(i, serieIndexes.getEquatorSerieIndex(), Math.toDegrees(mp.getY()));
 						optimizedData.setValue(i, serieIndexes.getEquatorSerieIndex()+1, msg.commonEquator());
@@ -344,8 +345,8 @@ public class DsoCatalogGWT implements EntryPoint {
 					}
 					if (searchOptions.isDisplayGalacticPlan()) {
 						Point2D mp = projectionToUse.project(
-								Math.toRadians(galacticAdapter.getRightAscension()), 
-								Math.toRadians(galacticAdapter.getDeclinaison()));
+							Math.toRadians(galacticAdapter.getRightAscension()), 
+							Math.toRadians(galacticAdapter.getDeclinaison()));
 						optimizedData.setValue(i, 0, Math.toDegrees(mp.getX()));
 						optimizedData.setValue(i, serieIndexes.getGalacticPlanSerieIndex(), Math.toDegrees(mp.getY()));
 						optimizedData.setValue(i, serieIndexes.getGalacticPlanSerieIndex()+1, msg.commonGalacticPlan());
