@@ -156,13 +156,13 @@ public class VisualizationHelper {
 
 		optimizedData.addRows(objects.size());
 		if (searchOptions.isDisplayEcliptic()) {
-			optimizedData.addRows(360);
+			optimizedData.addRows(360*2);
 		}
 		if (searchOptions.isDisplayEquator()) {
-			optimizedData.addRows(360);
+			optimizedData.addRows(360*2);
 		}
 		if (searchOptions.isDisplayGalacticPlan()) {
-			optimizedData.addRows(360);
+			optimizedData.addRows(360*2);
 		}
 		if (searchOptions.isDisplayConstellationNames()) {
 			optimizedData.addRows(codeOfConstellationsToDisplay.size());
@@ -424,6 +424,7 @@ public class VisualizationHelper {
 		if (searchOptions.isDisplayEcliptic()) {
 			MySeries s = MySeries.create();
 			s.setLineWidth(1);
+			s.setPointShape(Shape.circle);
 			s.setPointSize(0);
 			s.setColor(DsoCatalogGWT.STYLE_ECLIPTIC_COLOR);
 			s.setVisibleInLegend(false);
@@ -433,6 +434,7 @@ public class VisualizationHelper {
 		if (searchOptions.isDisplayEquator()) {
 			MySeries s = MySeries.create();
 			s.setLineWidth(1);
+			s.setPointShape(Shape.circle);
 			s.setPointSize(0);
 			s.setColor(DsoCatalogGWT.STYLE_EQUATOR_COLOR);
 			s.setVisibleInLegend(false);
@@ -442,6 +444,7 @@ public class VisualizationHelper {
 		if (searchOptions.isDisplayGalacticPlan()) {
 			MySeries s = MySeries.create();
 			s.setLineWidth(1);
+			s.setPointShape(Shape.circle);
 			s.setPointSize(0);
 			s.setColor(DsoCatalogGWT.STYLE_GALACTIC_PLAN_COLOR);
 			s.setVisibleInLegend(false);

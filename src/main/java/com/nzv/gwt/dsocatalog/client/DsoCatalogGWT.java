@@ -271,7 +271,9 @@ public class DsoCatalogGWT implements EntryPoint {
 						optimizedData.setValue(i, 0, GeometryUtils.normalizeAngleInDegrees(Math.toDegrees(mp.getX()), -180, 180));
 						optimizedData.setValue(i, serieIndexes.getEclipticSerieIndex(), Math.toDegrees(mp.getY()));
 						optimizedData.setValue(i, serieIndexes.getEclipticSerieIndex()+1, msg.commonEcliptic());
-						i++;
+						optimizedData.setValue(i+1, 0, GeometryUtils.normalizeAngleInDegrees(Math.toDegrees(mp.getX()), -180, 180));
+						optimizedData.setValueNull(i+1, serieIndexes.getEclipticSerieIndex());
+						i += 2;
 					}
 					if (searchOptions.isDisplayEquator()) {
 						Point2D mp = projectionToUse.project(
@@ -280,7 +282,9 @@ public class DsoCatalogGWT implements EntryPoint {
 						optimizedData.setValue(i, 0, Math.toDegrees(mp.getX()));
 						optimizedData.setValue(i, serieIndexes.getEquatorSerieIndex(), Math.toDegrees(mp.getY()));
 						optimizedData.setValue(i, serieIndexes.getEquatorSerieIndex()+1, msg.commonEquator());
-						i++;
+						optimizedData.setValue(i+1, 0, Math.toDegrees(mp.getX()));
+						optimizedData.setValueNull(i+1, serieIndexes.getEquatorSerieIndex());
+						i += 2;
 					}
 					if (searchOptions.isDisplayGalacticPlan()) {
 						EquatorialCoordinatesAdapter tmp = new EquatorialCoordinatesAdapter(new EquatorialCoordinates(galacticAdapter.getRightAscension(), galacticAdapter.getDeclinaison()));
@@ -290,7 +294,9 @@ public class DsoCatalogGWT implements EntryPoint {
 						optimizedData.setValue(i, 0, Math.toDegrees(mp.getX()));
 						optimizedData.setValue(i, serieIndexes.getGalacticPlanSerieIndex(), Math.toDegrees(mp.getY()));
 						optimizedData.setValue(i, serieIndexes.getGalacticPlanSerieIndex()+1, msg.commonGalacticPlan());
-						i++;
+						optimizedData.setValue(i+1, 0, Math.toDegrees(mp.getX()));
+						optimizedData.setValueNull(i+1, serieIndexes.getGalacticPlanSerieIndex());
+						i += 2;
 					}
 					break;
 				case GAL:
@@ -299,28 +305,35 @@ public class DsoCatalogGWT implements EntryPoint {
 							new EquatorialCoordinates(eclipticAdapter.getRightAscension(), eclipticAdapter.getDeclinaison()));
 						Point2D mp = projectionToUse.project(
 							Math.toRadians(GeometryUtils.normalizeAngleInDegrees(tmp.getGalacticLongitude(), -180, 180)), 
-							Math.toRadians(GeometryUtils.normalizeAngleInDegrees(tmp.getGalacticLatitude(), -180, 180)));
+							Math.toRadians(tmp.getGalacticLatitude()));
 						optimizedData.setValue(i, 0, Math.toDegrees(mp.getX()));
 						optimizedData.setValue(i, serieIndexes.getEclipticSerieIndex(), Math.toDegrees(mp.getY()));
 						optimizedData.setValue(i, serieIndexes.getEclipticSerieIndex()+1, msg.commonEcliptic());
-						i++;
+						optimizedData.setValue(i+1, 0, Math.toDegrees(mp.getX()));
+						optimizedData.setValueNull(i+1, serieIndexes.getEclipticSerieIndex());
+						i += 2;
 					}
 					if (searchOptions.isDisplayEquator()) {
 						Point2D mp = projectionToUse.project(
 							Math.toRadians(GeometryUtils.normalizeAngleInDegrees(equatorAdapter.getGalacticLongitude(), -180, 180)), 
-							Math.toRadians(GeometryUtils.normalizeAngleInDegrees(equatorAdapter.getGalacticLatitude(), -180, 180)));
+							Math.toRadians(equatorAdapter.getGalacticLatitude()));
 						optimizedData.setValue(i, 0, Math.toDegrees(mp.getX()));
 						optimizedData.setValue(i, serieIndexes.getEquatorSerieIndex(), Math.toDegrees(mp.getY()));
 						optimizedData.setValue(i, serieIndexes.getEquatorSerieIndex()+1, msg.commonEquator());
-						i++;
+						optimizedData.setValue(i+1, 0, Math.toDegrees(mp.getX()));
+						optimizedData.setValueNull(i+1, serieIndexes.getEquatorSerieIndex());
+						i += 2;
 					}
 					if (searchOptions.isDisplayGalacticPlan()) {
 						Point2D mp = projectionToUse.project(
-							Math.toRadians(galacticAdapter.getGalacticCoordinates().getGalacticLongitude()), 
+							Math.toRadians(GeometryUtils.normalizeAngleInDegrees(galacticAdapter.getGalacticCoordinates().getGalacticLongitude(), -180, 180)), 
 							Math.toRadians(galacticAdapter.getGalacticCoordinates().getGalacticLatitude()));
 						optimizedData.setValue(i, 0, Math.toDegrees(mp.getX()));
 						optimizedData.setValue(i, serieIndexes.getGalacticPlanSerieIndex(), Math.toDegrees(mp.getY()));
 						optimizedData.setValue(i, serieIndexes.getGalacticPlanSerieIndex()+1, msg.commonGalacticPlan());
+						optimizedData.setValue(i+1, 0, Math.toDegrees(mp.getX()));
+						optimizedData.setValueNull(i+1, serieIndexes.getGalacticPlanSerieIndex());
+						i += 2;
 					}
 					break;
 				case EQ:
@@ -332,7 +345,9 @@ public class DsoCatalogGWT implements EntryPoint {
 						optimizedData.setValue(i, 0, GeometryUtils.normalizeAngleInDegrees(Math.toDegrees(mp.getX()), 0, 360));
 						optimizedData.setValue(i, serieIndexes.getEclipticSerieIndex(), Math.toDegrees(mp.getY()));
 						optimizedData.setValue(i, serieIndexes.getEclipticSerieIndex()+1, msg.commonEcliptic());
-						i++;
+						optimizedData.setValue(i+1, 0, GeometryUtils.normalizeAngleInDegrees(Math.toDegrees(mp.getX()), 0, 360));
+						optimizedData.setValueNull(i+1, serieIndexes.getEclipticSerieIndex());
+						i += 2;
 					}
 					if (searchOptions.isDisplayEquator()) {
 						Point2D mp = projectionToUse.project(
@@ -341,7 +356,9 @@ public class DsoCatalogGWT implements EntryPoint {
 						optimizedData.setValue(i, 0, Math.toDegrees(mp.getX()));
 						optimizedData.setValue(i, serieIndexes.getEquatorSerieIndex(), Math.toDegrees(mp.getY()));
 						optimizedData.setValue(i, serieIndexes.getEquatorSerieIndex()+1, msg.commonEquator());
-						i++;
+						optimizedData.setValue(i+1, 0, Math.toDegrees(mp.getX()));
+						optimizedData.setValueNull(i+1, serieIndexes.getEquatorSerieIndex());
+						i += 2;
 					}
 					if (searchOptions.isDisplayGalacticPlan()) {
 						Point2D mp = projectionToUse.project(
@@ -350,7 +367,9 @@ public class DsoCatalogGWT implements EntryPoint {
 						optimizedData.setValue(i, 0, Math.toDegrees(mp.getX()));
 						optimizedData.setValue(i, serieIndexes.getGalacticPlanSerieIndex(), Math.toDegrees(mp.getY()));
 						optimizedData.setValue(i, serieIndexes.getGalacticPlanSerieIndex()+1, msg.commonGalacticPlan());
-						i++;
+						optimizedData.setValue(i+1, 0, Math.toDegrees(mp.getX()));
+						optimizedData.setValueNull(i+1, serieIndexes.getGalacticPlanSerieIndex());
+						i += 2;
 					}
 					break;
 				}
