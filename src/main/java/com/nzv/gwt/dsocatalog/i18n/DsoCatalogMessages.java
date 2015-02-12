@@ -8,10 +8,16 @@ public interface DsoCatalogMessages extends Constants {
 	String commonLanguageFrench();
 	String commonLanguageEnglish();
 	String commonLanguageSpanish();
+	String commonLanguageRussian();
+	String commonNorth();
+	String commonEast();
+	String commonSouth();
+	String commonWest();
+	String commonZenith();
+	String commonHorizon();
 	String commonEcliptic();
 	String commonEquator();
 	String commonGalacticPlan();
-	String commonHorizon();
 	String commonConstellation();
 	String commonStars();
 	String commonPlanets();
