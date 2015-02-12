@@ -10,7 +10,7 @@ public class InfrastructureServiceImpl implements InfrastructureService {
 
 	@Value("${GOOGLE_ANALYTICS_WEB_PROPERTY_ID}")
 	private String googleAnalyticsWebPropertyId;
-
+	
 	@Override
 	public String getGoogleAnalyticsWebPropertyId() {
 		return this.googleAnalyticsWebPropertyId;

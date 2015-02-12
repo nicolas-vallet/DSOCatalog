@@ -126,7 +126,6 @@ public class ApplicationBoard extends SplitLayoutPanel {
 	VerticalPanel centerPanel = new VerticalPanel();
 	TabLayoutPanel southPanel = new TabLayoutPanel(25, Unit.PX);
 	
-	
 	private ApplicationBoard() {
 		super(PANEL_SPLITTER_WIDTH);
 	}
@@ -145,13 +144,13 @@ public class ApplicationBoard extends SplitLayoutPanel {
 		appPanel.liCoordinatesMode.addItem(msg.tabProjectionCoordinatesSystemEQ(), ""+CoordinatesSystem.EQ);
 		appPanel.liCoordinatesMode.addItem(msg.tabProjectionCoordinatesSystemECL(), ""+CoordinatesSystem.ECL);
 		appPanel.liCoordinatesMode.addItem(msg.tabProjectionCoordinatesSystemGAL(), ""+CoordinatesSystem.GAL);
-		//appPanel.liCoordinatesMode.addItem(msg.tabProjectionCoordinatesSystemALTAZ(), ""+CoordinatesSystem.ALTAZ);
+		appPanel.liCoordinatesMode.addItem(msg.tabProjectionCoordinatesSystemALTAZ(), ""+CoordinatesSystem.ALTAZ);
 		appPanel.liCoordinatesMode.addChangeHandler(new UpdateMapEventHandler(source));
 		appPanel.liCoordinatesMode.addChangeHandler(new GoogleAnalyticsEventProjectionAware(appPanel.liCoordinatesMode));
 		
 		appPanel.projectionPanel.add(appPanel.liCoordinatesMode);
 		appPanel.chkShowObjectsUnderHorizon.addClickHandler(new UpdateMapEventHandler(source));
-//		appPanel.projectionPanel.add(appPanel.chkShowObjectsUnderHorizon);
+		appPanel.projectionPanel.add(appPanel.chkShowObjectsUnderHorizon);
 		appPanel.chkDisplayEcliptic.addClickHandler(new UpdateMapEventHandler(source));
 		appPanel.chkDisplayEcliptic.addValueChangeHandler(new GoogleAnalyticsEventFilterAware("Ecliptic"));
 		appPanel.projectionPanel.add(appPanel.chkDisplayEcliptic);
@@ -180,15 +179,18 @@ public class ApplicationBoard extends SplitLayoutPanel {
 		appPanel.liObserverLanguage.addItem(msg.commonLanguageEnglish(), "en");
 		appPanel.liObserverLanguage.addItem(msg.commonLanguageSpanish(), "es");
 		appPanel.liObserverLanguage.addItem(msg.commonLanguageFrench(), "fr");
+		appPanel.liObserverLanguage.addItem(msg.commonLanguageRussian(), "ru");
 		if ("en".equals(currentLocale)) {
 			appPanel.liObserverLanguage.setSelectedIndex(0);
 		} else if ("es".equals(currentLocale)) {
 			appPanel.liObserverLanguage.setSelectedIndex(1);
 		} else if ("fr".equals(currentLocale)) {
 			appPanel.liObserverLanguage.setSelectedIndex(2);
+		} else if ("ru".equals(currentLocale)) {
+			appPanel.liObserverLanguage.setSelectedIndex(3);
 		}
 		appPanel.liObserverLanguage.addChangeHandler(
-				new UserLanguageUpdater(appPanel.liObserverLanguage, appPanel.hiddenObserverCurrentLanguage));
+			new UserLanguageUpdater(appPanel.liObserverLanguage, appPanel.hiddenObserverCurrentLanguage));
 		appPanel.observerPanel.add(appPanel.liObserverLanguage);
 		appPanel.observerPanel.add(appPanel.lbObserverLatitude);
 		appPanel.txtObserverLatitude.setText("48.833");
@@ -352,6 +354,7 @@ public class ApplicationBoard extends SplitLayoutPanel {
 	
 	public CatalogSearchOptions getCatalogSearchOptions() {
 		CatalogSearchOptions options = new CatalogSearchOptions();
+		options.setCoordinatesSystem(CoordinatesSystem.valueOf(liCoordinatesMode.getValue(liCoordinatesMode.getSelectedIndex())));
 		options.setRestrictedToConstellationCode(liConstellations.getValue(liConstellations.getSelectedIndex()));
 		options.setFindPlanets(chkDisplayPlanets.getValue());
 		options.setDisplayEcliptic(chkDisplayEcliptic.getValue());

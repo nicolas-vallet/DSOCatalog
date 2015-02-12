@@ -7,5 +7,5 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 public interface InfrastructureService extends RemoteService {
 	
 	public String getGoogleAnalyticsWebPropertyId();
-
+	
 }

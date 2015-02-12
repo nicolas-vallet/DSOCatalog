@@ -2,45 +2,32 @@ package com.nzv.gwt.dsocatalog.model;
 
 import java.io.Serializable;
 
+import com.nzv.gwt.dsocatalog.projection.MollweideProjection;
+import com.nzv.gwt.dsocatalog.projection.NeutralProjection;
+import com.nzv.gwt.dsocatalog.projection.OrthographicProjection;
+import com.nzv.gwt.dsocatalog.projection.Projection;
+
 public enum CoordinatesSystem implements Serializable {
 
-	EQ("EQUATO", 0, 360, -90, 90),
-	ECL("ECLIPTIC", -180, 180, -90, 90),
-	GAL("GALACTIC", -180, 180, -90, 90),
-	ALTAZ("ALTAZ", 0, 0, 0, 0);
+	EQ("EQUATO", new NeutralProjection()),
+	ECL("ECLIPTIC", new NeutralProjection()),
+	GAL("GALACTIC", new MollweideProjection()),
+	ALTAZ("ALTAZ", new OrthographicProjection());
 	
 	private String comment;
-	private double chartMinValueX;
-	private double chartMaxValueX;
-	private double chartMinValueY;
-	private double chartMaxValueY;
+	private Projection projection; 
 	
-	private CoordinatesSystem(String c, double minX, double maxX, double minY, double maxY) {
+	private CoordinatesSystem(String c, Projection proj) {
 		this.comment = c;
-		chartMinValueX = minX;
-		chartMaxValueX = maxX;
-		chartMinValueY = minY;
-		chartMaxValueY = maxY;
+		projection = proj;
 	}
 
 	public String getComment() {
 		return comment;
 	}
 	
-	public double getChartMinValueX() {
-		return chartMinValueX;
-	}
-
-	public double getChartMaxValueX() {
-		return chartMaxValueX;
-	}
-
-	public double getChartMinValueY() {
-		return chartMinValueY;
-	}
-
-	public double getChartMaxValueY() {
-		return chartMaxValueY;
+	public Projection getProjection() {
+		return projection;
 	}
 
 	public static CoordinatesSystem instanceOf(String coordinatesSystem) {

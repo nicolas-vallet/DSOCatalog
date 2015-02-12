@@ -45,4 +45,36 @@ public class GeometryUtilsTest {
 		Assert.assertEquals(20, GeometryUtils.getAngleDifference(10, 350), 0);
 		Assert.assertEquals(20, GeometryUtils.getAngleDifference(10, 350), 0);
 	}
+
+	@Test
+	public void testIntermediatePointOnHorizon() {
+		Point2D p1 = new Point2D(30, 30);
+		Point2D p2 = new Point2D(30, -30);
+		Point2D intermediatePoint = GeometryUtils.giveIntermediatePointOnHorizon(p1, p2);
+		Assert.assertEquals(30, intermediatePoint.getX(), 0);
+		Assert.assertEquals(0, intermediatePoint.getY(), 0);
+		
+		p1 = new Point2D(10, 10);
+		p2 = new Point2D(30, -10);
+		intermediatePoint = GeometryUtils.giveIntermediatePointOnHorizon(p1, p2);
+		Assert.assertEquals(20, intermediatePoint.getX(), 0);
+		Assert.assertEquals(0, intermediatePoint.getY(), 0);
+		
+		p1 = new Point2D(10, 10);
+		p2 = new Point2D(20, 20);
+		intermediatePoint = GeometryUtils.giveIntermediatePointOnHorizon(p1, p2);
+		Assert.assertNull(intermediatePoint);
+		
+		p1 = new Point2D(10, -10);
+		p2 = new Point2D(20, -20);
+		intermediatePoint = GeometryUtils.giveIntermediatePointOnHorizon(p1, p2);
+		Assert.assertNull(intermediatePoint);
+		
+		p1 = new Point2D(10, -10);
+		p2 = new Point2D(30, 10);
+		intermediatePoint = GeometryUtils.giveIntermediatePointOnHorizon(p1, p2);
+		Assert.assertEquals(20, intermediatePoint.getX(), 0);
+		Assert.assertEquals(0, intermediatePoint.getY(), 0);
+		
+	}
 }

@@ -68,6 +68,43 @@ public class GeometryUtils {
 		}
 	}
 	
+	/**
+	 * Given two points expressed as AltAzimutal coordinates, return the point on the joining segment that is on the horizon (e.g. elevation equals to zero).
+	 * If both point are over or under horizon, this method returns null.
+	 * 
+	 * @param A point with AltAz coordinates
+	 * @param A point with AltAz coordinates
+	 * @return The point which is part of the segment joining the two input points and just on the horizon (e.g. with elevation equals to zero).
+	 */
+	public static Point2D giveIntermediatePointOnHorizon(Point2D p1, Point2D p2) {
+		double iX, iY, a, b;
+		double x1 = p1.getX();
+		double y1 = p1.getY();
+		double x2 = p2.getX();
+		double y2 = p2.getY();
+		
+		if ((y1 > 0 && y2 > 0) || (y1 < 0 && y2 < 0)) {
+			return null;
+		}
+		
+		if (x1 == x2) {
+			return new Point2D(x1, 0);
+		}
+		
+		a = (y2 - y1) / (x2 - x1);
+		b = (x2 * y1 - x1 * y2) / (x2 - x1);
+		
+		iY = 0;
+		
+		// y = a * x + b
+		// |
+		// +-> a * x = y - b
+		// |
+		// *-> x = (y - b) / a
+		iX = (iY - b) / a;
+		return new Point2D(iX, iY);
+	}
+	
 	public static Point2D giveIntermediatePointOnChartLimit(Point2D p1, Point2D p2, CoordinatesSystem cs) {
 		double iX, iY, a, b;
 		double x1 = p1.getX();

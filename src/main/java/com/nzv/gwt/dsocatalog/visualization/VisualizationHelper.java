@@ -43,6 +43,7 @@ import com.nzv.gwt.dsocatalog.model.Planet;
 import com.nzv.gwt.dsocatalog.model.PlanetEnum;
 import com.nzv.gwt.dsocatalog.model.Star;
 import com.nzv.gwt.dsocatalog.projection.GeometryUtils;
+import com.nzv.gwt.dsocatalog.projection.OrthographicProjection;
 
 public class VisualizationHelper {
 	
@@ -58,6 +59,8 @@ public class VisualizationHelper {
 				appPanel.getLiCoordinatesMode().getSelectedIndex()));
 		switch (cs) {
 		case ECL:
+			optimizedData.addColumn(ColumnType.NUMBER, msg.mapEclHaxisTitle());
+			break;
 		case GAL:
 			optimizedData.addColumn(ColumnType.NUMBER, msg.mapGalHaxisTitle());
 			break;
@@ -68,6 +71,12 @@ public class VisualizationHelper {
 		default:
 			optimizedData.addColumn(ColumnType.NUMBER, msg.mapEqHaxisTitle());
 			break;
+		}
+		if (searchOptions.getCoordinatesSystem() == CoordinatesSystem.ALTAZ) {
+			optimizedData.addColumn(ColumnType.NUMBER, msg.commonHorizon());
+			optimizedData.addStyleColumn(optimizedData);
+			optimizedData.addTooltipColumn(optimizedData);
+			optimizedData.addAnnotationColumn(optimizedData);
 		}
 		if (searchOptions.isDisplayEcliptic()) {
 			optimizedData.addColumn(ColumnType.NUMBER, msg.commonEcliptic());
@@ -155,6 +164,10 @@ public class VisualizationHelper {
 		}
 
 		optimizedData.addRows(objects.size());
+		if (searchOptions.getCoordinatesSystem() == CoordinatesSystem.ALTAZ) {
+			// We create a row for each point of the horizon (one each 1 degree)
+			optimizedData.addRows(361);
+		}
 		if (searchOptions.isDisplayEcliptic()) {
 			optimizedData.addRows(360*2);
 		}
@@ -354,10 +367,10 @@ public class VisualizationHelper {
 		} else if (("" + CoordinatesSystem.ALTAZ).equals(coordinatesMode)) {
 			hAxisOptions.setTitle(msg.mapAltazHaxisTitle());
 			vAxisOptions.setTitle(msg.mapAltazVaxisTitle());
-			hAxisOptions.setMinValue(Math.toDegrees(-2));
-			hAxisOptions.setMaxValue(Math.toDegrees(2));
-			vAxisOptions.setMinValue(Math.toDegrees(-2));
-			vAxisOptions.setMaxValue(Math.toDegrees(2));
+			hAxisOptions.setMinValue(Math.toDegrees(OrthographicProjection.MIN_X));
+			hAxisOptions.setMaxValue(Math.toDegrees(OrthographicProjection.MAX_X));
+			vAxisOptions.setMinValue(Math.toDegrees(OrthographicProjection.MIN_Y));
+			vAxisOptions.setMaxValue(Math.toDegrees(OrthographicProjection.MAX_Y));
 		} else if (("" + CoordinatesSystem.EQ).equals(coordinatesMode)) {
 			if (!appPanel.getLiConstellations()
 					.getValue(appPanel.getLiConstellations().getSelectedIndex()).isEmpty()) {
@@ -385,7 +398,9 @@ public class VisualizationHelper {
 		options.setLineWidth(0);
 		TextStyle textStyle = TextStyle.create();
 		textStyle.setColor("#ffffff");
-		hAxisOptions.setDirection(-1);
+		if (!("" + CoordinatesSystem.ALTAZ).equals(coordinatesMode)) {
+			hAxisOptions.setDirection(-1);
+		}
 		hAxisOptions.setTextStyle(textStyle);
 		vAxisOptions.setTextStyle(textStyle);
 		options.setHAxisOptions(hAxisOptions);
@@ -401,7 +416,6 @@ public class VisualizationHelper {
 		
 		// Configure the zoom
 		Explorer explorer = Explorer.create();
-//		explorer.setKeepInBounds(true);
 		explorer.setMaxZoomIn(0.001);
 		explorer.setMaxZoomOut(1);
 		explorer.setZoomDelta(1.1);
@@ -421,6 +435,16 @@ public class VisualizationHelper {
 			CatalogSearchOptions searchOptions) {
 		DataSerieIndexes serieIndexes = new DataSerieIndexes(searchOptions);
 		int i = 0;
+		if (searchOptions.getCoordinatesSystem() == CoordinatesSystem.ALTAZ) {
+			MySeries s = MySeries.create();
+			s.setLineWidth(1);
+			s.setPointShape(Shape.circle);
+			s.setPointSize(0);
+			s.setColor(DsoCatalogGWT.STYLE_HORIZON_COLOR);
+			s.setVisibleInLegend(false);
+			options.setSeries(i, s);
+			i++;
+		}
 		if (searchOptions.isDisplayEcliptic()) {
 			MySeries s = MySeries.create();
 			s.setLineWidth(1);

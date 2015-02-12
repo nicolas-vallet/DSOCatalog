@@ -2,11 +2,14 @@ package com.nzv.gwt.dsocatalog.client;
 
 import java.io.Serializable;
 
+import com.nzv.gwt.dsocatalog.model.CoordinatesSystem;
+
 @SuppressWarnings("serial")
 public class CatalogSearchOptions implements Serializable {
 
 	public static final double DEFAULT_STAR_LIMIT_MAGNITUDE = 4.0d;
 	public static final double DEFAULT_DSO_LIMIT_MAGNITUDE = 7.0d;
+	public static final CoordinatesSystem DEFAULT_COORDINATES_SYSTEM = CoordinatesSystem.EQ;
 
 	public static CatalogSearchOptions createDefaultOptions() {
 		CatalogSearchOptions options = new CatalogSearchOptions();
@@ -33,6 +36,7 @@ public class CatalogSearchOptions implements Serializable {
 		return options;
 	}
 
+	private CoordinatesSystem coordinatesSystem = DEFAULT_COORDINATES_SYSTEM;
 	private boolean findPlanets = false;
 	private String restrictedToConstellationCode = null;
 	private boolean displayEquator = false;
@@ -61,6 +65,14 @@ public class CatalogSearchOptions implements Serializable {
 	private double observatoryLatitude = 0;
 	private double observatoryLongitude = 0;
 	
+	public CoordinatesSystem getCoordinatesSystem() {
+		return coordinatesSystem;
+	}
+
+	public void setCoordinatesSystem(CoordinatesSystem coordinatesSystem) {
+		this.coordinatesSystem = coordinatesSystem;
+	}
+
 	public boolean isDisplayEquator() {
 		return displayEquator;
 	}

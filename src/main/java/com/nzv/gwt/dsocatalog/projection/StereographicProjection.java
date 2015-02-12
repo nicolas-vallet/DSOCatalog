@@ -1,6 +1,11 @@
 package com.nzv.gwt.dsocatalog.projection;
 
 public class StereographicProjection implements Projection {
+	
+	public static double MIN_X = -2;
+	public static double MAX_X = 2;
+	public static double MIN_Y = -2;
+	public static double MAX_Y = 2;
 
 	@Override
 	public Point2D project(double azimuthInRadians, double elevationInRadians) {
@@ -13,5 +18,4 @@ public class StereographicProjection implements Projection {
 		
 		return new Point2D(x,y);
 	}
-
 }

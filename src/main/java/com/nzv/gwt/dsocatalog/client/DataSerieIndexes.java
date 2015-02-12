@@ -1,7 +1,10 @@
 package com.nzv.gwt.dsocatalog.client;
 
+import com.nzv.gwt.dsocatalog.model.CoordinatesSystem;
+
 
 public class DataSerieIndexes {
+	private int horizonSerieIndex = 0;
 	private int planetSerieIndex = 0;
 	private int starSerieIndex = 0;
 	private int asterismSerieIndex = 0;
@@ -22,6 +25,11 @@ public class DataSerieIndexes {
 
 	public DataSerieIndexes(CatalogSearchOptions searchOptions) {
 		int serieIndex = 0;
+		
+		if (searchOptions.getCoordinatesSystem() == CoordinatesSystem.ALTAZ) {
+			horizonSerieIndex = ++serieIndex;
+			serieIndex += 3;
+		}
 
 		if (searchOptions.isDisplayEcliptic()) {
 			eclipticSerieIndex = ++serieIndex;
@@ -153,6 +161,10 @@ public class DataSerieIndexes {
 		return constellationShapeSerieIndex;
 	}
 	
+	public int getHorizonSerieIndex() {
+		return horizonSerieIndex;
+	}
+
 	public int getEclipticSerieIndex() {
 		return eclipticSerieIndex;
 	}
@@ -181,6 +193,7 @@ public class DataSerieIndexes {
 				+ ", \n nebulaSerieIndex=" + nebulaSerieIndex
 				+ ", \n snRemnantSerieIndex=" + snRemnantSerieIndex
 				+ ", \n quasarSerieIndex=" + quasarSerieIndex
+				+ ", \n horizonSerieIndex=" + horizonSerieIndex
 				+ ", \n eclipticSerieIndex=" + eclipticSerieIndex
 				+ ", \n equatorSerieIndex=" + equatorSerieIndex
 				+ ", \n galacticPlanSerieIndex=" + galacticPlanSerieIndex
