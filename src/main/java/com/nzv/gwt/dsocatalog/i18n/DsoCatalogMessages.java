@@ -73,6 +73,10 @@ public interface DsoCatalogMessages extends Constants {
 	String tabFiltersDisplaySnRemnants();
 	String tabFiltersDisplayQuasars();
 	String tabFiltersDsoSubtypeRestriction();
+	String tabFilterDsoInMessierCatalog();
+	String tabFilterDsoInBestNgcCatalog();
+	String tabFilterDsoInCaldwellCatalog();
+	String tabFilterDsoInHerschelCatalog();
 	String tabFiltersLimitMagnitudeDso();
 	
 	String messageRenderingMap();

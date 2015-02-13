@@ -105,6 +105,20 @@ public class DeepSkyObject extends AstroObject implements Serializable {
 	
 	@Column(name = "in_messier_catalog", columnDefinition = "tinyint(1)")
 	private boolean inMessierCatalog;
+	
+	/**
+	 * Returns a mask with initial of the catalogs in which this object is present.
+	 * The catalogs come in this order : "(M) Messier, (N) Best NGC, (C) Caldwell, (H) Herschel".
+	 * If the object is in the considered catalog, the returned string will contains it initial, otherwise, it will have an underscore.
+	 * 
+	 * For instance, an object which is present in the Best NGC and the Caldwell will return the mask "_NC_"
+	 * An object which is present in the messier, the caldwell and the herschel will return "M_CH"
+	 * An object which is present in the four catalogs will return "MNCH"
+	 * An object which is only present in the Herschel will return "___H"
+	 * An object which is present in none of theses catalogs will return "____"
+	 */
+	@Formula("CONCAT(IF(in_messier_catalog>0, 'M', '_'), IF(in_bestngc_catalog>0, 'N', '_'), IF(in_caldwell_catalog>0, 'C', '_'), IF(in_herschel_catalog>0, 'H', '_'))")
+	private String inCatalogs;
 
 	@Column(name = "ngc_desc")
 	private String ngcDescription;
@@ -327,6 +341,10 @@ public class DeepSkyObject extends AstroObject implements Serializable {
 
 	public void setBrightestStarMagnitude(Double brightestStarMagnitude) {
 		this.brightestStarMagnitude = brightestStarMagnitude;
+	}
+
+	public String getInCatalogs() {
+		return inCatalogs;
 	}
 
 	public boolean isInBestNgcCatalog() {

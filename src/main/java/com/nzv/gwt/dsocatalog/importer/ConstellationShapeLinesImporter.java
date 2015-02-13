@@ -50,7 +50,6 @@ public class ConstellationShapeLinesImporter {
 				lines.add(initializeConstellationShape(constellationByName, inputLine));
 			}
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		

@@ -133,11 +133,6 @@ public class GeometryUtils {
 		return new Point2D(iX, iY);
 	}
 	
-	public static boolean isCrossingChartLimitY(Point2D p1, Point2D p2, CoordinatesSystem cs) {
-		// TODO
-		return false;
-	}
-	
 	public static double normalizeAngleInDegrees(double angle, double minimum, double maximum) {
 		double interval = Math.abs(minimum - maximum);
 		while (angle < minimum) {

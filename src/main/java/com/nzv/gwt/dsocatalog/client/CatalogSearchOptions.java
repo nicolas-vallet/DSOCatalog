@@ -49,7 +49,7 @@ public class CatalogSearchOptions implements Serializable {
 	private double dsoLimitMagnitude = 0d;
 
 	private boolean findStars = true;
-	private String spectralTypeRestriction;
+	private String spectralTypeRestriction = new String();
 	private boolean findAsterisms = false;
 	private boolean findGalaxies = false;
 	private boolean findGlobularClusters = false;
@@ -58,7 +58,11 @@ public class CatalogSearchOptions implements Serializable {
 	private boolean findNebulas = false;
 	private boolean findSupernovaRemnant = false;
 	private boolean findQuasars = false;
-	private String dsoSubtypeRestriction;
+	private String dsoSubtypeRestriction = new String();
+	private boolean dsoInMessierCatalog = false;
+	private boolean dsoInBestNgcCatalog = false;
+	private boolean dsoInCaldwellCatalog = false;
+	private boolean dsoInHerschelCatalog = false;
 	private String observerCurrentDateAsString;
 	private String observerCurrentTimeAsString;
 	private int observerGreenwhichHourOffset;
@@ -241,6 +245,38 @@ public class CatalogSearchOptions implements Serializable {
 
 	public void setDsoSubtypeRestriction(String dsoSubtypeRestriction) {
 		this.dsoSubtypeRestriction = dsoSubtypeRestriction;
+	}
+	
+	public boolean isDsoInMessierCatalog() {
+		return dsoInMessierCatalog;
+	}
+
+	public void setDsoInMessierCatalog(boolean dsoInMessierCatalog) {
+		this.dsoInMessierCatalog = dsoInMessierCatalog;
+	}
+
+	public boolean isDsoInBestNgcCatalog() {
+		return dsoInBestNgcCatalog;
+	}
+
+	public void setDsoInBestNgcCatalog(boolean dsoInBestNgcCatalog) {
+		this.dsoInBestNgcCatalog = dsoInBestNgcCatalog;
+	}
+
+	public boolean isDsoInCaldwellCatalog() {
+		return dsoInCaldwellCatalog;
+	}
+
+	public void setDsoInCaldwellCatalog(boolean dsoInCaldwellCatalog) {
+		this.dsoInCaldwellCatalog = dsoInCaldwellCatalog;
+	}
+
+	public boolean isDsoInHerschelCatalog() {
+		return dsoInHerschelCatalog;
+	}
+
+	public void setDsoInHerschelCatalog(boolean dsoInHerschelCatalog) {
+		this.dsoInHerschelCatalog = dsoInHerschelCatalog;
 	}
 
 	public double getObservatoryLatitude() {

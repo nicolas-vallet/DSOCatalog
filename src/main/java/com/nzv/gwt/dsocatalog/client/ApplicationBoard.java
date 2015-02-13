@@ -7,6 +7,7 @@ import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.i18n.shared.DateTimeFormat;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.CheckBox;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Hidden;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
@@ -25,7 +26,7 @@ import com.nzv.gwt.dsocatalog.model.CoordinatesSystem;
 public class ApplicationBoard extends SplitLayoutPanel {
 	
 	public static int LEFT_PANEL_WIDTH = 280;
-	public static int LEFT_PANEL_HEIGHT = 580;
+	public static int LEFT_PANEL_HEIGHT = 660;
 	public static int SOUTH_PANEL_HEIGHT = 300;
 	public static int PANEL_SPLITTER_WIDTH = 2;
 	
@@ -80,6 +81,11 @@ public class ApplicationBoard extends SplitLayoutPanel {
 	
 	Label lbDsoSubtypeRestriction = new Label(msg.tabFiltersDsoSubtypeRestriction()+" :");
 	TextBox txtDsoSubtypeRestriction = new TextBox();
+	
+	CheckBox chkDsoInMessierCatalog = new CheckBox(msg.tabFilterDsoInMessierCatalog());
+	CheckBox chkDsoInBestNgcCatalog = new CheckBox(msg.tabFilterDsoInBestNgcCatalog());
+	CheckBox chkDsoInCaldwellCatalog = new CheckBox(msg.tabFilterDsoInCaldwellCatalog());
+	CheckBox chkDsoInHerschelCatalog = new CheckBox(msg.tabFilterDsoInHerschelCatalog());
 
 	Label lbDsoLimitMagnitude = new Label(msg.tabFiltersLimitMagnitudeDso()+" :");
 	HorizontalPanel dsoLimitMagnitudePanel = new HorizontalPanel();
@@ -279,6 +285,7 @@ public class ApplicationBoard extends SplitLayoutPanel {
 		appPanel.starLimitMagnitudePanel.add(appPanel.btIncreaseStarLimitMagnitude);
 		appPanel.starLimitMagnitudePanel.add(appPanel.btDecreaseStarLimitMagnitude);
 		appPanel.filterPanel.add(appPanel.starLimitMagnitudePanel);
+		appPanel.filterPanel.add(new HTML("<hr/>"));
 		
 		// We set the DSO filter fields
 		appPanel.chkDisplayAsterisms.setValue(false);
@@ -326,7 +333,6 @@ public class ApplicationBoard extends SplitLayoutPanel {
 		appPanel.filterPanel.add(appPanel.txtDsoSubtypeRestriction);
 		
 		appPanel.filterPanel.add(appPanel.lbDsoLimitMagnitude);
-		
 		appPanel.txtBoxDsoLimitMagnitude.setText("" + CatalogSearchOptions.DEFAULT_DSO_LIMIT_MAGNITUDE);
 		appPanel.txtBoxDsoLimitMagnitude.setTitle(msg.tabFiltersLimitMagnitudeDso());
 		appPanel.txtBoxDsoLimitMagnitude.setWidth("100px");
@@ -336,6 +342,15 @@ public class ApplicationBoard extends SplitLayoutPanel {
 		appPanel.dsoLimitMagnitudePanel.add(appPanel.btIncreaseDsoLimitMagnitude);
 		appPanel.dsoLimitMagnitudePanel.add(appPanel.btDecreaseDsoLimitMagnitude);
 		appPanel.filterPanel.add(appPanel.dsoLimitMagnitudePanel);
+
+		appPanel.chkDsoInMessierCatalog.addValueChangeHandler(new UpdateMapEventHandler(source));
+		appPanel.filterPanel.add(appPanel.chkDsoInMessierCatalog);
+		appPanel.chkDsoInBestNgcCatalog.addValueChangeHandler(new UpdateMapEventHandler(source));
+		appPanel.filterPanel.add(appPanel.chkDsoInBestNgcCatalog);
+		appPanel.chkDsoInCaldwellCatalog.addValueChangeHandler(new UpdateMapEventHandler(source));
+		appPanel.filterPanel.add(appPanel.chkDsoInCaldwellCatalog);
+		appPanel.chkDsoInHerschelCatalog.addValueChangeHandler(new UpdateMapEventHandler(source));
+		appPanel.filterPanel.add(appPanel.chkDsoInHerschelCatalog);
 
 		// We add the filter panel to configuration panel.
 		appPanel.configurationPanel.add(appPanel.filterPanel, new Label(msg.tabFiltersTitle()), 28);
@@ -413,6 +428,10 @@ public class ApplicationBoard extends SplitLayoutPanel {
 		options.setFindSupernovaRemnant(chkDisplaySupernovaRemnants.getValue());
 		options.setFindQuasars(chkDisplayQuasars.getValue());
 		options.setDsoSubtypeRestriction(txtDsoSubtypeRestriction.getValue());
+		options.setDsoInMessierCatalog(chkDsoInMessierCatalog.getValue());
+		options.setDsoInBestNgcCatalog(chkDsoInBestNgcCatalog.getValue());
+		options.setDsoInCaldwellCatalog(chkDsoInCaldwellCatalog.getValue());
+		options.setDsoInHerschelCatalog(chkDsoInHerschelCatalog.getValue());
 		Observer observer = application.initializeObserver();
 		options.setObserverCurrentDateAsString(txtObserverDate.getText());
 		options.setObserverCurrentTimeAsString(txtObserverLocalTime.getText());

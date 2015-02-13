@@ -1,10 +1,13 @@
 package com.nzv.gwt.dsocatalog.service.impl;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.hibernate.mapping.Array;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
@@ -164,20 +167,22 @@ public class PublicCatalogServiceImpl implements PublicCatalogService {
 			searchedTypes.add(DsoType.QUASR);
 		}
 		if (!searchedTypes.isEmpty()) {
+			List<DeepSkyObject> dsos = new ArrayList<DeepSkyObject>();
+			
 			if (constellation != null) {
 				if (options.getDsoSubtypeRestriction().isEmpty()) {
-					result.addAll(dsoRepository
+					dsos.addAll(dsoRepository
 							.findDistinctByConstellationAndMagnitudeLessThanEqualAndTypeInOrderByMagnitudeAsc(
 									constellation, options.getDsoLimitMagnitude(),
 									searchedTypes));
 				} else {
 					if (options.getDsoSubtypeRestriction().indexOf("*") != -1) {
-						result.addAll(dsoRepository
+						dsos.addAll(dsoRepository
 								.findDistinctByConstellationAndMagnitudeLessThanEqualAndTypeInAndClasstypeContainingOrderByMagnitudeAsc(
 										constellation, options.getDsoLimitMagnitude(),searchedTypes,
 										options.getDsoSubtypeRestriction().replace("*", "")));
 					} else {
-						result.addAll(dsoRepository
+						dsos.addAll(dsoRepository
 								.findDistinctByConstellationAndMagnitudeLessThanEqualAndTypeInAndClasstypeEqualsOrderByMagnitudeAsc(
 										constellation, options.getDsoLimitMagnitude(),searchedTypes,
 										options.getDsoSubtypeRestriction()));
@@ -186,21 +191,67 @@ public class PublicCatalogServiceImpl implements PublicCatalogService {
 				}
 			} else {
 				if (options.getDsoSubtypeRestriction().isEmpty()) {
-					result.addAll(dsoRepository
+					dsos.addAll(dsoRepository
 							.findDistinctByMagnitudeLessThanEqualAndTypeInOrderByMagnitudeAsc(
 									options.getDsoLimitMagnitude(), searchedTypes));
 				} else {
 					if (options.getDsoSubtypeRestriction().indexOf("*") != -1) {
-						result.addAll(dsoRepository
+						dsos.addAll(dsoRepository
 								.findDistinctByMagnitudeLessThanEqualAndTypeInAndClasstypeContainingOrderByMagnitudeAsc(
 										options.getDsoLimitMagnitude(), searchedTypes, options.getDsoSubtypeRestriction().replace("*", "")));
 					} else {
-						result.addAll(dsoRepository
+						dsos.addAll(dsoRepository
 								.findDistinctByMagnitudeLessThanEqualAndTypeInAndClasstypeEqualsOrderByMagnitudeAsc(
 										options.getDsoLimitMagnitude(), searchedTypes, options.getDsoSubtypeRestriction()));
 					}
 				}
 			}
+			// Filtering by catalog...
+			if (options.isDsoInMessierCatalog()) {
+				List<DeepSkyObject> tmp = new ArrayList<DeepSkyObject>();
+				for (DeepSkyObject dso : dsos) {
+					if (dso.getInCatalogs().contains("M")) {
+						tmp.add(dso);
+					}
+				}
+				dsos.clear();
+				dsos.addAll(tmp);
+				tmp = null;
+			}
+			if (options.isDsoInBestNgcCatalog()) {
+				List<DeepSkyObject> tmp = new ArrayList<DeepSkyObject>();
+				for (DeepSkyObject dso : dsos) {
+					if (dso.getInCatalogs().contains("N")) {
+						tmp.add(dso);
+					}
+				}
+				dsos.clear();
+				dsos.addAll(tmp);
+				tmp = null;
+			}
+			if (options.isDsoInCaldwellCatalog()) {
+				List<DeepSkyObject> tmp = new ArrayList<DeepSkyObject>();
+				for (DeepSkyObject dso : dsos) {
+					if (dso.getInCatalogs().contains("C")) {
+						tmp.add(dso);
+					}
+				}
+				dsos.clear();
+				dsos.addAll(tmp);
+				tmp = null;
+			}
+			if (options.isDsoInHerschelCatalog()) {
+				List<DeepSkyObject> tmp = new ArrayList<DeepSkyObject>();
+				for (DeepSkyObject dso : dsos) {
+					if (dso.getInCatalogs().contains("H")) {
+						tmp.add(dso);
+					}
+				}
+				dsos.clear();
+				dsos.addAll(tmp);
+				tmp = null;
+			}
+			result.addAll(dsos);
 		}
 		long tEnd = System.currentTimeMillis();
 		logger.info("Found " + result.size() + " matching AstroObject(s) in "
@@ -275,7 +326,6 @@ public class PublicCatalogServiceImpl implements PublicCatalogService {
 		PlanetData planetaryEngine = new PlanetData();
 		ObsInfo observatory = new ObsInfo(new Latitude(options.getObservatoryLatitude()), new Longitude(options.getObservatoryLongitude()));
 		
-		// TODO : compute the Julian day based on the observer configuration...
 		String[] date = options.getObserverCurrentDateAsString().split("/");
 		int j = Integer.valueOf(date[0]);
 		int m = Integer.valueOf(date[1]);

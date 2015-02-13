@@ -45,7 +45,6 @@ public class UpdateDssImageHandler implements ChangeHandler {
 			url.append("&height=500"); // Height=500px
 			url.append("&query="); // Unknown parameter
 			url.append("&Label=on"); // Label
-			// TODO : Calculate the scale to match the dimension of the object the best manner...
 			double scale = ((double)(widthInArcmin) * 60) / 500;
 			url.append("&scale="+scale);
 			if (choosedSurvey.endsWith("_inverted")) {
