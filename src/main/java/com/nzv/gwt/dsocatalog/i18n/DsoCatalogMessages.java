@@ -12,6 +12,9 @@ public interface DsoCatalogMessages extends Constants {
 	String commonLanguageEnglish();
 	String commonLanguageSpanish();
 	String commonLanguageRussian();
+	String commonLanguageArab();
+	String commonLanguageHindi();
+	String commonLanguageChinese();
 	String commonNorth();
 	String commonEast();
 	String commonSouth();

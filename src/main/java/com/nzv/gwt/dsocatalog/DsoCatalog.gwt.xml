@@ -25,4 +25,7 @@
     <extend-property name="locale" values="en"/>
     <extend-property name="locale" values="es"/>
     <extend-property name="locale" values="ru"/>
+<!--     <extend-property name="locale" values="ar"/> -->
+<!--     <extend-property name="locale" values="hi"/> -->
+<!--     <extend-property name="locale" values="zh"/> -->
 </module>

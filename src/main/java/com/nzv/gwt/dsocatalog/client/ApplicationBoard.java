@@ -4,6 +4,7 @@ import java.util.Date;
 
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.dom.client.Style.Unit;
+import com.google.gwt.i18n.client.HasDirection;
 import com.google.gwt.i18n.shared.DateTimeFormat;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.CheckBox;
@@ -159,6 +160,9 @@ public class ApplicationBoard extends SplitLayoutPanel {
 		appPanel.liObserverLanguage.addItem(msg.commonLanguageSpanish(), "es");
 		appPanel.liObserverLanguage.addItem(msg.commonLanguageFrench(), "fr");
 		appPanel.liObserverLanguage.addItem(msg.commonLanguageRussian(), "ru");
+		appPanel.liObserverLanguage.addItem(msg.commonLanguageArab(), HasDirection.Direction.RTL, "ar");
+		appPanel.liObserverLanguage.addItem(msg.commonLanguageHindi(), "hi");
+		appPanel.liObserverLanguage.addItem(msg.commonLanguageChinese(), "zh");
 		if ("en".equals(currentLocale)) {
 			appPanel.liObserverLanguage.setSelectedIndex(0);
 		} else if ("es".equals(currentLocale)) {
@@ -167,6 +171,12 @@ public class ApplicationBoard extends SplitLayoutPanel {
 			appPanel.liObserverLanguage.setSelectedIndex(2);
 		} else if ("ru".equals(currentLocale)) {
 			appPanel.liObserverLanguage.setSelectedIndex(3);
+//		} else if ("ar".equals(currentLocale)) {
+//			appPanel.liObserverLanguage.setSelectedIndex(4);
+//		} else if ("hi".equals(currentLocale)) {
+//			appPanel.liObserverLanguage.setSelectedIndex(5);
+//		} else if ("zh".equals(currentLocale)) {
+//			appPanel.liObserverLanguage.setSelectedIndex(6);
 		}
 		appPanel.liObserverLanguage.addChangeHandler(
 			new UserLanguageUpdater(appPanel.liObserverLanguage, appPanel.hiddenObserverCurrentLanguage));
