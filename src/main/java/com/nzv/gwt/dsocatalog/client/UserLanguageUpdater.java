@@ -28,7 +28,6 @@ public class UserLanguageUpdater implements ChangeHandler {
 
 	@Override
 	public void onChange(ChangeEvent event) {
-		Window.alert("Changement de langue vers "+guiComponent.getValue(guiComponent.getSelectedIndex()));
 		if (Window.confirm(msg.tabObserverLanguageConfirmChange())) {
 			String desiredLocaleCode = guiComponent.getValue(guiComponent.getSelectedIndex());
 			currentLocaleHandler.setValue(desiredLocaleCode);

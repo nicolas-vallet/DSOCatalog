@@ -31,6 +31,8 @@ public class ApplicationBoard extends SplitLayoutPanel {
 	
 	private static DsoCatalogMessages msg = GWT.create(DsoCatalogMessages.class);
 	
+	private static boolean showAltAzProjectionOption = false;
+	
 	public ListBox getLiConstellations() {
 		return liConstellations;
 	}
@@ -93,7 +95,8 @@ public class ApplicationBoard extends SplitLayoutPanel {
 	CheckBox chkDisplayGalacticPlan = new CheckBox(msg.tabProjectionDisplayGalacticPlan());
 	VerticalPanel projectionPanel = new VerticalPanel();
 
-	Label lbObserverLanguage = new Label(msg.tabObserverLanguage());
+	HorizontalPanel languagePanel = new HorizontalPanel();
+	Label lbObserverLanguage = new Label(" "+msg.tabObserverLanguage()+" : ");
 	ListBox liObserverLanguage = new ListBox();
 	Hidden hiddenObserverCurrentLanguage = new Hidden();
 	Label lbObserverLatitude = new Label(msg.tabObserverLatitude());
@@ -122,7 +125,8 @@ public class ApplicationBoard extends SplitLayoutPanel {
 	Label systemMessage = new Label("");
 
 	StackLayoutPanel configurationPanel = new StackLayoutPanel(Unit.PX);
-	VerticalPanel leftPanel = new VerticalPanel();
+	VerticalPanel leftSubPanel = new VerticalPanel();
+	SplitLayoutPanel leftPanel = new SplitLayoutPanel(0);
 	VerticalPanel centerPanel = new VerticalPanel();
 	TabLayoutPanel southPanel = new TabLayoutPanel(25, Unit.PX);
 	
@@ -135,39 +139,8 @@ public class ApplicationBoard extends SplitLayoutPanel {
 		
 		appPanel.application = source;
 		
-		// We set the size of the stack panel.
-		appPanel.configurationPanel.setPixelSize(LEFT_PANEL_WIDTH, LEFT_PANEL_HEIGHT);
-		
-		// We add the coordinates panel.
-		appPanel.projectionPanel.setSize("270px", "30px");
-		appPanel.projectionPanel.add(appPanel.lbCoordinatesMode);
-		appPanel.liCoordinatesMode.addItem(msg.tabProjectionCoordinatesSystemEQ(), ""+CoordinatesSystem.EQ);
-		appPanel.liCoordinatesMode.addItem(msg.tabProjectionCoordinatesSystemECL(), ""+CoordinatesSystem.ECL);
-		appPanel.liCoordinatesMode.addItem(msg.tabProjectionCoordinatesSystemGAL(), ""+CoordinatesSystem.GAL);
-		appPanel.liCoordinatesMode.addItem(msg.tabProjectionCoordinatesSystemALTAZ(), ""+CoordinatesSystem.ALTAZ);
-		appPanel.liCoordinatesMode.addChangeHandler(new UpdateMapEventHandler(source));
-		appPanel.liCoordinatesMode.addChangeHandler(new GoogleAnalyticsEventProjectionAware(appPanel.liCoordinatesMode));
-		
-		appPanel.projectionPanel.add(appPanel.liCoordinatesMode);
-		appPanel.chkShowObjectsUnderHorizon.addClickHandler(new UpdateMapEventHandler(source));
-		appPanel.projectionPanel.add(appPanel.chkShowObjectsUnderHorizon);
-		appPanel.chkDisplayEcliptic.addClickHandler(new UpdateMapEventHandler(source));
-		appPanel.chkDisplayEcliptic.addValueChangeHandler(new GoogleAnalyticsEventFilterAware("Ecliptic"));
-		appPanel.projectionPanel.add(appPanel.chkDisplayEcliptic);
-		appPanel.chkDisplayEquator.addClickHandler(new UpdateMapEventHandler(source));
-		appPanel.chkDisplayEquator.addValueChangeHandler(new GoogleAnalyticsEventFilterAware("Equator"));
-		appPanel.projectionPanel.add(appPanel.chkDisplayEquator);
-		appPanel.chkDisplayGalacticPlan.addClickHandler(new UpdateMapEventHandler(source));
-		appPanel.chkDisplayGalacticPlan.addValueChangeHandler(new GoogleAnalyticsEventFilterAware("Galactic plan"));
-		appPanel.projectionPanel.add(appPanel.chkDisplayGalacticPlan);
-
-		// We add the coordinates panel to configuration panel.
-		appPanel.configurationPanel.add(appPanel.projectionPanel, new Label(msg.tabProjectionTitle()), 28);
-		
-		// We add the observer panel.
-		appPanel.observerPanel.setSize("270px", "250px");
 		// Language selection
-		appPanel.observerPanel.add(appPanel.lbObserverLanguage);
+		appPanel.languagePanel.add(appPanel.lbObserverLanguage);
 		String currentLocale = "fr";
 		{
 			String pLocale = Window.Location.getParameter("locale");
@@ -191,7 +164,43 @@ public class ApplicationBoard extends SplitLayoutPanel {
 		}
 		appPanel.liObserverLanguage.addChangeHandler(
 			new UserLanguageUpdater(appPanel.liObserverLanguage, appPanel.hiddenObserverCurrentLanguage));
-		appPanel.observerPanel.add(appPanel.liObserverLanguage);
+		appPanel.languagePanel.add(appPanel.liObserverLanguage);
+		
+		// We set the size of the stack panel.
+		appPanel.configurationPanel.setPixelSize(LEFT_PANEL_WIDTH, LEFT_PANEL_HEIGHT);
+		
+		// We add the coordinates panel.
+		appPanel.projectionPanel.setSize("270px", "30px");
+		appPanel.projectionPanel.add(appPanel.lbCoordinatesMode);
+		appPanel.liCoordinatesMode.addItem(msg.tabProjectionCoordinatesSystemEQ(), ""+CoordinatesSystem.EQ);
+		appPanel.liCoordinatesMode.addItem(msg.tabProjectionCoordinatesSystemECL(), ""+CoordinatesSystem.ECL);
+		appPanel.liCoordinatesMode.addItem(msg.tabProjectionCoordinatesSystemGAL(), ""+CoordinatesSystem.GAL);
+		if (showAltAzProjectionOption) {
+			appPanel.liCoordinatesMode.addItem(msg.tabProjectionCoordinatesSystemALTAZ(), ""+CoordinatesSystem.ALTAZ);
+		}
+		appPanel.liCoordinatesMode.addChangeHandler(new UpdateMapEventHandler(source));
+		appPanel.liCoordinatesMode.addChangeHandler(new GoogleAnalyticsEventProjectionAware(appPanel.liCoordinatesMode));
+		appPanel.projectionPanel.add(appPanel.liCoordinatesMode);
+		
+		if (showAltAzProjectionOption) {
+			appPanel.chkShowObjectsUnderHorizon.addClickHandler(new UpdateMapEventHandler(source));
+			appPanel.projectionPanel.add(appPanel.chkShowObjectsUnderHorizon);
+		}
+		appPanel.chkDisplayEcliptic.addClickHandler(new UpdateMapEventHandler(source));
+		appPanel.chkDisplayEcliptic.addValueChangeHandler(new GoogleAnalyticsEventFilterAware("Ecliptic"));
+		appPanel.projectionPanel.add(appPanel.chkDisplayEcliptic);
+		appPanel.chkDisplayEquator.addClickHandler(new UpdateMapEventHandler(source));
+		appPanel.chkDisplayEquator.addValueChangeHandler(new GoogleAnalyticsEventFilterAware("Equator"));
+		appPanel.projectionPanel.add(appPanel.chkDisplayEquator);
+		appPanel.chkDisplayGalacticPlan.addClickHandler(new UpdateMapEventHandler(source));
+		appPanel.chkDisplayGalacticPlan.addValueChangeHandler(new GoogleAnalyticsEventFilterAware("Galactic plan"));
+		appPanel.projectionPanel.add(appPanel.chkDisplayGalacticPlan);
+
+		// We add the coordinates panel to configuration panel.
+		appPanel.configurationPanel.add(appPanel.projectionPanel, new Label(msg.tabProjectionTitle()), 28);
+		
+		// We add the observer panel.
+		appPanel.observerPanel.setSize("270px", "250px");
 		appPanel.observerPanel.add(appPanel.lbObserverLatitude);
 		appPanel.txtObserverLatitude.setText("48.833");
 		appPanel.observerPanel.add(appPanel.txtObserverLatitude);
@@ -332,11 +341,11 @@ public class ApplicationBoard extends SplitLayoutPanel {
 		appPanel.configurationPanel.add(appPanel.filterPanel, new Label(msg.tabFiltersTitle()), 28);
 		appPanel.configurationPanel.showWidget(appPanel.filterPanel);
 		
-		appPanel.leftPanel.add(appPanel.configurationPanel);
+		appPanel.leftSubPanel.add(appPanel.configurationPanel);
 
 		// We set the button which will trigger the map's display.
 		appPanel.btUpdateMap.addClickHandler(new UpdateMapEventHandler(source));
-		appPanel.leftPanel.add(appPanel.btUpdateMap);
+		appPanel.leftSubPanel.add(appPanel.btUpdateMap);
 		
 		// We put a label that will be used to give feedback to the user.
 		appPanel.centerPanel.add(appPanel.systemMessage);
@@ -345,6 +354,8 @@ public class ApplicationBoard extends SplitLayoutPanel {
 		appPanel.centerPanel.add(appPanel.visualizationPanel);
 		
 		// We place the left and the right panels in the main one.
+		appPanel.leftPanel.addSouth(appPanel.languagePanel, 30);
+		appPanel.leftPanel.add(appPanel.leftSubPanel);
 		appPanel.addWest(appPanel.leftPanel, LEFT_PANEL_WIDTH);
 		appPanel.addSouth(appPanel.southPanel, SOUTH_PANEL_HEIGHT);
 		appPanel.add(appPanel.centerPanel);

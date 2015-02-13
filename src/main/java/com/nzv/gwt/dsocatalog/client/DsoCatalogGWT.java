@@ -7,9 +7,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.dom4j.dtd.ElementDecl;
+
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.shared.GWT;
+import com.google.gwt.dom.client.Document;
+import com.google.gwt.dom.client.Element;
+import com.google.gwt.dom.client.MetaElement;
+import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -100,6 +106,20 @@ public class DsoCatalogGWT implements EntryPoint {
 	
 	@Override
 	public void onModuleLoad() {
+		// Set up the title and meta tags
+		Window.setTitle(msg.metaTitle());
+		NodeList<Element> metaTags = Document.get().getElementsByTagName("meta");
+	    for (int i = 0; i < metaTags.getLength(); i++) {
+	        MetaElement metaTag = ((MetaElement) metaTags.getItem(i));
+	        if ("description".equals(metaTag.getName())) {
+	            metaTag.setContent(msg.metaDescription());
+	            continue;
+	        }
+	        if ("keywords".equals(metaTag.getName())) {
+	        	metaTag.setContent(msg.metaKeywords());
+	        	continue;
+	        }
+	    }
 		
 		// We load the list of constellation.
 		catalogService.findAllConstellations(new AsyncCallback<List<Constellation>>() {

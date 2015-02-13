@@ -3,6 +3,9 @@ package com.nzv.gwt.dsocatalog.i18n;
 import com.google.gwt.i18n.client.Constants;
 
 public interface DsoCatalogMessages extends Constants {
+	String metaTitle();
+	String metaDescription();
+	String metaKeywords();
 	String commonYes();
 	String commonNo();
 	String commonLanguageFrench();
